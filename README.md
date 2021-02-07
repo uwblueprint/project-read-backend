@@ -1,6 +1,8 @@
-# project-read-backend
+# Project READ backend
 
-# Setup
+## Setup
+
+### Run the code
 
 1. Clone the repo
 2. Run `docker-compose up -d` in the project directory
@@ -8,6 +10,12 @@
 4. Go to `localhost:8000` to make sure everything works
 
 When you're done, run `docker-compose down` to stop the containers.
+
+### Open the Django admin
+
+1. Open a shell with `docker-compose run web bash`
+2. Create a superuser with `python manage.py createsuperuser`
+3. Open `localhost:8080/admin` and log in
 
 ## Installing new packages
 
