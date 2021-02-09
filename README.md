@@ -37,3 +37,12 @@ When you're done, run `docker-compose down` to stop the containers.
 docker-compose run web bash
 black .
 ```
+
+## Updating Secrets
+
+1. Set up your local vault client by following the sections **Install the Vault Client** and **Point to our Vault server** in these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#86337406f266493d990911901480f435)
+2. Edit secrets in `./projectread/.env`
+3. Update secrets by running
+    ```bash
+    vault kv get -format=json kv/project-read | python update_secret_files.py
+    ```
