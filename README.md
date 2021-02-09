@@ -6,7 +6,11 @@
 
 1. Clone the repo
 2. Run `docker-compose up -d` in the project directory
-3. Copy `.env.example` as `.env` in `projectread/` and add the environment variables
+3. Copy `.env.example` as `.env` in `projectread/`
+4. Pull secrets into .env by running
+    ```bash
+    vault kv get -format=json kv/project-read | python update_secret_files.py
+    ```
 4. Go to `localhost:8000` to make sure everything works
 
 When you're done, run `docker-compose down` to stop the containers.
@@ -41,8 +45,7 @@ black .
 ## Updating Secrets
 
 1. Set up your local vault client by following the sections **Install the Vault Client** and **Point to our Vault server** in these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#86337406f266493d990911901480f435)
-2. Edit secrets in `./projectread/.env`
-3. Update secrets by running
+3. Update your local secrets by running
     ```bash
     vault kv get -format=json kv/project-read | python update_secret_files.py
     ```
