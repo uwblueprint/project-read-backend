@@ -11,8 +11,7 @@ class FamilyAdmin(admin.ModelAdmin):
         "address",
     )
     ordering = (
-        "id",
-        "-created_at",
+        "-id",
     )
     search_fields = (
         "email",
