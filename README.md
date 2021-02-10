@@ -7,7 +7,7 @@
 1. Clone the repo
 2. Run `docker-compose up -d` in the project directory
 3. Copy `.env.example` as `.env` in `projectread/`
-4. Follow these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#a93b3e62a9a2459fa4990bf68b3dbc49) to set up with vault. 
+4. Follow these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#a93b3e62a9a2459fa4990bf68b3dbc49) to set up with vault.  
     Notes on setup:
     - Ignore the section *Create a GitHub team* since we already have a team set up
     - For the section *Configure dev tools for your project repo*, setup.sh exists in /scripts, so make sure to run ./scripts/setup.sh instead of ./setup.sh
