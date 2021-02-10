@@ -7,14 +7,14 @@
 1. Clone the repo
 2. Run `docker-compose up -d` in the project directory
 3. Copy `.env.example` as `.env` in `projectread/` and add the environment variables
-34. Go to `localhost:8000` to make sure everything works
+4. Go to `localhost:8000` to make sure everything works
 
 When you're done, run `docker-compose down` to stop the containers.
 
 ### Open the Django admin
 
 1. Create a superuser with `docker-compose exec web ./manage.py createsuperuser`
-3. Open `localhost:8080/admin` and log in
+2. Open `localhost:8080/admin` and log in
 
 ## Installing new packages
 
