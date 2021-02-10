@@ -10,9 +10,7 @@ class FamilyAdmin(admin.ModelAdmin):
         "phone_number",
         "address",
     )
-    ordering = (
-        "-id",
-    )
+    ordering = ("-id",)
     search_fields = (
         "email",
         "phone_number",
