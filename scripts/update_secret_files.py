@@ -4,7 +4,7 @@ import json
 # Open secret.config file
 configFileNotFound = False
 try:
-    configFile = open("secret.config")
+    configFile = open("./secret.config")
 except Exception as e:
     print("File secret.config could not be opened in current directory.")
     print(e)
