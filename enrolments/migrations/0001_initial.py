@@ -7,16 +7,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Session',
+            name="Session",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('season', models.CharField(choices=[('Spring', 'Spring'), ('Summer', 'Summer'), ('Fall', 'Fall')], max_length=6)),
-                ('year', models.PositiveSmallIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "season",
+                    models.CharField(
+                        choices=[
+                            ("Spring", "Spring"),
+                            ("Summer", "Summer"),
+                            ("Fall", "Fall"),
+                        ],
+                        max_length=6,
+                    ),
+                ),
+                ("year", models.PositiveSmallIntegerField()),
             ],
         ),
     ]

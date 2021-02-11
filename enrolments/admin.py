@@ -4,6 +4,7 @@ from .models import Session
 
 # Register your models here.
 
+
 class SessionAdmin(admin.ModelAdmin):
     list_display = (
         "id",
@@ -18,7 +19,10 @@ class SessionAdmin(admin.ModelAdmin):
         "season",
         "year",
     )
-    list_filter = ("season","year",)
+    list_filter = (
+        "season",
+        "year",
+    )
 
 
 admin.site.register(Session, SessionAdmin)
