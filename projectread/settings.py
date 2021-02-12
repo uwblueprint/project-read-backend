@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts.apps.AccountsConfig",
     "enrolments.apps.EnrolmentsConfig",
+    "registration.apps.RegistrationConfig",
 ]
 
 MIDDLEWARE = [
