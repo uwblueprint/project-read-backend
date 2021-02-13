@@ -6,8 +6,16 @@
 
 1. Clone the repo
 2. Run `docker-compose up -d` in the project directory
-3. Copy `.env.example` as `.env` in `projectread/` and add the environment variables
-4. Go to `localhost:8000` to make sure everything works
+3. Copy `.env.example` as `.env` in `projectread/`
+4. Follow these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#a93b3e62a9a2459fa4990bf68b3dbc49) to set up with vault.  
+    Notes on setup:
+    - Ignore the section *Create a GitHub team* since we already have a team set up
+    - For the section *Configure dev tools for your project repo*, setup.sh exists in /scripts, so make sure to run ./scripts/setup.sh instead of ./setup.sh
+5. Pull secrets into `.env` by running
+    ```bash
+    vault kv get -format=json kv/project-read | python ./scripts/update_secret_files.py
+    ```
+6. Go to `localhost:8000` to make sure everything works
 
 When you're done, run `docker-compose down` to stop the containers.
 
@@ -37,3 +45,8 @@ When you're done, run `docker-compose down` to stop the containers.
 docker-compose run web bash
 black .
 ```
+
+## Updating Secrets
+
+- Set up your local vault client by following the sections **Install the Vault Client** and **Point to our Vault server** in these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#86337406f266493d990911901480f435)
+- Secrets User Guide [here](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#d6b60b9cd5694ffbb2dbb265d03048ce)

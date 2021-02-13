@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "accounts.apps.AccountsConfig",
+    "enrolments.apps.EnrolmentsConfig",
+    "registration.apps.RegistrationConfig",
 ]
 
 MIDDLEWARE = [
