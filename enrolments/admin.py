@@ -38,3 +38,16 @@ class ClassAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Class, ClassAdmin)
+from .models import Enrolment
+
+
+class EnrolmentAdmin(admin.ModelAdmin):
+    # add class once model is created
+    list_display = ("id", "family")
+
+    ordering = ("-id",)
+
+    search_fields = ("family",)
+
+
+admin.site.register(Enrolment, EnrolmentAdmin)
