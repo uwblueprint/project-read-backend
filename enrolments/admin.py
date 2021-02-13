@@ -8,8 +8,8 @@ class ClassAdmin(admin.ModelAdmin):
         "id",
         "name",
     )
-    ordering = "-id"
-    search_fields = "name"
+    ordering = ("-id",)
+    search_fields = ("name",)
 
 
-admin.site.register(Family, FamilyAdmin)
+admin.site.register(Class, ClassAdmin)
