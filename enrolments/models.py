@@ -1,7 +1,5 @@
 from django.db import models
 
-# Create your models here.
-
 class Session(models.Model):
     SPRING = "Spring"
     SUMMER = "Summer"
@@ -38,8 +36,9 @@ class Class(models.Model):
         return self.name
 
 class Enrolment(models.Model):
+    active = models.BooleanField()
     family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
-    # class = models.ForeignKey()
+    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
