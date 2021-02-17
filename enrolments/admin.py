@@ -4,7 +4,6 @@ from .models import Session
 
 # Register your models here.
 
-
 class SessionAdmin(admin.ModelAdmin):
     list_display = (
         "id",
@@ -26,7 +25,6 @@ class SessionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Session, SessionAdmin)
-
 
 class ClassAdmin(admin.ModelAdmin):
     list_display = (

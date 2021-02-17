@@ -2,7 +2,6 @@ from django.db import models
 
 # Create your models here.
 
-
 class Session(models.Model):
     SPRING = "Spring"
     SUMMER = "Summer"
@@ -27,3 +26,4 @@ class Class(models.Model):
 
     def __str__(self):
         return self.name
+

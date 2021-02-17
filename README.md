@@ -47,6 +47,4 @@ black .
 ```
 
 ## Updating Secrets
-
-- Set up your local vault client by following the sections **Install the Vault Client** and **Point to our Vault server** in these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#86337406f266493d990911901480f435)
-- Secrets User Guide [here](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#d6b60b9cd5694ffbb2dbb265d03048ce)
+If you have not set up secrets management, please refer to steps 4 and 5 in the *Run the code* section of this README.
