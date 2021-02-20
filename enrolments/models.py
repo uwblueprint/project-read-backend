@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Session(models.Model):
     SPRING = "Spring"
     SUMMER = "Summer"
@@ -34,6 +35,7 @@ class Class(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Enrolment(models.Model):
     active = models.BooleanField()

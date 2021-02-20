@@ -8,32 +8,70 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0001_initial'),
+        ("registration", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('enrolments', '0002_session'),
+        ("enrolments", "0002_session"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='class',
-            name='facilitator',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="class",
+            name="facilitator",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='class',
-            name='session',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='enrolments.session'),
+            model_name="class",
+            name="session",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="enrolments.session",
+            ),
         ),
         migrations.CreateModel(
-            name='Enrolment',
+            name="Enrolment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('active', models.BooleanField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('enrolled_class', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='enrolments.class')),
-                ('family', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='registration.family')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("active", models.BooleanField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "enrolled_class",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="enrolments.class",
+                    ),
+                ),
+                (
+                    "family",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="registration.family",
+                    ),
+                ),
             ],
         ),
     ]
