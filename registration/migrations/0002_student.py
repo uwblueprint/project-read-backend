@@ -7,24 +7,50 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0001_initial'),
+        ("registration", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Student',
+            name="Student",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=128)),
-                ('last_name', models.CharField(max_length=128)),
-                ('attendee_type', models.CharField(choices=[('Parent', 'Parent'), ('Child', 'Child'), ('Guest', 'Guest')], max_length=6)),
-                ('information', models.JSONField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('family', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='registration.family')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=128)),
+                ("last_name", models.CharField(max_length=128)),
+                (
+                    "attendee_type",
+                    models.CharField(
+                        choices=[
+                            ("Parent", "Parent"),
+                            ("Child", "Child"),
+                            ("Guest", "Guest"),
+                        ],
+                        max_length=6,
+                    ),
+                ),
+                ("information", models.JSONField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "family",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="registration.family",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'students',
+                "verbose_name_plural": "students",
             },
         ),
     ]
