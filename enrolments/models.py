@@ -22,8 +22,18 @@ class Session(models.Model):
 
 class Class(models.Model):
     name = models.CharField(max_length=128)
-    # session = models.ForeignKey()
-    # facilitator = models.ForeignKey()
+    session = models.ForeignKey(
+        "Session",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    facilitator = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
