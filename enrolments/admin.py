@@ -7,6 +7,7 @@ class SessionAdmin(admin.ModelAdmin):
         "id",
         "season",
         "year",
+        "attendance",
     )
     ordering = (
         "id",
