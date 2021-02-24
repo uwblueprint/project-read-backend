@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import Class
-from .models import Session
-
-# Register your models here.
+from .models import Class, Session, Enrolment
 
 
 class SessionAdmin(admin.ModelAdmin):
@@ -25,9 +22,6 @@ class SessionAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(Session, SessionAdmin)
-
-
 class ClassAdmin(admin.ModelAdmin):
     list_display = (
         "id",
@@ -37,4 +31,14 @@ class ClassAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+class EnrolmentAdmin(admin.ModelAdmin):
+    list_display = ("id", "family", "created_at", "updated_at", "enrolled_class")
+
+    ordering = ("-id",)
+
+    search_fields = ("family__id", "family__email", "enrolled_class__name")
+
+
+admin.site.register(Session, SessionAdmin)
 admin.site.register(Class, ClassAdmin)
+admin.site.register(Enrolment, EnrolmentAdmin)
