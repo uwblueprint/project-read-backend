@@ -20,3 +20,33 @@ class Family(models.Model):
 
     class Meta:
         verbose_name_plural = "families"
+
+
+class Student(models.Model):
+    PARENT = "Parent"
+    CHILD = "Child"
+    GUEST = "Guest"
+    ATTENDEE_CHOICES = [
+        (PARENT, "Parent"),
+        (CHILD, "Child"),
+        (GUEST, "Guest"),
+    ]
+
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    attendee_type = models.CharField(max_length=6, choices=ATTENDEE_CHOICES)
+    family = models.ForeignKey(
+        "Family",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    information = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        verbose_name_plural = "students"
