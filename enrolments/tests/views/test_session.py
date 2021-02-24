@@ -14,7 +14,7 @@ class SessionTestCase(APITestCase):
         self.session_2 = Session.objects.create(season=Session.SUMMER, year=2021)
 
     def test_get_all_sessions(self):
-        url = reverse("session-list")
+        url = reverse("sessions-list")
         self.client.force_login(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -29,7 +29,7 @@ class SessionTestCase(APITestCase):
         )
 
     def test_get_session(self):
-        url = reverse("session-detail", args=[self.session_1.id])
+        url = reverse("sessions-detail", args=[self.session_1.id])
         self.client.force_login(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -38,7 +38,7 @@ class SessionTestCase(APITestCase):
         self.assertEqual(payload, SessionSerializer(self.session_1).data)
 
     def test_method_not_allowed(self):
-        url = reverse("session-detail", args=[self.session_1.id])
+        url = reverse("sessions-detail", args=[self.session_1.id])
         self.client.force_login(self.user)
 
         response = self.client.put(url)
@@ -51,7 +51,7 @@ class SessionTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
-        url = reverse("session-list")
+        url = reverse("sessions-list")
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -59,7 +59,7 @@ class SessionTestCase(APITestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        url = reverse("session-detail", args=[self.session_1.id])
+        url = reverse("sessions-detail", args=[self.session_1.id])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
