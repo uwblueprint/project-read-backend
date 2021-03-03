@@ -41,9 +41,9 @@ class SessionTestCase(APITestCase):
         self.assertEqual(payload, SessionSerializer(self.session_1).data)
         
     def test_get_session_1_classes(self):
-        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes'
+        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes/'
         self.client.force_login(self.user)
-        response = self.client.get(url, content_type='application/json')
+        response = self.client.get(url)
         payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -55,52 +55,44 @@ class SessionTestCase(APITestCase):
             ],
         )
 
-    # def test_get_session_2_classes(self):
-    #     url = reverse("sessions-detail", args=[self.session_2.id]) + 'classes'
-    #     self.client.force_login(self.user)
-    #     response = self.client.get(url)
-    #     payload = response.json()
+    def test_get_session_2_classes(self):
+        url = reverse("sessions-detail", args=[self.session_2.id]) + 'classes/'
+        self.client.force_login(self.user)
+        response = self.client.get(url)
+        payload = response.json()
 
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(
-    #         payload,
-    #         [
-    #             SessionSerializer(self.class_3).data,
-    #         ],
-    #     )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            payload,
+            [
+                ClassListSerializer(self.class_3).data,
+            ],
+        )
 
-    # def test_method_not_allowed(self):
-    #     url = reverse("session-detail", args=[self.session_1.id])
-    #     self.client.force_login(self.user)
+    def test_method_not_allowed(self):
+        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes/'
+        self.client.force_login(self.user)
 
-    #     response = self.client.put(url)
-    #     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    #     response = self.client.patch(url)
-    #     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    #     response = self.client.delete(url)
-    #     self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # def test_unauthorized(self):
-    #     url = reverse("session-list")
+    def test_unauthorized(self):
+        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes/'
 
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    #     response = self.client.post(url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    #     url = reverse("session-detail", args=[self.session_1.id])
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    #     response = self.client.put(url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    #     response = self.client.patch(url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    #     response = self.client.delete(url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
