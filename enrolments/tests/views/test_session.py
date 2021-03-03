@@ -11,7 +11,7 @@ class SessionTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
         self.session1 = Session.objects.create(season=Session.SPRING, year=2021)
-        self.session2= Session.objects.create(season=Session.SUMMER, year=2021)
+        self.session2 = Session.objects.create(season=Session.SUMMER, year=2021)
 
     def test_get_all_sessions(self):
         url = reverse("sessions-list")
