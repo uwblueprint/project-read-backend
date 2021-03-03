@@ -37,6 +37,12 @@ class SessionTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(payload, SessionSerializer(self.session_1).data)
 
+    def test_post_session(self):
+         url = reverse("sessions-list")
+         self.client.force_login(self.user)
+         response = self.client.post(url)
+         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def test_method_not_allowed(self):
         url = reverse("sessions-detail", args=[self.session_1.id])
         self.client.force_login(self.user)
