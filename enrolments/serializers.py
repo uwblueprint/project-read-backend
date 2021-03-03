@@ -3,7 +3,6 @@ from .models import Session, Class
 
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
-
     class Meta:
         model = Session
         fields = [
@@ -12,15 +11,12 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
             "year",
         ]
 
-class ClassListSerializer(serializers.HyperlinkedModelSerializer):
 
+class ClassListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Class
-        fields = [
-            "id",
-            "name",
-            "facilitator_id"
-        ]
+        fields = ["id", "name", "facilitator_id"]
+
 
 class SessionDetailsSerializer(serializers.HyperlinkedModelSerializer):
     classes = ClassListSerializer(many=True)

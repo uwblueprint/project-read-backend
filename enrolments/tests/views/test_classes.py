@@ -4,7 +4,11 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from enrolments.models import Session, Class
-from enrolments.serializers import SessionSerializer, ClassListSerializer, SessionDetailsSerializer
+from enrolments.serializers import (
+    SessionSerializer,
+    ClassListSerializer,
+    SessionDetailsSerializer,
+)
 
 
 class SessionTestCase(APITestCase):
@@ -12,9 +16,15 @@ class SessionTestCase(APITestCase):
         self.user = User.objects.create(email="user@staff.com")
         self.session_1 = Session.objects.create(season=Session.SPRING, year=2021)
         self.session_2 = Session.objects.create(season=Session.FALL, year=2020)
-        self.class_1 = Class.objects.create(name="class1", session=self.session_1, facilitator=self.user)
-        self.class_2 = Class.objects.create(name="class2", session=self.session_1, facilitator=self.user)
-        self.class_3 = Class.objects.create(name="class3", session=self.session_2, facilitator=self.user)
+        self.class_1 = Class.objects.create(
+            name="class1", session=self.session_1, facilitator=self.user
+        )
+        self.class_2 = Class.objects.create(
+            name="class2", session=self.session_1, facilitator=self.user
+        )
+        self.class_3 = Class.objects.create(
+            name="class3", session=self.session_2, facilitator=self.user
+        )
 
     def test_get_all_sessions(self):
         url = reverse("sessions-list")
@@ -39,9 +49,9 @@ class SessionTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(payload, SessionSerializer(self.session_1).data)
-        
+
     def test_get_session_1_classes(self):
-        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes/'
+        url = reverse("sessions-detail", args=[self.session_1.id]) + "classes/"
         self.client.force_login(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -56,7 +66,7 @@ class SessionTestCase(APITestCase):
         )
 
     def test_get_session_2_classes(self):
-        url = reverse("sessions-detail", args=[self.session_2.id]) + 'classes/'
+        url = reverse("sessions-detail", args=[self.session_2.id]) + "classes/"
         self.client.force_login(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -70,7 +80,7 @@ class SessionTestCase(APITestCase):
         )
 
     def test_method_not_allowed(self):
-        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes/'
+        url = reverse("sessions-detail", args=[self.session_1.id]) + "classes/"
         self.client.force_login(self.user)
 
         response = self.client.put(url)
@@ -83,7 +93,7 @@ class SessionTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
-        url = reverse("sessions-detail", args=[self.session_1.id]) + 'classes/'
+        url = reverse("sessions-detail", args=[self.session_1.id]) + "classes/"
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
