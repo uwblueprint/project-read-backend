@@ -14,7 +14,6 @@ class Session(models.Model):
 
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
-    attendance = models.JSONField(validators=[validate_attendance])
 
     def __str__(self):
         return self.season
@@ -34,6 +33,11 @@ class Class(models.Model):
         null=True,
         blank=True,
     )
+
+    attendance = models.JSONField(validators=[validate_attendance])
+
+    class Meta:
+        verbose_name_plural = "classes"
 
     def __str__(self):
         return self.name

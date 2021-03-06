@@ -7,7 +7,6 @@ class SessionAdmin(admin.ModelAdmin):
         "id",
         "season",
         "year",
-        "attendance",
     )
     ordering = (
         "id",
@@ -27,6 +26,7 @@ class ClassAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
+        "attendance",
     )
     ordering = ("-id",)
     search_fields = ("name",)
