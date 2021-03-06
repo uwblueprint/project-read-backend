@@ -50,3 +50,12 @@ class Student(models.Model):
 
     class Meta:
         verbose_name_plural = "students"
+
+
+class FamilyInfo(models.Model):
+    name = models.CharField(max_length=512)
+    question = models.CharField(max_length=512)
+    active = models.BooleanField()
+
+    def __str__(self):
+        return f"{self.name}"
