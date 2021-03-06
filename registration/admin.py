@@ -25,7 +25,6 @@ class FamilyInfoAdmin(admin.ModelAdmin):
         "id",
         "name",
         "question",
-        "active",
     )
     ordering = ("-id",)
     search_fields = (
@@ -39,7 +38,6 @@ class ChildInfoAdmin(admin.ModelAdmin):
         "id",
         "name",
         "question",
-        "active",
     )
     ordering = ("-id",)
     search_fields = (

@@ -21,7 +21,6 @@ class FamilyInfoSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "question",
-            "active",
         ]
 
 
@@ -32,5 +31,4 @@ class ChildInfoSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "question",
-            "active",
         ]
