@@ -18,6 +18,9 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
         ]
+    
+    def get_num_children(self, obj):
+        return Student.objects.filter(family=obj.id, attendee_type=Student.ATTENDEE_CHOICES.CHILD).count()
 
     def get_first_name(self, obj):
         return obj.parent.first_name if obj.parent else ""
