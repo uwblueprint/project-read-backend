@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Family
+from .models import Family, FamilyInfo
 from .models import Student
 
 
@@ -18,6 +18,20 @@ class FamilyAdmin(admin.ModelAdmin):
         "address",
     )
     list_filter = ("preferred_comms",)
+
+
+class FamilyInfoAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "name",
+        "question",
+        "active",
+    )
+    ordering = ("-id",)
+    search_fields = (
+        "name",
+        "question",
+    )
 
 
 class StudentAdmin(admin.ModelAdmin):
@@ -44,4 +58,5 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Family, FamilyAdmin)
+admin.site.register(FamilyInfo, FamilyInfoAdmin)
 admin.site.register(Student, StudentAdmin)
