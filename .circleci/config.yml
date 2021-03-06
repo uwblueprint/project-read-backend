@@ -4,6 +4,13 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.9
+        environment:
+          DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=disable
+      - image: circleci/postgres:13.1
+        environment:
+          POSTGRES_DB: circle_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
     working_directory: ~/projectread
     steps:
       - checkout
