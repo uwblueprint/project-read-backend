@@ -7,17 +7,19 @@ import enrolments.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('enrolments', '0004_enrolment'),
+        ("enrolments", "0004_enrolment"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='class',
-            options={'verbose_name_plural': 'classes'},
+            name="class",
+            options={"verbose_name_plural": "classes"},
         ),
         migrations.AddField(
-            model_name='class',
-            name='attendance',
-            field=models.JSONField(validators=[enrolments.validators.validate_attendance]),
+            model_name="class",
+            name="attendance",
+            field=models.JSONField(
+                validators=[enrolments.validators.validate_attendance]
+            ),
         ),
     ]
