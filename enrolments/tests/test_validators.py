@@ -1,6 +1,6 @@
 from django.test import TestCase
 from registration.models import Student
-from .validators import validate_attendance, validate_schema
+from enrolments.validators import validate_attendance, validate_schema
 from django.core.exceptions import ValidationError
 
 
