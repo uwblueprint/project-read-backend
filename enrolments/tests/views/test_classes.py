@@ -26,30 +26,6 @@ class SessionTestCase(APITestCase):
             name="class3", session=self.session2, facilitator=self.user
         )
 
-    def test_get_all_sessions(self):
-        url = reverse("sessions-list")
-        self.client.force_login(self.user)
-        response = self.client.get(url)
-        payload = response.json()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            payload,
-            [
-                SessionSerializer(self.session1).data,
-                SessionSerializer(self.session2).data,
-            ],
-        )
-
-    def test_get_session(self):
-        url = reverse("sessions-detail", args=[self.session1.id])
-        self.client.force_login(self.user)
-        response = self.client.get(url)
-        payload = response.json()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(payload, SessionSerializer(self.session1).data)
-
     def test_get_session1_classes(self):
         url = reverse("sessions-detail", args=[self.session1.id]) + "classes/"
         self.client.force_login(self.user)
@@ -84,6 +60,9 @@ class SessionTestCase(APITestCase):
         self.client.force_login(self.user)
 
         response = self.client.put(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         response = self.client.patch(url)
