@@ -1,7 +1,15 @@
 from django.db import models
+from .validators import validate_family_parent
 
 
 class Family(models.Model):
+    parent = models.ForeignKey(
+        "Student",
+        null=True,
+        on_delete=models.PROTECT,
+        related_name="represents_family",
+        validators=[validate_family_parent],
+    )
     email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=128, blank=True)
     address = models.CharField(max_length=256, blank=True)
@@ -16,6 +24,8 @@ class Family(models.Model):
     )
 
     def __str__(self):
+        if self.parent is not None:
+            return f"{self.id} - {self.parent.first_name} {self.parent.last_name} - {self.email}"
         return f"{self.id} - {self.email}"
 
     class Meta:
