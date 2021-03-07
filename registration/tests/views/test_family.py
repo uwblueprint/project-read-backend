@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from registration.models import Family
-from registration.serializers import FamilySerializer
+from registration.serializers import FamilyDetailSerializer
 
 
 class FamilyTestCase(APITestCase):
@@ -33,8 +33,8 @@ class FamilyTestCase(APITestCase):
         self.assertEqual(
             payload,
             [
-                FamilySerializer(self.family).data,
-                FamilySerializer(self.other_family).data,
+                FamilyDetailSerializer(self.family).data,
+                FamilyDetailSerializer(self.other_family).data,
             ],
         )
 
@@ -45,7 +45,7 @@ class FamilyTestCase(APITestCase):
         payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(payload, FamilySerializer(self.family).data)
+        self.assertEqual(payload, FamilyDetailSerializer(self.family).data)
 
     def test_post_family(self):
         url = reverse("families-list")

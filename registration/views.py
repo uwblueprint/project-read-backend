@@ -1,7 +1,7 @@
 from rest_framework import mixins, permissions, viewsets
 
 from .models import Family
-from .serializers import FamilySerializer
+from .serializers import FamilyDetailSerializer
 
 
 class FamilyViewSet(
@@ -11,7 +11,7 @@ class FamilyViewSet(
     mixins.CreateModelMixin,
 ):
     queryset = Family.objects.all()
-    serializer_class = FamilySerializer
+    serializer_class = FamilyDetailSerializer
     http_method_names = [
         "get",
         "post",
