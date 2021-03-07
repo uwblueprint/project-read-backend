@@ -44,7 +44,23 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return obj.parent.last_name if obj.parent else ""
 
     def get_parent_fields(self, obj):
-        return obj.parent.information if obj.parent else {}
+        parent_fields = {}
+        if obj.parent:
+            field_responses = {
+                info["id"]: info["response"] for info in obj.parent.information
+            }
+            fields = FamilyInfo.objects.filter(id__in=field_responses.keys())
+            parent_fields = {
+                field.name: field_responses.get(field.id) for field in fields
+            }
+        return parent_fields
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        parent_fields_representation = representation.pop("parent_fields")
+        for key in parent_fields_representation:
+            representation[key] = parent_fields_representation[key]
+        return representation
 
 
 class FamilyInfoSerializer(serializers.HyperlinkedModelSerializer):
