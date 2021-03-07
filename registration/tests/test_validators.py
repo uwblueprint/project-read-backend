@@ -23,11 +23,15 @@ class ValidatorsTestCase(TestCase):
         self.assertRaises(ValidationError, validate_family_parent, self.child.id)
 
     def validate_parent_field_name(self):
-        self.assertIsNone(validate_parent_field_name, "Internet Access"),
+        field_name = "Internet Access"
+        self.assertNotIn(field_name, family_detail_constant_fields)
+        self.assertIsNone(validate_parent_field_name, field_name),
         for field in family_detail_constant_fields:
             self.assertRaises(ValidationError, validate_parent_field_name, field)
 
     def validate_child_field_name(self):
-        self.assertIsNone(validate_child_field_name, "Favourite Colour"),
+        field_name = "Favourite Colour"
+        self.assertNotIn(field_name, student_detail_constant_fields)
+        self.assertIsNone(validate_child_field_name, field_name),
         for field in student_detail_constant_fields:
             self.assertRaises(ValidationError, validate_child_field_name, field)
