@@ -1,13 +1,19 @@
 from rest_framework.test import APITestCase
 
-from registration.models import Family, Student
-from registration.serializers import FamilySerializer
+from registration.models import Family, Student, FamilyInfo
+from registration.serializers import FamilySerializer, FamilyDetailSerializer
 
 
 class SerializersTestCase(APITestCase):
     def setUp(self):
+        self.parent_field = FamilyInfo.objects.create(
+            name="Internet Access", question="Do you have access to internet?"
+        )
         self.parent = Student.objects.create(
-            first_name="Merlin", last_name="Fish", attendee_type="Parent"
+            first_name="Merlin",
+            last_name="Fish",
+            attendee_type="Parent",
+            information=[{"id": self.parent_field.id, "response": "Yes"}],
         )
         self.family = Family.objects.create(
             parent=self.parent,
@@ -32,3 +38,21 @@ class SerializersTestCase(APITestCase):
         data = FamilySerializer(self.family_without_parent).data
         self.assertEqual(data.get("first_name"), "")
         self.assertEqual(data.get("last_name"), "")
+
+    def test_family_detail_serializer_parent_name(self):
+        data = FamilyDetailSerializer(self.family).data
+        self.assertEqual(data.get("first_name"), self.parent.first_name)
+        self.assertEqual(data.get("last_name"), self.parent.last_name)
+
+    def test_family_detail_serializer_parent_name_none(self):
+        data = FamilyDetailSerializer(self.family_without_parent).data
+        self.assertEqual(data.get("first_name"), "")
+        self.assertEqual(data.get("last_name"), "")
+
+    def test_family_detail_serializer_parent_information(self):
+        data = FamilyDetailSerializer(self.family).data
+        self.assertEqual(data.get("parent_fields"), self.parent.information)
+
+    def test_family_detail_serializer_parent_information_none(self):
+        data = FamilyDetailSerializer(self.family_without_parent).data
+        self.assertEqual(data.get("parent_fields"), {})

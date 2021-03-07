@@ -1,5 +1,9 @@
 from django.db import models
-from .validators import validate_family_parent
+from .validators import (
+    validate_family_parent,
+    validate_parent_field_name,
+    validate_child_field_name,
+)
 
 
 class Family(models.Model):
@@ -63,7 +67,7 @@ class Student(models.Model):
 
 
 class FamilyInfo(models.Model):
-    name = models.CharField(max_length=512)
+    name = models.CharField(max_length=512, validators=[validate_parent_field_name])
     question = models.CharField(max_length=512)
 
     def __str__(self):
@@ -71,7 +75,7 @@ class FamilyInfo(models.Model):
 
 
 class ChildInfo(models.Model):
-    name = models.CharField(max_length=512)
+    name = models.CharField(max_length=512, validators=[validate_child_field_name])
     question = models.CharField(max_length=512)
 
     def __str__(self):
