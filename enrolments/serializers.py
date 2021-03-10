@@ -13,6 +13,7 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
             "year",
         ]
 
+
 class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
     students = StudentSerializer(many=True, read_only=True)
 

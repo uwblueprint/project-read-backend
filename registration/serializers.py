@@ -15,6 +15,10 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    family = serializers.HyperlinkedRelatedField(
+        view_name="families-detail", read_only=True
+    )
+
     class Meta:
         model = Student
         fields = [
