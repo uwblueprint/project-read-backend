@@ -32,6 +32,7 @@ DEBUG = env.str("DJANGO_DEBUG") == "True"
 
 ALLOWED_HOSTS = [] if DEBUG else ["project-read-backend.herokuapp.com"]
 
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"] if DEBUG else []
 
 # Application definition
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders",
     "accounts.apps.AccountsConfig",
     "enrolments.apps.EnrolmentsConfig",
     "registration.apps.RegistrationConfig",
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Session
 from registration.models import Family
 from registration.serializers import StudentSerializer
+from .models import Session, Class
 
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
@@ -25,3 +25,9 @@ class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
             "phone_number",
             "students",
         ]
+
+
+class ClassListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Class
+        fields = ["id", "name", "facilitator_id"]
