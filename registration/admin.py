@@ -7,12 +7,15 @@ from .models import Student
 class FamilyAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "parent",
         "email",
         "phone_number",
         "address",
     )
     ordering = ("-id",)
     search_fields = (
+        "parent__first_name",
+        "parent__last_name",
         "email",
         "phone_number",
         "address",
