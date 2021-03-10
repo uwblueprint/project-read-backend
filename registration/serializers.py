@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Family, Student
+from .models import Family, Student, FamilyInfo, ChildInfo
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
@@ -24,4 +24,15 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "attendee_type",
             "family",
             "information",
+        ]
+
+
+class ChildInfoSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ChildInfo
+        fields = [
+            "id",
+            "name",
+            "question",
+            "active",
         ]

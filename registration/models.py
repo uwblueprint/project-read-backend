@@ -40,6 +40,7 @@ class Student(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="students",
     )
     information = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -53,6 +54,15 @@ class Student(models.Model):
 
 
 class FamilyInfo(models.Model):
+    name = models.CharField(max_length=512)
+    question = models.CharField(max_length=512)
+    active = models.BooleanField()
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class ChildInfo(models.Model):
     name = models.CharField(max_length=512)
     question = models.CharField(max_length=512)
     active = models.BooleanField()
