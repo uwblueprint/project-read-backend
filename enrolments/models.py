@@ -23,6 +23,7 @@ class Class(models.Model):
     name = models.CharField(max_length=128)
     session = models.ForeignKey(
         "Session",
+        related_name="classes",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
