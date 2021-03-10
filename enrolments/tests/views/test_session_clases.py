@@ -7,11 +7,10 @@ from enrolments.models import Session, Class
 from enrolments.serializers import (
     SessionSerializer,
     ClassListSerializer,
-    SessionDetailsSerializer,
 )
 
 
-class SessionTestCase(APITestCase):
+class SessionClassesTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
         self.session1 = Session.objects.create(season=Session.SPRING, year=2021)
@@ -38,20 +37,6 @@ class SessionTestCase(APITestCase):
             [
                 ClassListSerializer(self.class1).data,
                 ClassListSerializer(self.class2).data,
-            ],
-        )
-
-    def test_get_session2_classes(self):
-        url = reverse("sessions-detail", args=[self.session2.id]) + "classes/"
-        self.client.force_login(self.user)
-        response = self.client.get(url)
-        payload = response.json()
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            payload,
-            [
-                ClassListSerializer(self.class3).data,
             ],
         )
 

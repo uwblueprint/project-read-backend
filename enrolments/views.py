@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from .models import Session
 from .serializers import (
     SessionSerializer,
-    SessionDetailsSerializer,
     ClassListSerializer,
 )
 
@@ -30,5 +29,5 @@ class SessionViewSet(
         url_name="classes",
     )
     def get_classes(self, request, pk=None):
-        classes = Session.objects.filter(id=pk).first().classes
+        classes = Session.objects.get(id=pk).classes
         return Response(ClassListSerializer(classes, many=True).data)
