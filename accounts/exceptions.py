@@ -25,3 +25,8 @@ class RevokedIDToken(APIException):
     default_detail = "ID token revoked"
     default_code = "token_revoked"
 
+
+class UserNotFound(APIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = "User from token not found"
+    default_code = "user_not_found"
