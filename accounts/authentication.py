@@ -1,6 +1,6 @@
 from firebase_admin import credentials, initialize_app, auth
 from rest_framework import authentication
-from .exceptions import InvalidIDToken, ExpiredIDToken, MissingIDToken, RevokedIDToken
+from .exceptions import InvalidIDToken, ExpiredIDToken, MissingIDToken, RevokedIDToken, UserNotFound
 from .models import User
 import environ
 
@@ -35,17 +35,20 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             raise ExpiredIDToken
         except auth.RevokedIdTokenError:
             raise RevokedIDToken
-        except Exception:
+        except auth.InvalidIdTokenError:
             raise InvalidIDToken
 
         if not id_token or not decoded_token:
             return None
 
         try:
-            uid = decoded_token.get("uid")
-        except Exception:
+            uid = decoded_token["uid"]
+        except KeyError:
             raise InvalidIDToken
 
-        user = User.objects.all()[0]
+        try:
+            user = User.objects.get(firebase_uid=uid)
+        except User.DoesNotExist:
+            raise UserNotFound
         return user, None
 
