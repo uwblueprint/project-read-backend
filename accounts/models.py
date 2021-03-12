@@ -15,9 +15,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     class Meta:
-        indexes = [
-            models.Index(fields=['firebase_uid'])
-        ]
+        indexes = [models.Index(fields=["firebase_uid"])]
 
     def __str__(self):
         return self.email

@@ -122,8 +122,8 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        'accounts.authentication.FirebaseAuthentication',
-    ]
+        "accounts.authentication.FirebaseAuthentication",
+    ],
 }
 
 # Internationalization

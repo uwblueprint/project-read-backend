@@ -1,6 +1,12 @@
 from firebase_admin import credentials, initialize_app, auth
 from rest_framework import authentication
-from .exceptions import InvalidIDToken, ExpiredIDToken, MissingIDToken, RevokedIDToken, UserNotFound
+from .exceptions import (
+    InvalidIDToken,
+    ExpiredIDToken,
+    MissingIDToken,
+    RevokedIDToken,
+    UserNotFound,
+)
 from .models import User
 import environ
 
@@ -10,7 +16,7 @@ creds = {
     "type": "service_account",
     "project_id": env.str("FIREBASE_PROJECT_ID"),
     "project_key_id": env.str("FIREBASE_PRIVATE_KEY_ID"),
-    "private_key": env.str("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
+    "private_key": env.str("FIREBASE_PRIVATE_KEY").replace("\\n", "\n"),
     "client_email": env.str("FIREBASE_CLIENT_EMAIL"),
     "client_id": env.str("FIREBASE_CLIENT_ID"),
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -51,4 +57,3 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
         except User.DoesNotExist:
             raise UserNotFound
         return user, None
-
