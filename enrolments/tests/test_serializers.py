@@ -1,14 +1,9 @@
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory
 
 from accounts.models import User
-from registration.models import Family
-from registration.models import Student
+from registration.models import Family, Student
 from enrolments.serializers import FamilyAttendanceSerializer
 from registration.serializers import StudentSerializer
-
-factory = APIRequestFactory()
-request = factory.get("/")
 
 
 class FamilyAttendanceSerializerTestCase(TestCase):
@@ -63,6 +58,6 @@ class FamilyAttendanceSerializerTestCase(TestCase):
                 "students": [],
             },
             FamilyAttendanceSerializer(
-                self.empty_family, context={"request": request}
+                self.empty_family, context={"request": None}
             ).data,
         )
