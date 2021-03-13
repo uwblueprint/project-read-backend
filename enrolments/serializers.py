@@ -3,6 +3,7 @@ from registration.models import Family
 from registration.serializers import StudentSerializer
 from .models import Session, Class
 
+from rest_framework.response import Response
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -15,8 +16,11 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
-    students = StudentSerializer(many=True, read_only=True)
-
+    # students = StudentSerializer(many=True, read_only=True)
+    students = Response(StudentSerializer(many=True, read_only=True).data)
+    # students = serializers.HyperlinkedRelatedField(
+    #     view_name="students-detail", read_only=True
+    # )
     class Meta:
         model = Family
         fields = [
@@ -25,6 +29,8 @@ class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
             "phone_number",
             "students",
         ]
+    
+    
 
 
 class ClassListSerializer(serializers.HyperlinkedModelSerializer):

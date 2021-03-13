@@ -1,5 +1,6 @@
 from django.test import TestCase
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.test import APIRequestFactory
 
 from accounts.models import User
@@ -40,46 +41,53 @@ class FamilyAttendanceSerializerTestCase(TestCase):
             family=self.family1,
             information="null",
         )
-        self.family1less_student2 = Student.objects.create(
-            first_name="Student2 FirstName",
-            last_name="Student2 LastName",
-            attendee_type="Guest",
-            family=None,
-            information="null",
-        )
 
     def test_serializer1(self):
-        try:
-            self.assertEqual(
-                {
-                    "id": self.family1.id,
-                    "email": self.family1.email,
-                    "phone_number": self.family1.phone_number,
-                    "students": [
-                        {
-                            "id": self.student1.id,
-                            "first_name": self.student1.first_name,
-                            "last_name": self.student1.last_name,
-                            "attendee_type": self.student1.attendee_type,
-                            "family": self.family1,
-                            "information": self.student1.information,
-                        },
-                        {
-                            "id": self.student2.id,
-                            "first_name": self.student2.first_name,
-                            "last_name": self.student2.last_name,
-                            "attendee_type": self.student2.attendee_type,
-                            "family": self.family1,
-                            "information": self.student2.information,
-                        },
-                    ],
-                },
-                FamilyAttendanceSerializer(
-                    self.family1, context={"request": request}
-                ).data,
-            )
-        except AssertionError as e:
-            e.args += ("???", 400)
+        # self.maxDiff = None
+        #   {
+        #     'email': 'fam1@test.com',
+        #     'id': 1,
+        #     'phone_number': '123456789',
+        #     'students': [OrderedDict([('id', 1),
+        #     +                            ('first_name', 'Student1 FirstName'),
+        #     +                            ('last_name', 'Student1 LastName'),
+        #     +                            ('attendee_type', 'Child'),
+        #     +                            ('family', 'http://testserver/families/1/'),
+        #     +                            ('information', 'null')]),
+        #     +               OrderedDict([('id', 2),
+        #     +                            ('first_name', 'Student2 FirstName'),
+        #     +                            ('last_name', 'Student2 LastName'),
+        #     +                            ('attendee_type', 'Guest'),
+        #     +                            ('family', 'http://testserver/families/1/'),
+        #     +                            ('information', 'null')])]
+        #     }
+        self.assertEqual(
+            {
+                "id": self.family1.id,
+                "email": self.family1.email,
+                "phone_number": self.family1.phone_number,
+                "students": [
+                    {
+                        "id": self.student1.id,
+                        "first_name": self.student1.first_name,
+                        "last_name": self.student1.last_name,
+                        "attendee_type": self.student1.attendee_type,
+                        "family": self.family1,
+                        "information": self.student1.information,
+                    },
+                    {
+                        "id": self.student2.id,
+                        "first_name": self.student2.first_name,
+                        "last_name": self.student2.last_name,
+                        "attendee_type": self.student2.attendee_type,
+                        "family": self.family1,
+                        "information": self.student2.information,
+                    },
+                ],
+            },
+            FamilyAttendanceSerializer(self.family1, context={"request": request}).data,
+            # Response(FamilyAttendanceSerializer(self.family1, context={"request": request}).data),
+        )
 
     def test_serializer2(self):
         self.assertEqual(
@@ -93,3 +101,5 @@ class FamilyAttendanceSerializerTestCase(TestCase):
                 self.empty_family, context={"request": request}
             ).data,
         )
+
+
