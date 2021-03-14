@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from accounts.models import User
 from registration.models import Family, Student
 from enrolments.serializers import FamilyAttendanceSerializer
 from registration.serializers import StudentSerializer

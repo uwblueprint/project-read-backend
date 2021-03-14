@@ -1,7 +1,7 @@
 from rest_framework import mixins, permissions, viewsets
 
-from .models import Family, Student
-from .serializers import FamilySerializer, StudentSerializer
+from .models import Family
+from .serializers import FamilySerializer
 
 
 class FamilyViewSet(
