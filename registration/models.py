@@ -50,6 +50,7 @@ class Student(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="students",
     )
     information = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

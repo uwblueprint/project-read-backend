@@ -33,6 +33,23 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
         return obj.parent.last_name if obj.parent else ""
 
 
+class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    family = serializers.HyperlinkedRelatedField(
+        view_name="families-detail", read_only=True
+    )
+
+    class Meta:
+        model = Student
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "attendee_type",
+            "family",
+            "information",
+        ]
+
+
 class FamilyInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = FamilyInfo
