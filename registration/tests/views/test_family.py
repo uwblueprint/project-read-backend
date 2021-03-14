@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from accounts.models import User
-from registration.models import Family
-from registration.serializers import FamilySerializer
+from registration.models import Family, Student
+from registration.serializers import FamilySerializer, FamilyDetailSerializer
 
 
 class FamilyTestCase(APITestCase):
@@ -15,6 +15,9 @@ class FamilyTestCase(APITestCase):
             phone_number="123456789",
             address="1 Test Ave",
             preferred_comms="email",
+        )
+        Student.objects.create(
+            first_name="Nemo", last_name="Fish", information={"2": "shrimp"}
         )
         self.other_family = Family.objects.create(
             email="example@test.com",
@@ -37,6 +40,13 @@ class FamilyTestCase(APITestCase):
                 FamilySerializer(self.other_family).data,
             ],
         )
+        self.assertNotEqual(
+            payload,
+            [
+                FamilyDetailSerializer(self.family).data,
+                FamilyDetailSerializer(self.other_family).data,
+            ],
+        )
 
     def test_get_family(self):
         url = reverse("families-detail", args=[self.family.id])
@@ -45,12 +55,28 @@ class FamilyTestCase(APITestCase):
         payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(payload, FamilySerializer(self.family).data)
+        self.assertNotEqual(payload, FamilySerializer(self.family).data)
+        self.assertEqual(payload, FamilyDetailSerializer(self.family).data)
 
     def test_post_family(self):
         url = reverse("families-list")
         self.client.force_login(self.user)
-        response = self.client.post(url)
+        response = self.client.post(
+            url,
+            {
+                "email": "weasleys@theorder.com",
+                "phone_number": "123456789",
+                "address": "12 Grimmauld Place",
+                "preferred_comms": "Owl Post",
+                "parent": {
+                    "first_name": "Molly",
+                    "last_name": "Weasley",
+                },
+                "children": [],
+                "guests": [],
+            },
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_method_not_allowed(self):

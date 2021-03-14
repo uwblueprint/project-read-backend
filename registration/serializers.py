@@ -1,5 +1,7 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+
 from .models import Family, Student, FamilyInfo, ChildInfo
 
 
@@ -48,6 +50,57 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "family",
             "information",
         ]
+        read_only_fields = ["attendee_type"]
+
+
+class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
+    parent = StudentSerializer()
+    children = StudentSerializer(many=True)
+    guests = StudentSerializer(many=True)
+
+    class Meta:
+        model = Family
+        fields = [
+            "id",
+            "email",
+            "phone_number",
+            "address",
+            "preferred_comms",
+            "parent",
+            "children",
+            "guests",
+        ]
+
+    def create(self, validated_data):
+        parent_data = validated_data.pop("parent")
+        children_data = validated_data.pop("children")
+        guests_data = validated_data.pop("guests")
+
+        with transaction.atomic():
+            family = Family.objects.create(**validated_data)
+
+            parent_data["family"] = family
+            parent_data["attendee_type"] = Student.PARENT
+
+            for child_data in children_data:
+                child_data["family"] = family
+                child_data["attendee_type"] = Student.CHILD
+
+            for guest_data in guests_data:
+                guest_data["family"] = family
+                guest_data["attendee_type"] = Student.GUEST
+
+            Student.objects.bulk_create(
+                Student(**student_data)
+                for student_data in [parent_data] + children_data + guests_data
+            )
+
+            family.parent = Student.objects.get(
+                family=family, attendee_type=Student.PARENT
+            )
+            family.save()
+
+        return family
 
 
 class FamilyInfoSerializer(serializers.HyperlinkedModelSerializer):

@@ -1,10 +1,10 @@
-from rest_framework.test import APITestCase
+from django.test.testcases import TestCase
 
 from registration.models import Family, Student
 from registration.serializers import FamilySerializer
 
 
-class SerializersTestCase(APITestCase):
+class FamilySerializerTestCase(TestCase):
     def setUp(self):
         self.parent1 = Student.objects.create(
             first_name="Merlin", last_name="Fish", attendee_type=Student.PARENT
