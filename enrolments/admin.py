@@ -32,7 +32,16 @@ class ClassAdmin(admin.ModelAdmin):
 
 
 class EnrolmentAdmin(admin.ModelAdmin):
-    list_display = ("id", "family", "created_at", "updated_at", "enrolled_class")
+    list_display = (
+        "id",
+        "active",
+        "family",
+        "session",
+        "created_at",
+        "updated_at",
+        "preferred_class",
+        "enrolled_class",
+    )
 
     ordering = ("-id",)
 
