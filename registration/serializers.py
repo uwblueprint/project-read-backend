@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from .models import Family, FamilyInfo, ChildInfo
+from .models import Family, Student, FamilyInfo, ChildInfo
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     first_name = SerializerMethodField()
     last_name = SerializerMethodField()
+    num_children = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -17,13 +18,36 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "phone_number",
             "address",
             "preferred_comms",
+            "num_children",
         ]
+
+    def get_num_children(self, obj):
+        return Student.objects.filter(
+            family=obj.id, attendee_type=Student.CHILD
+        ).count()
 
     def get_first_name(self, obj):
         return obj.parent.first_name if obj.parent else ""
 
     def get_last_name(self, obj):
         return obj.parent.last_name if obj.parent else ""
+
+
+class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    family = serializers.HyperlinkedRelatedField(
+        view_name="families-detail", read_only=True
+    )
+
+    class Meta:
+        model = Student
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "attendee_type",
+            "family",
+            "information",
+        ]
 
 
 class FamilyInfoSerializer(serializers.HyperlinkedModelSerializer):
