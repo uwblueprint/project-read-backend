@@ -27,7 +27,7 @@ class SessionClassesTestCase(APITestCase):
 
     def test_get_session1_classes(self):
         url = reverse("sessions-detail", args=[self.session1.id]) + "classes/"
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
 
@@ -42,7 +42,7 @@ class SessionClassesTestCase(APITestCase):
 
     def test_method_not_allowed(self):
         url = reverse("sessions-detail", args=[self.session1.id]) + "classes/"
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
 
         response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -60,13 +60,13 @@ class SessionClassesTestCase(APITestCase):
         url = reverse("sessions-detail", args=[self.session1.id]) + "classes/"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.patch(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

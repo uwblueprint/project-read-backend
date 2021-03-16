@@ -28,7 +28,7 @@ class FamilyTestCase(APITestCase):
 
     def test_get_families(self):
         url = reverse("families-list")
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
 
@@ -50,7 +50,7 @@ class FamilyTestCase(APITestCase):
 
     def test_get_family(self):
         url = reverse("families-detail", args=[self.family.id])
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
 
@@ -60,7 +60,7 @@ class FamilyTestCase(APITestCase):
 
     def test_post_family(self):
         url = reverse("families-list")
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
         response = self.client.post(
             url,
             {
@@ -81,7 +81,7 @@ class FamilyTestCase(APITestCase):
 
     def test_method_not_allowed(self):
         url = reverse("families-detail", args=[self.family.id])
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
 
         response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -96,21 +96,21 @@ class FamilyTestCase(APITestCase):
         url = reverse("families-list")
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         url = reverse("families-detail", args=[self.family.id])
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.patch(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
