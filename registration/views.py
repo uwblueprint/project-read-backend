@@ -1,7 +1,7 @@
 from rest_framework import mixins, permissions, viewsets
 
 from .models import Family
-from .serializers import FamilySerializer
+from .serializers import FamilySerializer, FamilyDetailSerializer
 
 
 class FamilyViewSet(
@@ -17,3 +17,8 @@ class FamilyViewSet(
         "post",
     ]
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ["retrieve", "create"]:
+            return FamilyDetailSerializer
+        return FamilySerializer

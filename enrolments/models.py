@@ -47,6 +47,17 @@ class Class(models.Model):
 class Enrolment(models.Model):
     active = models.BooleanField()
     family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
+    session = models.ForeignKey(
+        "enrolments.Session",
+        null=True,
+        on_delete=models.PROTECT,
+    )
+    preferred_class = models.ForeignKey(
+        "enrolments.Class",
+        null=True,
+        on_delete=models.PROTECT,
+        related_name="preferred_enrolment",
+    )
     enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

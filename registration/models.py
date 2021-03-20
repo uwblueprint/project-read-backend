@@ -23,13 +23,21 @@ class Family(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    class Meta:
+        verbose_name_plural = "families"
+
+    @property
+    def children(self):
+        return self.students.filter(attendee_type=Student.CHILD)
+
+    @property
+    def guests(self):
+        return self.students.filter(attendee_type=Student.GUEST)
+
     def __str__(self):
         if self.parent is not None:
             return f"{self.id} - {self.parent.first_name} {self.parent.last_name} - {self.email}"
         return f"{self.id} - {self.email}"
-
-    class Meta:
-        verbose_name_plural = "families"
 
 
 class Student(models.Model):
@@ -50,6 +58,7 @@ class Student(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="students",
     )
     information = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

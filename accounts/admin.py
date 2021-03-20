@@ -9,6 +9,7 @@ class UserAdmin(BaseUserAdmin):
         "email",
         "is_staff",
         "is_active",
+        "firebase_uid",
     )
     ordering = ("email",)
     search_fields = ("email",)
@@ -25,6 +26,7 @@ class UserAdmin(BaseUserAdmin):
             "Permissions",
             {
                 "fields": (
+                    "firebase_uid",
                     "is_active",
                     "is_staff",
                     "is_superuser",
@@ -48,6 +50,7 @@ class UserAdmin(BaseUserAdmin):
                     "password2",
                     "is_staff",
                     "is_active",
+                    "firebase_uid",
                 )
             },
         ),
