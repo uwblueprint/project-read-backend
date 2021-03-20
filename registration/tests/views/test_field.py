@@ -6,29 +6,33 @@ from accounts.models import User
 from registration.models import Field
 from registration.serializers import FieldSerializer
 
+
 class FieldTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
         self.parent_field = Field.objects.create(
-            role=PARENT,
+            role=Field.PARENT,
             name="email",
             question="What is your email?",
-            question_type=TEXT,
+            question_type=Field.TEXT,
             is_default=True,
+            order=1,
         )
         self.child_field = Field.objects.create(
-            role=CHILD,
+            role=Field.CHILD,
             name="Date Of Birth",
             question="When were you born?",
-            question_type=TEXT,
+            question_type=Field.TEXT,
             is_default=True,
+            order=1,
         )
         self.guest_field = Field.objects.create(
-            role=GUEST,
+            role=Field.GUEST,
             name="Relation to Family",
             question="How are you related?",
-            question_type=TEXT,
+            question_type=Field.TEXT,
             is_default=True,
+            order=1,
         )
 
     def test_get_fields(self):
@@ -46,7 +50,7 @@ class FieldTestCase(APITestCase):
                 FieldSerializer(self.guest_field).data,
             ],
         )
-        
+
     def test_get_field(self):
         url = reverse("fields-detail", args=[self.parent_field.id])
         self.client.force_authenticate(self.user)
@@ -54,15 +58,10 @@ class FieldTestCase(APITestCase):
         payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            payload,
-            [
-                FieldSerializer(self.parent_field).data,
-            ], 
-        )
+        self.assertEqual(payload, FieldSerializer(self.parent_field).data)
 
     def test_method_not_allowed(self):
-        url = reverse("field-detail", args=[self.parent_field.id])
+        url = reverse("fields-detail", args=[self.parent_field.id])
         self.client.force_authenticate(self.user)
 
         response = self.client.post(url)
@@ -99,4 +98,3 @@ class FieldTestCase(APITestCase):
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-

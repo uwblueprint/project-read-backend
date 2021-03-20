@@ -23,6 +23,7 @@ class FamilyViewSet(
             return FamilyDetailSerializer
         return FamilySerializer
 
+
 class FieldViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -35,4 +36,3 @@ class FieldViewSet(
         "get",
     ]
     permission_classes = [permissions.IsAuthenticated]
-

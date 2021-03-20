@@ -98,6 +98,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
         return family
 
+
 class FieldSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Field
@@ -109,4 +110,3 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
             "is_default",
             "order",
         ]
-
