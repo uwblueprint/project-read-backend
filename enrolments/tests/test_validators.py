@@ -8,9 +8,7 @@ class ValidatorsTestCase(TestCase):
     def setUp(self):
         Student.objects.bulk_create(
             [
-                Student(
-                    first_name="Brittany", last_name="Buckets", role="Parent"
-                ),
+                Student(first_name="Brittany", last_name="Buckets", role="Parent"),
                 Student(first_name="Buckets", last_name="Jr", role="Child"),
             ]
         )
