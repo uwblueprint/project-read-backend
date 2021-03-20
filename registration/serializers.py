@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from .models import Family, Student
+from .models import Family, Student, Field
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
@@ -97,3 +97,16 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             family.save()
 
         return family
+
+class FieldSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Field
+        fields = [
+            "role",
+            "name",
+            "question",
+            "question_type",
+            "is_default",
+            "order",
+        ]
+
