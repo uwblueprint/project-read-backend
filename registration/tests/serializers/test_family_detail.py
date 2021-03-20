@@ -17,7 +17,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.parent = Student.objects.create(
             first_name="Claire",
             last_name="Dunphy",
-            attendee_type=Student.PARENT,
+            role=Student.PARENT,
             family=self.family,
         )
         self.family.parent = self.parent
@@ -25,13 +25,13 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.child = Student.objects.create(
             first_name="Haley",
             last_name="Dunphy",
-            attendee_type=Student.CHILD,
+            role=Student.CHILD,
             family=self.family,
         )
         self.guest = Student.objects.create(
             first_name="Phil",
             last_name="Dunphy",
-            attendee_type=Student.GUEST,
+            role=Student.GUEST,
             family=self.family,
         )
 

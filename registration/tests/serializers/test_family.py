@@ -7,11 +7,11 @@ from registration.serializers import FamilySerializer
 class FamilySerializerTestCase(TestCase):
     def setUp(self):
         self.parent1 = Student.objects.create(
-            first_name="Merlin", last_name="Fish", attendee_type=Student.PARENT
+            first_name="Merlin", last_name="Fish", role=Student.PARENT
         )
 
         self.parent2 = Student.objects.create(
-            first_name="Gandalf", last_name="Whale", attendee_type=Student.PARENT
+            first_name="Gandalf", last_name="Whale", role=Student.PARENT
         )
 
         self.family = Family.objects.create(
@@ -40,21 +40,21 @@ class FamilySerializerTestCase(TestCase):
         self.child1 = Student.objects.create(
             first_name="Albus",
             last_name="Whale",
-            attendee_type=Student.CHILD,
+            role=Student.CHILD,
             family=self.family,
         )
 
         self.child2 = Student.objects.create(
             first_name="Lily",
             last_name="Whale",
-            attendee_type=Student.CHILD,
+            role=Student.CHILD,
             family=self.family,
         )
 
         self.child3 = Student.objects.create(
             first_name="Harry",
             last_name="Tuna",
-            attendee_type=Student.CHILD,
+            role=Student.CHILD,
             family=self.family_without_parent,
         )
 
