@@ -16,13 +16,13 @@ class SessionClassesTestCase(APITestCase):
         self.session1 = Session.objects.create(season=Session.SPRING, year=2021)
         self.session2 = Session.objects.create(season=Session.FALL, year=2020)
         self.class1 = Class.objects.create(
-            name="class1", session=self.session1, facilitator=self.user
+            name="class1", session=self.session1, facilitator=self.user, attendance={}
         )
         self.class2 = Class.objects.create(
-            name="class2", session=self.session1, facilitator=self.user
+            name="class2", session=self.session1, facilitator=self.user, attendance={}
         )
         self.class3 = Class.objects.create(
-            name="class3", session=self.session2, facilitator=self.user
+            name="class3", session=self.session2, facilitator=self.user, attendance={}
         )
 
     def test_get_session1_classes(self):

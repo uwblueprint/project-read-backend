@@ -1,4 +1,5 @@
 from django.db import models
+from .validators import validate_attendance
 
 
 class Session(models.Model):
@@ -33,6 +34,11 @@ class Class(models.Model):
         null=True,
         blank=True,
     )
+
+    attendance = models.JSONField(validators=[validate_attendance])
+
+    class Meta:
+        verbose_name_plural = "classes"
 
     def __str__(self):
         return self.name
