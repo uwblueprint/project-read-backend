@@ -28,11 +28,11 @@ class Family(models.Model):
 
     @property
     def children(self):
-        return self.students.filter(attendee_type=Student.CHILD)
+        return self.students.filter(role=Student.CHILD)
 
     @property
     def guests(self):
-        return self.students.filter(attendee_type=Student.GUEST)
+        return self.students.filter(role=Student.GUEST)
 
     def __str__(self):
         if self.parent is not None:
@@ -44,7 +44,7 @@ class Student(models.Model):
     PARENT = "Parent"
     CHILD = "Child"
     GUEST = "Guest"
-    ATTENDEE_CHOICES = [
+    ROLE_CHOICES = [
         (PARENT, "Parent"),
         (CHILD, "Child"),
         (GUEST, "Guest"),
@@ -52,7 +52,7 @@ class Student(models.Model):
 
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    attendee_type = models.CharField(max_length=6, choices=ATTENDEE_CHOICES)
+    role = models.CharField(max_length=6, choices=ROLE_CHOICES)
     family = models.ForeignKey(
         "Family",
         null=True,
@@ -71,17 +71,24 @@ class Student(models.Model):
         verbose_name_plural = "students"
 
 
-class FamilyInfo(models.Model):
+class Field(models.Model):
+    PARENT = "Parent"
+    CHILD = "Child"
+    GUEST = "Guest"
+    TEXT = "Text"
+    MULTIPLE_CHOICE = "Multiple Choice"
+    ROLE_CHOICES = [
+        (PARENT, "Parent"),
+        (CHILD, "Child"),
+        (GUEST, "Guest"),
+    ]
+    QUESTION_CHOICES = [(TEXT, "Text"), (MULTIPLE_CHOICE, "Multiple Choice")]
+    role = models.CharField(max_length=6, choices=ROLE_CHOICES)
     name = models.CharField(max_length=512)
     question = models.CharField(max_length=512)
-
-    def __str__(self):
-        return f"{self.name}"
-
-
-class ChildInfo(models.Model):
-    name = models.CharField(max_length=512)
-    question = models.CharField(max_length=512)
+    question_type = models.CharField(max_length=15, choices=QUESTION_CHOICES)
+    is_default = models.BooleanField()
+    order = models.PositiveSmallIntegerField()
 
     def __str__(self):
         return f"{self.name}"
