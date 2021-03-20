@@ -7,10 +7,10 @@ from django.core.exceptions import ValidationError
 class ValidatorsTestCase(TestCase):
     def setUp(self):
         self.parent = Student.objects.create(
-            first_name="Merlin", last_name="Fish", attendee_type="Parent"
+            first_name="Merlin", last_name="Fish", role="Parent"
         )
         self.child = Student.objects.create(
-            first_name="Nemo", last_name="Fish", attendee_type="Child"
+            first_name="Nemo", last_name="Fish", role="Child"
         )
 
     def test_family_parent(self):

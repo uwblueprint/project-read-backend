@@ -24,14 +24,14 @@ class FamilyAttendanceSerializerTestCase(TestCase):
         self.student1 = Student.objects.create(
             first_name="Student1 FirstName",
             last_name="Student1 LastName",
-            attendee_type="Child",
+            role="Child",
             family=self.family1,
             information="null",
         )
         self.student2 = Student.objects.create(
             first_name="Student2 FirstName",
             last_name="Student2 LastName",
-            attendee_type="Guest",
+            role="Guest",
             family=self.family1,
             information="null",
         )

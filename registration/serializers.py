@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from .models import Family, Student, FamilyInfo, ChildInfo
+from .models import Family, Student
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
@@ -24,9 +24,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_num_children(self, obj):
-        return Student.objects.filter(
-            family=obj.id, attendee_type=Student.CHILD
-        ).count()
+        return Student.objects.filter(family=obj.id, role=Student.CHILD).count()
 
     def get_first_name(self, obj):
         return obj.parent.first_name if obj.parent else ""
@@ -46,11 +44,11 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "first_name",
             "last_name",
-            "attendee_type",
+            "role",
             "family",
             "information",
         ]
-        read_only_fields = ["attendee_type"]
+        read_only_fields = ["role"]
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -80,44 +78,22 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             family = Family.objects.create(**validated_data)
 
             parent_data["family"] = family
-            parent_data["attendee_type"] = Student.PARENT
+            parent_data["role"] = Student.PARENT
 
             for child_data in children_data:
                 child_data["family"] = family
-                child_data["attendee_type"] = Student.CHILD
+                child_data["role"] = Student.CHILD
 
             for guest_data in guests_data:
                 guest_data["family"] = family
-                guest_data["attendee_type"] = Student.GUEST
+                guest_data["role"] = Student.GUEST
 
             Student.objects.bulk_create(
                 Student(**student_data)
                 for student_data in [parent_data] + children_data + guests_data
             )
 
-            family.parent = Student.objects.get(
-                family=family, attendee_type=Student.PARENT
-            )
+            family.parent = Student.objects.get(family=family, role=Student.PARENT)
             family.save()
 
         return family
-
-
-class FamilyInfoSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = FamilyInfo
-        fields = [
-            "id",
-            "name",
-            "question",
-        ]
-
-
-class ChildInfoSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ChildInfo
-        fields = [
-            "id",
-            "name",
-            "question",
-        ]

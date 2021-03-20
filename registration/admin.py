@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import Family, FamilyInfo, ChildInfo
-from .models import Student
+from .models import Family, Student, Field
 
 
 class FamilyAdmin(admin.ModelAdmin):
@@ -23,32 +22,6 @@ class FamilyAdmin(admin.ModelAdmin):
     list_filter = ("preferred_comms",)
 
 
-class FamilyInfoAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "name",
-        "question",
-    )
-    ordering = ("-id",)
-    search_fields = (
-        "name",
-        "question",
-    )
-
-
-class ChildInfoAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "name",
-        "question",
-    )
-    ordering = ("-id",)
-    search_fields = (
-        "name",
-        "question",
-    )
-
-
 class StudentAdmin(admin.ModelAdmin):
     list_display = (
         "id",
@@ -68,11 +41,25 @@ class StudentAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "family",
-        "attendee_type",
+        "role",
+    )
+
+
+class FieldAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "name",
+        "question",
+    )
+    ordering = ("id", "order", "name")
+    search_fields = ("name", "question")
+    list_filter = (
+        "role",
+        "question_type",
+        "is_default",
     )
 
 
 admin.site.register(Family, FamilyAdmin)
-admin.site.register(FamilyInfo, FamilyInfoAdmin)
-admin.site.register(ChildInfo, ChildInfoAdmin)
 admin.site.register(Student, StudentAdmin)
+admin.site.register(Field, FieldAdmin)
