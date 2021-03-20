@@ -31,3 +31,18 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Class
         fields = ["id", "name", "facilitator_id"]
+
+
+class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
+    families = FamilyAttendanceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Class
+        fields = [
+            "id",
+            "name",
+            "session_id",
+            "facilitator_id",
+            "attendance",
+            "families",
+        ]
