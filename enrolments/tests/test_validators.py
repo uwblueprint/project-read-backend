@@ -9,9 +9,9 @@ class ValidatorsTestCase(TestCase):
         Student.objects.bulk_create(
             [
                 Student(
-                    first_name="Brittany", last_name="Buckets", attendee_type="Parent"
+                    first_name="Brittany", last_name="Buckets", role="Parent"
                 ),
-                Student(first_name="Buckets", last_name="Jr", attendee_type="Child"),
+                Student(first_name="Buckets", last_name="Jr", role="Child"),
             ]
         )
         self.student_ids = list(Student.objects.values_list("id", flat=True))
