@@ -23,7 +23,7 @@ def validate_information(information):
     validate_information_responses(information.values())
 
 
-def validate_student_role_information(student_data):
+def validate_student_information_role(student_data):
     Field = apps.get_model("registration", "Field")
     information = student_data.get("information", {})
     role = student_data["role"]
