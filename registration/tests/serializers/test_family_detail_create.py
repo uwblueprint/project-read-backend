@@ -122,9 +122,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         data = dict(self.family_data)
         self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
 
-    @patch(
-        "registration.serializers.validate_student_information",
-    )
+    @patch("registration.serializers.validate_student_role_information")
     def test_family_detail_serializer_validate(self, mock_validate):
         data = dict(self.family_data)
         data["parent"] = self.parent_data
@@ -138,7 +136,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertTrue(is_valid)
 
     @patch(
-        "registration.serializers.validate_student_information",
+        "registration.serializers.validate_student_role_information",
         side_effect=ValidationError(""),
     )
     def test_family_detail_serializer_validate__invalid(self, mock_validate):
