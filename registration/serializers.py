@@ -75,7 +75,6 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         students = validated_data.pop("students")
-
         with transaction.atomic():
             family = Family.objects.create(**validated_data)
             Student.objects.bulk_create(
@@ -105,9 +104,10 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
     def validate(self, attrs):
-        for student in attrs["students"]:
-            if not StudentSerializer(data=student).is_valid():
-                raise serializers.ValidationError("Student data is invalid")
+        if not all(
+            StudentSerializer(data=student).is_valid() for student in attrs["students"]
+        ):
+            raise serializers.ValidationError("Student data is invalid")
         return super().validate(attrs)
 
 
