@@ -41,7 +41,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         num_families = Family.objects.all().count()
         num_students = Student.objects.all().count()
 
-        data = self.family_data
+        data = dict(self.family_data)
         data["parent"] = self.parent_data
 
         serializer = FamilyDetailSerializer(data=data)
@@ -59,7 +59,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         num_families = Family.objects.all().count()
         num_students = Student.objects.all().count()
 
-        data = self.family_data
+        data = dict(self.family_data)
         data["parent"] = self.parent_data
         data["children"] = self.children_data
         data["guests"] = self.guests_data
@@ -91,6 +91,6 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertEqual(guest.last_name, self.guests_data[0]["last_name"])
         self.assertEqual(guest.information, self.guests_data[0]["information"])
 
-    def test_family_detail_serializer_create__no_parent(self):
+    def test_family_detail_serializer_validate__no_parent(self):
         data = dict(self.family_data)
         self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
