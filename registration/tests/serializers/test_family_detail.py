@@ -35,36 +35,36 @@ class FamilyDetailSerializerTestCase(TestCase):
             family=self.family,
         )
 
-        self.post_data = {
+        self.family_data = {
             "email": "weasleys@theorder.com",
             "phone_number": "123456789",
             "address": "12 Grimmauld Place",
             "preferred_comms": "Owl Post",
-            "parent": {
-                "first_name": "Molly",
-                "last_name": "Weasley",
-                "information": {"2": "yes"},
-            },
-            "children": [
-                {
-                    "first_name": "Ron",
-                    "last_name": "Weasley",
-                    "information": {"1": "male"},
-                },
-                {
-                    "first_name": "Ginny",
-                    "last_name": "Weasley",
-                    "information": {"1": "female"},
-                },
-            ],
-            "guests": [
-                {
-                    "first_name": "Harry",
-                    "last_name": "Potter",
-                    "information": {"3": "friend"},
-                }
-            ],
         }
+        self.parent_data = {
+            "first_name": "Molly",
+            "last_name": "Weasley",
+            "information": {"2": "yes"},
+        }
+        self.children_data = [
+            {
+                "first_name": "Ron",
+                "last_name": "Weasley",
+                "information": {"1": "male"},
+            },
+            {
+                "first_name": "Ginny",
+                "last_name": "Weasley",
+                "information": {"1": "female"},
+            },
+        ]
+        self.guests_data = [
+            {
+                "first_name": "Harry",
+                "last_name": "Potter",
+                "information": {"3": "friend"},
+            }
+        ]
 
     def test_family_detail_serializer_parent(self):
         data = FamilyDetailSerializer(self.family, context=context).data
@@ -88,52 +88,56 @@ class FamilyDetailSerializerTestCase(TestCase):
         num_families = Family.objects.all().count()
         num_students = Student.objects.all().count()
 
-        data = self.post_data
+        data = self.family_data
+        data["parent"] = self.parent_data
 
         serializer = FamilyDetailSerializer(data=data)
-        serializer.is_valid()
+        self.assertTrue(serializer.is_valid())
+        family = serializer.save()
+
+        self.assertEqual(Family.objects.all().count(), num_families + 1)
+        self.assertEqual(Student.objects.all().count(), num_students + 1)
+
+        self.assertEqual(family.parent.first_name, self.parent_data["first_name"])
+        self.assertEqual(family.parent.last_name, self.parent_data["last_name"])
+        self.assertEqual(family.parent.information, self.parent_data["information"])
+
+    def test_family_detail_serializer_create__children_guests(self):
+        num_families = Family.objects.all().count()
+        num_students = Student.objects.all().count()
+
+        data = self.family_data
+        data["parent"] = self.parent_data
+        data["children"] = self.children_data
+        data["guests"] = self.guests_data
+
+        serializer = FamilyDetailSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
         family = serializer.save()
 
         self.assertEqual(Family.objects.all().count(), num_families + 1)
         self.assertEqual(Student.objects.all().count(), num_students + 4)
 
-        self.assertEqual(family.parent.first_name, data["parent"]["first_name"])
-        self.assertEqual(family.parent.last_name, data["parent"]["last_name"])
-        self.assertEqual(family.parent.information, data["parent"]["information"])
+        self.assertEqual(family.parent.first_name, self.parent_data["first_name"])
+        self.assertEqual(family.parent.last_name, self.parent_data["last_name"])
+        self.assertEqual(family.parent.information, self.parent_data["information"])
 
         self.assertEqual(family.children.count(), 2)
 
-        child1 = family.children.get(first_name=data["children"][0]["first_name"])
-        self.assertEqual(child1.last_name, data["children"][0]["last_name"])
-        self.assertEqual(child1.information, data["children"][0]["information"])
+        child1 = family.children.get(first_name=self.children_data[0]["first_name"])
+        self.assertEqual(child1.last_name, self.children_data[0]["last_name"])
+        self.assertEqual(child1.information, self.children_data[0]["information"])
 
-        child2 = family.children.get(first_name=data["children"][1]["first_name"])
-        self.assertEqual(child2.last_name, data["children"][1]["last_name"])
-        self.assertEqual(child2.information, data["children"][1]["information"])
+        child2 = family.children.get(first_name=self.children_data[1]["first_name"])
+        self.assertEqual(child2.last_name, self.children_data[1]["last_name"])
+        self.assertEqual(child2.information, self.children_data[1]["information"])
 
         self.assertEqual(family.guests.count(), 1)
         guest = family.guests.first()
-        self.assertEqual(guest.first_name, data["guests"][0]["first_name"])
-        self.assertEqual(guest.last_name, data["guests"][0]["last_name"])
-        self.assertEqual(guest.information, data["guests"][0]["information"])
+        self.assertEqual(guest.first_name, self.guests_data[0]["first_name"])
+        self.assertEqual(guest.last_name, self.guests_data[0]["last_name"])
+        self.assertEqual(guest.information, self.guests_data[0]["information"])
 
-    def test_family_detail_serializer_create_invalid(self):
-        # missing family field
-        data = dict(self.post_data).pop("email")
-        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
-
-        # missing student field
-        data = dict(self.post_data)["parent"].pop("first_name")
-        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
-
-        # no parent
-        data = dict(self.post_data).pop("parent")
-        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
-
-        # no children
-        data = dict(self.post_data).pop("children")
-        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
-
-        # no guests
-        data = dict(self.post_data).pop("guests")
+    def test_family_detail_serializer_create__no_parent(self):
+        data = dict(self.family_data)
         self.assertFalse(FamilyDetailSerializer(data=data).is_valid())

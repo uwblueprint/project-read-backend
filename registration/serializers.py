@@ -71,32 +71,35 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         parent_data = validated_data.pop("parent")
-        children_data = validated_data.pop("children")
-        guests_data = validated_data.pop("guests")
+        children_data = validated_data.pop("children", [])
+        guests_data = validated_data.pop("guests", [])
 
         with transaction.atomic():
             family = Family.objects.create(**validated_data)
-
-            parent_data["family"] = family
-            parent_data["role"] = Student.PARENT
-
-            for child_data in children_data:
-                child_data["family"] = family
-                child_data["role"] = Student.CHILD
-
-            for guest_data in guests_data:
-                guest_data["family"] = family
-                guest_data["role"] = Student.GUEST
-
             Student.objects.bulk_create(
-                Student(**student_data)
+                Student(**student_data, family=family)
                 for student_data in [parent_data] + children_data + guests_data
             )
-
             family.parent = Student.objects.get(family=family, role=Student.PARENT)
             family.save()
 
         return family
+
+    def to_internal_value(self, data):
+        parent_data = data.get("parent")
+        if parent_data is None:
+            raise serializers.ValidationError("Parent is a required field")
+        parent_data["role"] = Student.PARENT
+
+        children_data = data.get("children", [])
+        for child_data in children_data:
+            child_data["role"] = Student.CHILD
+
+        guests_data = data.get("guests", [])
+        for guest_data in guests_data:
+            guest_data["role"] = Student.GUEST
+
+        return data
 
 
 class FieldSerializer(serializers.HyperlinkedModelSerializer):
