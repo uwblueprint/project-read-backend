@@ -102,28 +102,19 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
     def validate(self, attrs):
-        if attrs["parent"].get("information") is not None:
-            validate_field_ids_role(
-                set(attrs["parent"].get("information").keys()), Field.PARENT
-            )
-
-        children_field_ids = set(
-            [
-                field_id
-                for child in attrs.get("children", [])
-                for field_id in child["information"].keys()
-            ]
+        validate_field_ids_role(
+            set(attrs["parent"].get("information", {}).keys()), Field.PARENT
         )
-        validate_field_ids_role(children_field_ids, Field.CHILD)
 
-        guest_field_ids = set(
-            [
-                field_id
-                for guest in attrs.get("guests", [])
-                for field_id in guest["information"].keys()
-            ]
-        )
-        validate_field_ids_role(guest_field_ids, Field.GUEST)
+        children_field_ids = []
+        for child in attrs.get("children", []):
+            children_field_ids.extend(child.get("information", {}).keys())
+        validate_field_ids_role(set(children_field_ids), Field.CHILD)
+
+        guest_field_ids = []
+        for guest in attrs.get("guests", []):
+            guest_field_ids.extend(guest.get("information", {}).keys())
+        validate_field_ids_role(set(guest_field_ids), Field.GUEST)
 
         return super().validate(attrs)
 

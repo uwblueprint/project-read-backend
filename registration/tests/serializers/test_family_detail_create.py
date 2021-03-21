@@ -126,7 +126,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         "registration.serializers.validate_field_ids_role",
         side_effect=ValidationError(""),
     )
-    def test_family_detail_serializer_create__validate_parent(self, mock_validate):
+    def test_family_detail_serializer_validate__parent_fields(self, mock_validate):
         data = dict(self.family_data)
         data["parent"] = {
             "first_name": "Molly",
@@ -140,7 +140,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         mock_validate.assert_called_once_with(set(["0"]), Field.PARENT)
 
     @patch("registration.serializers.validate_field_ids_role")
-    def test_family_detail_serializer_create__validate_children(self, mock_validate):
+    def test_family_detail_serializer_validate__children_fields(self, mock_validate):
         def side_effect(_, role):
             if role == Field.CHILD:
                 raise ValidationError("")
@@ -175,7 +175,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         mock_validate.assert_has_calls(calls)
 
     @patch("registration.serializers.validate_field_ids_role")
-    def test_family_detail_serializer_create__validate_guests(self, mock_validate):
+    def test_family_detail_serializer_validate__guests_fields(self, mock_validate):
         def side_effect(_, role):
             if role == Field.GUEST:
                 raise ValidationError("")
@@ -207,5 +207,38 @@ class FamilyDetailSerializerTestCase(TestCase):
                 set(["100", "101"]),
                 Field.GUEST,
             ),
+        ]
+        mock_validate.assert_has_calls(calls)
+
+    @patch("registration.serializers.validate_field_ids_role")
+    def test_family_detail_serializer_validate__no_children(self, mock_validate):
+        data = dict(self.family_data)
+        data["parent"] = self.parent_data
+        data["guests"] = self.guests_data
+
+        FamilyDetailSerializer(data=data).is_valid()
+        self.assertEqual(mock_validate.call_count, 3)
+        calls = [
+            call(set([f"{self.parent_field.id}"]), Field.PARENT),
+            call(set(), Field.CHILD),
+            call(
+                set([f"{self.guest_field.id}"]),
+                Field.GUEST,
+            ),
+        ]
+        mock_validate.assert_has_calls(calls)
+
+    @patch("registration.serializers.validate_field_ids_role")
+    def test_family_detail_serializer_validate__no_guests(self, mock_validate):
+        data = dict(self.family_data)
+        data["parent"] = self.parent_data
+        data["children"] = self.children_data
+
+        FamilyDetailSerializer(data=data).is_valid()
+        self.assertEqual(mock_validate.call_count, 3)
+        calls = [
+            call(set([f"{self.parent_field.id}"]), Field.PARENT),
+            call(set([f"{self.child_field.id}"]), Field.CHILD),
+            call(set(), Field.GUEST),
         ]
         mock_validate.assert_has_calls(calls)

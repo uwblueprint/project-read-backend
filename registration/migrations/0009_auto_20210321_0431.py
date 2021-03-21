@@ -7,13 +7,15 @@ import registration.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0008_auto_20210320_1833'),
+        ("registration", "0008_auto_20210320_1833"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='student',
-            name='information',
-            field=models.JSONField(default=dict, validators=[registration.validators.validate_information]),
+            model_name="student",
+            name="information",
+            field=models.JSONField(
+                default=dict, validators=[registration.validators.validate_information]
+            ),
         ),
     ]
