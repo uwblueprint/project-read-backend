@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
-from .validators import validate_field_ids_role
+from .validators import validate_student_information
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
@@ -102,20 +102,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
     def validate(self, attrs):
-        validate_field_ids_role(
-            set(attrs["parent"].get("information", {}).keys()), Field.PARENT
-        )
-
-        children_field_ids = []
-        for child in attrs.get("children", []):
-            children_field_ids.extend(child.get("information", {}).keys())
-        validate_field_ids_role(set(children_field_ids), Field.CHILD)
-
-        guest_field_ids = []
-        for guest in attrs.get("guests", []):
-            guest_field_ids.extend(guest.get("information", {}).keys())
-        validate_field_ids_role(set(guest_field_ids), Field.GUEST)
-
+        validate_student_information(attrs["students"])
         return super().validate(attrs)
 
 
