@@ -103,6 +103,7 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Field
         fields = [
+            "id",
             "role",
             "name",
             "question",

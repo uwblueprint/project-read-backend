@@ -27,8 +27,6 @@ class FamilyViewSet(
 class FieldViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.CreateModelMixin,
 ):
     queryset = Field.objects.all()
     serializer_class = FieldSerializer
