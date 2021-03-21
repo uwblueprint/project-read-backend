@@ -16,20 +16,15 @@ def validate_information_responses(responses):
         raise ValidationError("One of the provided responses is not a string")
 
 
-def validate_information(information):
+def validate_student_information_role(information, role):
     Field = apps.get_model("registration", "Field")
-    if len(information) != Field.objects.filter(id__in=information.keys()).count():
-        raise ValidationError("One of the provided IDs is not a valid field ID")
-    validate_information_responses(information.values())
-
-
-def validate_student_information_role(student_data):
-    Field = apps.get_model("registration", "Field")
-    information = student_data.get("information", {})
-    role = student_data["role"]
     if (
         len(information)
         != Field.objects.filter(id__in=information.keys(), role=role).count()
     ):
         raise ValidationError(f"One of the provided IDs is not a valid {role} field ID")
     validate_information_responses(information.values())
+
+
+def validate_student(student):
+    validate_student_information_role(student.information, student.role)

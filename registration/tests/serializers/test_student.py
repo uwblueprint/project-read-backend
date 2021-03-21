@@ -27,7 +27,9 @@ class StudentSerializerTestCase(TestCase):
     @patch("registration.serializers.validate_student_information_role")
     def test_family_detail_serializer_validate(self, mock_validate):
         self.assertTrue(StudentSerializer(data=self.student_data).is_valid())
-        mock_validate.assert_called_once()
+        mock_validate.assert_called_once_with(
+            self.student_data["information"], Student.PARENT
+        )
 
     @patch(
         "registration.serializers.validate_student_information_role",
@@ -35,4 +37,6 @@ class StudentSerializerTestCase(TestCase):
     )
     def test_family_detail_serializer_validate__invalid(self, mock_validate):
         self.assertFalse(StudentSerializer(data=self.student_data).is_valid())
-        mock_validate.assert_called_once()
+        mock_validate.assert_called_once_with(
+            self.student_data["information"], Student.PARENT
+        )

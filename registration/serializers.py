@@ -51,7 +51,10 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def validate(self, attrs):
-        validate_student_information_role(attrs)
+        validate_student_information_role(
+            attrs.get("information", {}),
+            attrs["role"],
+        )
         return super().validate(attrs)
 
 

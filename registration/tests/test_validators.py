@@ -3,12 +3,7 @@ from django.test import TestCase
 from unittest.mock import patch
 
 from ..models import Student, Field
-from ..validators import (
-    validate_family_parent,
-    validate_information,
-    validate_information_responses,
-    validate_student_information_role,
-)
+from .. import validators
 
 
 class ValidatorsTestCase(TestCase):
@@ -45,54 +40,43 @@ class ValidatorsTestCase(TestCase):
         )
 
     def test_validate_family_parent(self):
-        self.assertIsNone(validate_family_parent(self.parent.id))
-        self.assertRaises(ValidationError, validate_family_parent, self.child.id)
+        self.assertIsNone(validators.validate_family_parent(self.parent.id))
+        self.assertRaises(
+            ValidationError, validators.validate_family_parent, self.child.id
+        )
 
     def test_validate_information_responses(self):
         responses = ["a", "b", "c"]
-        self.assertIsNone(validate_information_responses(responses))
+        self.assertIsNone(validators.validate_information_responses(responses))
 
     def test_validate_information_responses__invalid(self):
         responses = [["a"], "b", "c"]
-        self.assertRaises(ValidationError, validate_information_responses, responses)
-
-    @patch("registration.validators.validate_information_responses")
-    def test_validate_information(self, mock_validate_responses):
-        information = {f"{self.parent_field.id}": "Yes"}
-        is_valid = validate_information(information)
-        self.assertIsNone(is_valid)
-        mock_validate_responses.assert_called_once()
-        self.assertListEqual(
-            list(mock_validate_responses.call_args.args[0]),
-            list(information.values()),
+        self.assertRaises(
+            ValidationError, validators.validate_information_responses, responses
         )
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_information__invalid(self, mock_validate_responses):
-        information = {f"0": "Yes"}
-        self.assertRaises(ValidationError, validate_information, information)
-        mock_validate_responses.assert_not_called()
-
-    @patch("registration.validators.validate_information_responses")
-    def test_validate_student_information_role(self, mock_validate_responses):
+    def test_validate_student_information_role(self, mock_validate):
         student = {
             "role": Student.PARENT,
             "information": {
                 f"{self.parent_field.id}": "value",
             },
         }
-        is_valid = validate_student_information_role(student)
-        self.assertIsNone(is_valid)
-        mock_validate_responses.assert_called_once()
+        self.assertIsNone(
+            validators.validate_student_information_role(
+                student["information"],
+                student["role"],
+            )
+        )
+        mock_validate.assert_called_once()
         self.assertListEqual(
-            list(mock_validate_responses.call_args.args[0]),
-            list(["value"]),
+            list(mock_validate.call_args.args[0]),
+            list(student["information"].values()),
         )
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_student_information_role__invalid_id(
-        self, mock_validate_responses
-    ):
+    def test_validate_student_information_role__invalid_id(self, mock_validate):
         student = {
             "role": Student.PARENT,
             "information": {
@@ -100,13 +84,16 @@ class ValidatorsTestCase(TestCase):
                 "0": "",
             },
         }
-        self.assertRaises(ValidationError, validate_student_information_role, student)
-        mock_validate_responses.assert_not_called()
+        self.assertRaises(
+            ValidationError,
+            validators.validate_student_information_role,
+            student["information"],
+            student["role"],
+        )
+        mock_validate.assert_not_called()
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_student_information_role__invalid_role(
-        self, mock_validate_responses
-    ):
+    def test_validate_student_information_role__invalid_role(self, mock_validate):
         student = {
             "role": Student.PARENT,
             "information": {
@@ -114,5 +101,51 @@ class ValidatorsTestCase(TestCase):
                 f"{self.child_field.id}": "",
             },
         }
-        self.assertRaises(ValidationError, validate_student_information_role, student)
-        mock_validate_responses.assert_not_called()
+        self.assertRaises(
+            ValidationError,
+            validators.validate_student_information_role,
+            student["information"],
+            student["role"],
+        )
+        mock_validate.assert_not_called()
+
+    @patch(
+        "registration.validators.validate_information_responses",
+        side_effect=ValidationError(""),
+    )
+    def test_validate_student_information_role__invalid_responses(self, mock_validate):
+        student = {
+            "role": Student.PARENT,
+            "information": {
+                f"{self.parent_field.id}": ["value"],
+            },
+        }
+        self.assertRaises(
+            ValidationError,
+            validators.validate_student_information_role,
+            student["information"],
+            student["role"],
+        )
+        self.assertListEqual(
+            list(mock_validate.call_args.args[0]),
+            list(student["information"].values()),
+        )
+
+    @patch("registration.validators.validate_student_information_role")
+    def test_validate_student(self, mock_validate):
+        student = Student(role=Student.PARENT, information={})
+        self.assertIsNone(validators.validate_student(student))
+        mock_validate.assert_called_once_with(student.information, student.role)
+
+    @patch(
+        "registration.validators.validate_student_information_role",
+        side_effect=ValidationError(""),
+    )
+    def test_validate_student__invalid(self, mock_validate):
+        student = Student(role=Student.PARENT, information={})
+        self.assertRaises(
+            ValidationError,
+            validators.validate_student,
+            student,
+        )
+        mock_validate.assert_called_once_with(student.information, student.role)
