@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -108,7 +107,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     def validate(self, attrs):
         for student in attrs["students"]:
             if not StudentSerializer(data=student).is_valid():
-                raise serializers.ValidationError("no")
+                raise serializers.ValidationError("Student data is invalid")
         return super().validate(attrs)
 
 

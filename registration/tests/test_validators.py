@@ -1,11 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from unittest.mock import call, patch
+from unittest.mock import patch
 
 from ..models import Student, Field
 from ..validators import (
     validate_family_parent,
     validate_information,
+    validate_information_responses,
     validate_student_role_information,
 )
 
@@ -48,7 +49,12 @@ class ValidatorsTestCase(TestCase):
         self.assertRaises(ValidationError, validate_family_parent, self.child.id)
 
     def test_validate_information_responses(self):
-        pass
+        responses = ["a", "b", "c"]
+        self.assertIsNone(validate_information_responses(responses))
+
+    def test_validate_information_responses__invalid(self):
+        responses = [["a"], "b", "c"]
+        self.assertRaises(ValidationError, validate_information_responses, responses)
 
     @patch("registration.validators.validate_information_responses")
     def test_validate_information(self, mock_validate_responses):

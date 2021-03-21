@@ -12,9 +12,8 @@ def validate_family_parent(student_id):
 
 
 def validate_information_responses(responses):
-    for response in responses:
-        if not isinstance(response, str):
-            raise ValidationError("One of the provided responses is not a string")
+    if not all(isinstance(response, str) for response in responses):
+        raise ValidationError("One of the provided responses is not a string")
 
 
 def validate_information(information):
