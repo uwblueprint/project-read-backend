@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.test.testcases import TestCase
 from unittest.mock import patch
 
@@ -122,31 +121,22 @@ class FamilyDetailSerializerTestCase(TestCase):
         data = dict(self.family_data)
         self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
 
-    @patch("registration.serializers.validate_student_role_information")
+    @patch("registration.serializers.StudentSerializer.is_valid")
     def test_family_detail_serializer_validate(self, mock_validate):
         data = dict(self.family_data)
         data["parent"] = self.parent_data
         data["children"] = self.children_data
         data["guests"] = self.guests_data
 
-        is_valid = FamilyDetailSerializer(data=data).is_valid()
-        mock_validate.assert_called_once_with(
-            [self.parent_data] + self.children_data + self.guests_data
-        )
-        self.assertTrue(is_valid)
+        self.assertTrue(FamilyDetailSerializer(data=data).is_valid())
+        self.assertEqual(mock_validate.call_count, 4)
 
-    @patch(
-        "registration.serializers.validate_student_role_information",
-        side_effect=ValidationError(""),
-    )
+    @patch("registration.serializers.StudentSerializer.is_valid", return_value=False)
     def test_family_detail_serializer_validate__invalid(self, mock_validate):
         data = dict(self.family_data)
         data["parent"] = self.parent_data
         data["children"] = self.children_data
         data["guests"] = self.guests_data
 
-        is_valid = FamilyDetailSerializer(data=data).is_valid()
-        mock_validate.assert_called_once_with(
-            [self.parent_data] + self.children_data + self.guests_data
-        )
-        self.assertFalse(is_valid)
+        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
+        mock_validate.assert_called_once()

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -49,7 +50,10 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "family",
             "information",
         ]
-        read_only_fields = ["role"]
+
+    def validate(self, attrs):
+        validate_student_role_information(attrs)
+        return super().validate(attrs)
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -102,7 +106,9 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
     def validate(self, attrs):
-        validate_student_role_information(attrs["students"])
+        for student in attrs["students"]:
+            if not StudentSerializer(data=student).is_valid():
+                raise serializers.ValidationError("no")
         return super().validate(attrs)
 
 

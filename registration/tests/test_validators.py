@@ -51,68 +51,62 @@ class ValidatorsTestCase(TestCase):
         pass
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_information(self, mock_validate):
+    def test_validate_information(self, mock_validate_responses):
         information = {f"{self.parent_field.id}": "Yes"}
         is_valid = validate_information(information)
         self.assertIsNone(is_valid)
+        mock_validate_responses.assert_called_once()
         self.assertListEqual(
-            list(mock_validate.call_args.args[0]),
+            list(mock_validate_responses.call_args.args[0]),
             list(information.values()),
         )
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_information__invalid(self, mock_validate):
+    def test_validate_information__invalid(self, mock_validate_responses):
         information = {f"0": "Yes"}
         self.assertRaises(ValidationError, validate_information, information)
+        mock_validate_responses.assert_not_called()
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_student_role_information(self, mock_validate):
-        students = [
-            {
-                "role": Student.PARENT,
-                "information": {
-                    f"{self.parent_field.id}": "",
-                },
+    def test_validate_student_role_information(self, mock_validate_responses):
+        student = {
+            "role": Student.PARENT,
+            "information": {
+                f"{self.parent_field.id}": "value",
             },
-            {
-                "role": Student.CHILD,
-                "information": {
-                    f"{self.child_field.id}": "",
-                },
-            },
-            {
-                "role": Student.GUEST,
-                "information": {
-                    f"{self.guest_field.id}": "",
-                },
-            },
-        ]
-        is_valid = validate_student_role_information(students)
+        }
+        is_valid = validate_student_role_information(student)
         self.assertIsNone(is_valid)
-        self.assertEqual(mock_validate.call_count, len(students))
+        mock_validate_responses.assert_called_once()
+        self.assertListEqual(
+            list(mock_validate_responses.call_args.args[0]),
+            list(["value"]),
+        )
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_student_role_information__invalid_id(self, mock_validate):
-        students = [
-            {
-                "role": Student.PARENT,
-                "information": {
-                    f"{self.parent_field.id}": "",
-                    "0": "",
-                },
-            }
-        ]
-        self.assertRaises(ValidationError, validate_student_role_information, students)
+    def test_validate_student_role_information__invalid_id(
+        self, mock_validate_responses
+    ):
+        student = {
+            "role": Student.PARENT,
+            "information": {
+                f"{self.parent_field.id}": "",
+                "0": "",
+            },
+        }
+        self.assertRaises(ValidationError, validate_student_role_information, student)
+        mock_validate_responses.assert_not_called()
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_student_role_information__invalid_role(self, mock_validate):
-        students = [
-            {
-                "role": Student.PARENT,
-                "information": {
-                    f"{self.parent_field.id}": "",
-                    f"{self.child_field.id}": "",
-                },
-            }
-        ]
-        self.assertRaises(ValidationError, validate_student_role_information, students)
+    def test_validate_student_role_information__invalid_role(
+        self, mock_validate_responses
+    ):
+        student = {
+            "role": Student.PARENT,
+            "information": {
+                f"{self.parent_field.id}": "",
+                f"{self.child_field.id}": "",
+            },
+        }
+        self.assertRaises(ValidationError, validate_student_role_information, student)
+        mock_validate_responses.assert_not_called()
