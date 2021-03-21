@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test.testcases import TestCase
-from unittest.mock import call, patch
+from unittest.mock import patch
 
 from registration.models import Family, Student, Field
 from registration.serializers import FamilyDetailSerializer
