@@ -1,11 +1,38 @@
+from django.core.exceptions import ValidationError
 from django.test.testcases import TestCase
+from unittest.mock import call, patch
 
-from registration.models import Family, Student
+from registration.models import Family, Student, Field
 from registration.serializers import FamilyDetailSerializer
 
 
 class FamilyDetailSerializerTestCase(TestCase):
     def setUp(self):
+        self.parent_field = Field.objects.create(
+            role=Field.PARENT,
+            name="Internet Access",
+            question="Do you have access to internet",
+            question_type=Field.TEXT,
+            is_default=True,
+            order=1,
+        )
+        self.child_field = Field.objects.create(
+            role=Field.CHILD,
+            name="Gender",
+            question="What is their gender?",
+            question_type=Field.MULTIPLE_CHOICE,
+            is_default=True,
+            order=1,
+        )
+        self.guest_field = Field.objects.create(
+            role=Field.GUEST,
+            name="Relationship",
+            question="What's their relationship to your family?",
+            question_type=Field.MULTIPLE_CHOICE,
+            is_default=True,
+            order=1,
+        )
+
         self.family_data = {
             "email": "weasleys@theorder.com",
             "phone_number": "123456789",
@@ -15,25 +42,25 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.parent_data = {
             "first_name": "Molly",
             "last_name": "Weasley",
-            "information": {"2": "yes"},
+            "information": {f"{self.parent_field.id}": "yes"},
         }
         self.children_data = [
             {
                 "first_name": "Ron",
                 "last_name": "Weasley",
-                "information": {"1": "male"},
+                "information": {f"{self.child_field.id}": "male"},
             },
             {
                 "first_name": "Ginny",
                 "last_name": "Weasley",
-                "information": {"1": "female"},
+                "information": {f"{self.child_field.id}": "female"},
             },
         ]
         self.guests_data = [
             {
                 "first_name": "Harry",
                 "last_name": "Potter",
-                "information": {"3": "friend"},
+                "information": {f"{self.guest_field.id}": "friend"},
             }
         ]
 
@@ -94,3 +121,91 @@ class FamilyDetailSerializerTestCase(TestCase):
     def test_family_detail_serializer_validate__no_parent(self):
         data = dict(self.family_data)
         self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
+
+    @patch(
+        "registration.serializers.validate_field_ids_role",
+        side_effect=ValidationError(""),
+    )
+    def test_family_detail_serializer_create__validate_parent(self, mock_validate):
+        data = dict(self.family_data)
+        data["parent"] = {
+            "first_name": "Molly",
+            "last_name": "Weasley",
+            "information": {"0": "yes"},
+        }
+        data["children"] = self.children_data
+        data["guests"] = self.guests_data
+
+        FamilyDetailSerializer(data=data).is_valid()
+        mock_validate.assert_called_once_with(set(["0"]), Field.PARENT)
+
+    @patch("registration.serializers.validate_field_ids_role")
+    def test_family_detail_serializer_create__validate_children(self, mock_validate):
+        def side_effect(_, role):
+            if role == Field.CHILD:
+                raise ValidationError("")
+
+        mock_validate.side_effect = side_effect
+
+        data = dict(self.family_data)
+        data["parent"] = self.parent_data
+        data["children"] = [
+            {
+                "first_name": "Ron",
+                "last_name": "Weasley",
+                "information": {"0": "male", "100": "peanuts"},
+            },
+            {
+                "first_name": "Ginny",
+                "last_name": "Weasley",
+                "information": {"1": "female", "101": "1 year"},
+            },
+        ]
+        data["guests"] = self.guests_data
+
+        FamilyDetailSerializer(data=data).is_valid()
+        self.assertEqual(mock_validate.call_count, 2)
+        calls = [
+            call(set([f"{self.parent_field.id}"]), Field.PARENT),
+            call(
+                set(["0", "1", "100", "101"]),
+                Field.CHILD,
+            ),
+        ]
+        mock_validate.assert_has_calls(calls)
+
+    @patch("registration.serializers.validate_field_ids_role")
+    def test_family_detail_serializer_create__validate_guests(self, mock_validate):
+        def side_effect(_, role):
+            if role == Field.GUEST:
+                raise ValidationError("")
+
+        mock_validate.side_effect = side_effect
+
+        data = dict(self.family_data)
+        data["parent"] = self.parent_data
+        data["children"] = self.children_data
+        data["guests"] = [
+            {
+                "first_name": "Harry",
+                "last_name": "Potter",
+                "information": {f"100": "friend"},
+            },
+            {
+                "first_name": "Hermione",
+                "last_name": "Granger",
+                "information": {f"101": "friend"},
+            },
+        ]
+
+        FamilyDetailSerializer(data=data).is_valid()
+        self.assertEqual(mock_validate.call_count, 3)
+        calls = [
+            call(set([f"{self.parent_field.id}"]), Field.PARENT),
+            call(set([f"{self.child_field.id}"]), Field.CHILD),
+            call(
+                set(["100", "101"]),
+                Field.GUEST,
+            ),
+        ]
+        mock_validate.assert_has_calls(calls)

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
+from .validators import validate_field_ids_role
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
@@ -99,6 +100,32 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
         data["students"] = [parent] + children + guests
         return data
+
+    def validate(self, attrs):
+        if attrs["parent"].get("information") is not None:
+            validate_field_ids_role(
+                set(attrs["parent"].get("information").keys()), Field.PARENT
+            )
+
+        children_field_ids = set(
+            [
+                field_id
+                for child in attrs.get("children", [])
+                for field_id in child["information"].keys()
+            ]
+        )
+        validate_field_ids_role(children_field_ids, Field.CHILD)
+
+        guest_field_ids = set(
+            [
+                field_id
+                for guest in attrs.get("guests", [])
+                for field_id in guest["information"].keys()
+            ]
+        )
+        validate_field_ids_role(guest_field_ids, Field.GUEST)
+
+        return super().validate(attrs)
 
 
 class FieldSerializer(serializers.HyperlinkedModelSerializer):

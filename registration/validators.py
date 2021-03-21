@@ -9,3 +9,19 @@ def validate_family_parent(student_id):
         raise ValidationError(
             f"{student.first_name} {student.last_name} is a {student.role}, not a {Student.PARENT}"
         )
+
+
+def validate_information(information):
+    Field = apps.get_model("registration", "Field")
+    if len(information) != Field.objects.filter(id__in=information.keys()).count():
+        raise ValidationError("One of the provided IDs is not a valid field ID")
+    for value in information.values():
+        if not isinstance(value, str):
+            raise ValidationError("One of the provided responses is not a string")
+
+
+def validate_field_ids_role(field_ids, role):
+    Field = apps.get_model("registration", "Field")
+    field_ids = set(field_ids)
+    if len(field_ids) != Field.objects.filter(id__in=field_ids, role=role).count():
+        raise ValidationError(f"One of the provided IDs is not a valid {role} field ID")

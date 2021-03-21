@@ -1,5 +1,5 @@
 from django.db import models
-from .validators import validate_family_parent
+from .validators import validate_family_parent, validate_information
 
 
 class Family(models.Model):
@@ -60,7 +60,7 @@ class Student(models.Model):
         on_delete=models.SET_NULL,
         related_name="students",
     )
-    information = models.JSONField(blank=True, null=True)
+    information = models.JSONField(default=dict, validators=[validate_information])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
