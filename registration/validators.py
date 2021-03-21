@@ -18,12 +18,19 @@ def validate_information_responses(responses):
 
 def validate_student_information_role(information, role):
     Field = apps.get_model("registration", "Field")
-    if (
-        len(information)
-        != Field.objects.filter(id__in=information.keys(), role=role).count()
-    ):
-        raise ValidationError(f"One of the provided IDs is not a valid {role} field ID")
-    validate_information_responses(information.values())
+    try:
+        if (
+            len(information)
+            != Field.objects.filter(id__in=information.keys(), role=role).count()
+        ):
+            raise ValidationError(
+                f"One of the provided IDs is not a valid {role} field ID"
+            )
+        validate_information_responses(information.values())
+    except ValidationError as ve:
+        raise ve
+    except:
+        raise ValidationError("Invalid information JSON")
 
 
 def validate_student(student):
