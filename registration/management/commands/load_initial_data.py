@@ -9,12 +9,12 @@ from registration.models import Family, Student, Field
 
 fake = Faker()
 
-preferred_comms = ["Phone", "Email"]
-technologies = ["Laptop", "Tablet", "Desktop"]
-education_levels = ["High School", "Trade School", "College/University", "Masters"]
-genders = ["Man", "Woman", "Non-binary", "Other"]
-dietary_restrictions = ["Peanuts", "Dairy", "Eggs", "Nuts", "Vegetarian", "Vegan"]
-family_relations = [
+preferred_comms = {"Phone", "Email"}
+technologies = {"Laptop", "Tablet", "Desktop"}
+education_levels = {"High School", "Trade School", "College/University", "Masters"}
+genders = {"Man", "Woman", "Non-binary", "Other"}
+dietary_restrictions = {"Peanuts", "Dairy", "Eggs", "Nuts", "Vegetarian", "Vegan"}
+family_relations = {
     "Grandmother",
     "Grandfather",
     "Mother",
@@ -23,7 +23,7 @@ family_relations = [
     "Uncle",
     "Sibling",
     "Friend",
-]
+}
 
 
 def get_fields_list():
@@ -42,10 +42,10 @@ def gen_parent_info():
         "role": Student.PARENT,
         "information": {
             "1": fake.date(),
-            "4": technologies[fake.pyint(max_value=len(technologies) - 1)],
+            "4": fake.random_element(elements=technologies),
             "5": "Yes" if fake.pybool() else "No",
             "6": "Yes" if fake.pybool() else "No",
-            "7": education_levels[fake.pyint(max_value=len(education_levels) - 1)],
+            "7": fake.random_element(elements=education_levels),
         },
     }
 
@@ -55,11 +55,9 @@ def gen_child_info():
         "first_name": fake.first_name(),
         "role": Student.CHILD,
         "information": {
-            "8": genders[fake.pyint(max_value=len(genders) - 1)],
+            "8": fake.random_element(elements=genders),
             "9": fake.date_this_decade().strftime("%m/%d/%Y"),
-            "10": dietary_restrictions[
-                fake.pyint(max_value=len(dietary_restrictions) - 1)
-            ],
+            "10": fake.random_element(elements=dietary_restrictions),
         },
     }
 
@@ -69,7 +67,7 @@ def gen_guest_info():
         "first_name": fake.first_name(),
         "role": Student.GUEST,
         "information": {
-            "11": family_relations[fake.pyint(max_value=len(family_relations) - 1)],
+            "11": fake.random_element(elements=family_relations),
             "12": fake.phone_number(),
         },
     }
@@ -81,7 +79,7 @@ def create_family(has_guests=False):
         email=f"{last_name.lower()}@test.com",
         phone_number=fake.phone_number(),
         address=fake.address(),
-        preferred_comms=preferred_comms[fake.pyint(max_value=len(preferred_comms) - 1)],
+        preferred_comms=fake.random_element(elements=preferred_comms),
     )
     parent = Student.objects.create(
         **gen_parent_info(), last_name=last_name, family=family
@@ -100,7 +98,6 @@ def create_family(has_guests=False):
         guests.append(Student(**gen_guest_info(), last_name=last_name, family=family))
 
     Student.objects.bulk_create(children + guests)
-    # Student.objects.bulk_create(guests)
 
 
 class Command(BaseCommand):
