@@ -50,6 +50,7 @@ class LoadInitialRegDataTestCase(TestCase):
         call_command(
             "load_initial_reg_data",
             num_families=num_families,
+            verbose=False,
         )
         self.assertEqual(Field.objects.all().count(), self.num_fields)
         self.assertEqual(Family.objects.all().count(), num_families)

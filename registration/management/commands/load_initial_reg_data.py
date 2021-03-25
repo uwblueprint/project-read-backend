@@ -9,6 +9,7 @@ from registration.models import Family, Student, Field
 
 fake = Faker()
 
+# Sample options
 preferred_comms = {"Phone", "Email"}
 technologies = {"Laptop", "Tablet", "Desktop"}
 education_levels = {"High School", "Trade School", "College/University", "Masters"}
@@ -109,20 +110,24 @@ class Command(BaseCommand):
             type=int,
             help="Number of families to create",
         )
+        parser.add_argument(
+            "--verbose",
+            action="store_true",
+            help="Verbose messages",
+            default=True,
+        )
 
     def handle(self, *args, **options):
         num_families = options.get("num_families")
+        verbose = options.get("verbose")
 
-        # Load in fields from the JSON file
-        fields = get_fields_list()
-
-        # Create families & students
         try:
             with transaction.atomic():
                 Field.objects.all().delete()
                 Family.objects.all().delete()
                 Student.objects.all().delete()
 
+                fields = get_fields_list()
                 Field.objects.bulk_create(fields)
 
                 # Create at least 1 family with guests
@@ -132,6 +137,7 @@ class Command(BaseCommand):
                 for _ in range(num_families - 1):
                     create_family()
 
+            if verbose:
                 self.stdout.write(
                     self.style.SUCCESS(
                         f"Successfully created {len(fields)} fields, "
@@ -141,5 +147,6 @@ class Command(BaseCommand):
                 )
 
         except:
-            self.stdout.write(self.style.ERROR(f"Something went wrong"))
+            if verbose:
+                self.stdout.write(self.style.ERROR(f"Something went wrong"))
             raise
