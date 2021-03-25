@@ -4,7 +4,7 @@ from django.test import TestCase
 from ..models import Family, Field, Student
 
 
-class LoadInitialDataTestCase(TestCase):
+class LoadInitialRegDataTestCase(TestCase):
     def setUp(self):
         # Create objects to ensure they're deleted by the management command
         Family.objects.create()
@@ -45,10 +45,10 @@ class LoadInitialDataTestCase(TestCase):
         )
         self.num_fields = 12
 
-    def test_load_initial_data(self):
+    def test_load_initial_reg_data(self):
         num_families = 30
         call_command(
-            "load_initial_data",
+            "load_initial_reg_data",
             num_families=num_families,
         )
         self.assertEqual(Field.objects.all().count(), self.num_fields)
