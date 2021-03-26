@@ -33,6 +33,7 @@ class SessionViewSet(
         classes = Session.objects.get(id=pk).classes
         return Response(ClassListSerializer(classes, many=True).data)
 
+
 class ClassViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
@@ -44,4 +45,3 @@ class ClassViewSet(
         "get",
     ]
     permission_classes = [permissions.IsAuthenticated]
-

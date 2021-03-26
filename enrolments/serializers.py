@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from registration.models import Family
 from registration.serializers import StudentSerializer
+from enrolments.models import Enrolment
 from .models import Session, Class
 
 
@@ -35,6 +36,9 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
 
 class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
     families = FamilyAttendanceSerializer(many=True, read_only=True)
+    # families = serializers.HyperlinkedRelatedField(
+    #     view_name="families-detail", read_only=True
+    # )
 
     class Meta:
         model = Class
@@ -46,3 +50,17 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             "attendance",
             "families",
         ]
+
+# class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
+#     families = FamilyAttendanceSerializer(many=True, read_only=True)
+
+#     class Meta:
+#         model = Enrolment
+#         fields = [
+#             "id",
+#             "name",
+#             "session_id",
+#             "facilitator_id",
+#             "attendance",
+#             "families",
+#         ]

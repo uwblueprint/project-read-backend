@@ -46,7 +46,7 @@ class Class(models.Model):
 
 class Enrolment(models.Model):
     active = models.BooleanField()
-    family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
+    family = models.ForeignKey("registration.Family", on_delete=models.PROTECT, related_name="classes")
     session = models.ForeignKey(
         "enrolments.Session",
         null=True,
@@ -58,7 +58,7 @@ class Enrolment(models.Model):
         on_delete=models.PROTECT,
         related_name="preferred_enrolment",
     )
-    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
+    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT, related_name="classes")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
