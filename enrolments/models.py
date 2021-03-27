@@ -1,5 +1,5 @@
 from django.db import models
-from .validators import validate_attendance
+from .validators import validate_attendance, validate_fields
 
 
 class Session(models.Model):
@@ -14,6 +14,7 @@ class Session(models.Model):
 
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
+    fields = models.JSONField(default=list, validators=[validate_fields])
 
     def __str__(self):
         return self.season

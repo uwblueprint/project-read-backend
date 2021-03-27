@@ -1,9 +1,9 @@
 from datetime import datetime
 from django.core.exceptions import ValidationError
-from registration.models import Student
+from registration.models import Student, Field
 
 
-def validate_attendance(classObj):
+def validate_attendance(class_obj):
     """
     Validates against the attendance column for the Class model.
     The expected structure is:
@@ -26,9 +26,9 @@ def validate_attendance(classObj):
     """
 
     schema = [{"date": "str", "attendees": ["int"]}]
-    if not validate_schema(classObj, schema):
+    if not validate_schema(class_obj, schema):
         raise ValidationError("invalid json structure", code="invalid_schema")
-    for session in classObj:
+    for session in class_obj:
         date = session["date"]
         attendees = session["attendees"]
         try:
@@ -45,6 +45,34 @@ def validate_attendance(classObj):
                 "one or more of the following attendee IDs do not exist: "
                 + str(attendees),
                 code="invalid_attendee",
+            )
+
+
+def validate_fields(session_obj):
+    """
+    Validates against the fields column for the Session model.
+    The expected structure is:
+    [
+        {
+            "fields": [
+                // field IDs
+                1, 2, 3, 4, 5
+            ]
+        },
+    ]
+    """
+    schema = [{"fields": ["int"]}]
+    if not validate_schema(session_obj, schema):
+        raise ValidationError("invalid json structure", code="invalid_schema")
+    for question in session_obj:
+        fields = question["fields"]
+        if fields and not set(
+            Field.objects.filter(pk__in=fields).values_list("id", flat=True)
+        ) == set(fields):
+            raise ValidationError(
+                "one or more of the following attendee IDs do not exist: "
+                + str(fields),
+                code="invalid_field",
             )
 
 
