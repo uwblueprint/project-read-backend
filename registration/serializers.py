@@ -105,6 +105,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError("Student data is invalid")
         return super().validate(attrs)
 
+
 class FieldListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         iterable = data.all() if isinstance(data, models.Manager) else data
