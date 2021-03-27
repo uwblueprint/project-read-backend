@@ -107,7 +107,7 @@ class ClassDetailSerializerTestCase(TestCase):
         self.class1 = Class.objects.create(
             name="Test Class 1",
             session_id=self.session1.id,
-            facilitator_id= self.facilitator.id,
+            facilitator_id=self.facilitator.id,
             attendance=[{"date": "2020-01-01", "attendees": [1]}],
             # families=[self.family1, self.family2],
         )

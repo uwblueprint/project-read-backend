@@ -27,6 +27,9 @@ class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
             "students",
         ]
 
+    # def get_test():
+    #     return self
+
 
 class ClassListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -35,7 +38,11 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
-    families = FamilyAttendanceSerializer(many=True, read_only=True)
+    families = FamilyAttendanceSerializer(source='familyattendance_set', many=True, read_only=True)
+    # source='stylecolor_set',
+    #                               many=True, read_only=True
+    # families = FamilyAttendanceSerializer.get_test
+    # serializers.SerializerMethodField(method_name = )
     # families = serializers.HyperlinkedRelatedField(
     #     view_name="families-detail", read_only=True
     # )
