@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
+from .validators import validate_student_information_role
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
@@ -48,7 +49,13 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "family",
             "information",
         ]
-        read_only_fields = ["role"]
+
+    def validate(self, attrs):
+        validate_student_information_role(
+            attrs.get("information", {}),
+            attrs["role"],
+        )
+        return super().validate(attrs)
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -71,7 +78,6 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         students = validated_data.pop("students")
-
         with transaction.atomic():
             family = Family.objects.create(**validated_data)
             Student.objects.bulk_create(
@@ -99,6 +105,13 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
         data["students"] = [parent] + children + guests
         return data
+
+    def validate(self, attrs):
+        if not all(
+            StudentSerializer(data=student).is_valid() for student in attrs["students"]
+        ):
+            raise serializers.ValidationError("Student data is invalid")
+        return super().validate(attrs)
 
 
 class FieldSerializer(serializers.HyperlinkedModelSerializer):
