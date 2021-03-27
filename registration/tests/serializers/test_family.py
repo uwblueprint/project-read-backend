@@ -1,7 +1,7 @@
 from django.test.testcases import TestCase
 
 from registration.models import Family, Student
-from registration.serializers import FamilySerializer
+from registration.serializers import FamilySerializer, StudentSerializer
 
 
 class FamilySerializerTestCase(TestCase):
@@ -58,15 +58,10 @@ class FamilySerializerTestCase(TestCase):
             family=self.family_without_parent,
         )
 
-    def test_family_serializer_parent_name(self):
+    def test_family_serializer_parent(self):
         data = FamilySerializer(self.family_without_children).data
-        self.assertEqual(data.get("first_name"), self.parent1.first_name)
-        self.assertEqual(data.get("last_name"), self.parent1.last_name)
-
-    def test_family_serializer_parent_name_none(self):
-        data = FamilySerializer(self.family_without_parent).data
-        self.assertEqual(data.get("first_name"), "")
-        self.assertEqual(data.get("last_name"), "")
+        self.assertEqual(data["parent"], StudentSerializer(self.parent1).data)
+        self.assertEqual(data["parent"], StudentSerializer(self.parent1).data)
 
     def test_family_serializer_children(self):
         data = FamilySerializer(self.family).data

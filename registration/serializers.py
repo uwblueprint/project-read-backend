@@ -1,37 +1,9 @@
-from django.db import transaction
+from django.db import models, transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
 from .validators import validate_student_information_role
-
-
-class FamilySerializer(serializers.HyperlinkedModelSerializer):
-    first_name = SerializerMethodField()
-    last_name = SerializerMethodField()
-    num_children = SerializerMethodField()
-
-    class Meta:
-        model = Family
-        fields = [
-            "id",
-            "first_name",
-            "last_name",
-            "email",
-            "phone_number",
-            "address",
-            "preferred_comms",
-            "num_children",
-        ]
-
-    def get_num_children(self, obj):
-        return Student.objects.filter(family=obj.id, role=Student.CHILD).count()
-
-    def get_first_name(self, obj):
-        return obj.parent.first_name if obj.parent else ""
-
-    def get_last_name(self, obj):
-        return obj.parent.last_name if obj.parent else ""
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -56,6 +28,26 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             attrs["role"],
         )
         return super().validate(attrs)
+
+
+class FamilySerializer(serializers.HyperlinkedModelSerializer):
+    parent = StudentSerializer()
+    num_children = SerializerMethodField()
+
+    class Meta:
+        model = Family
+        fields = [
+            "id",
+            "parent",
+            "email",
+            "phone_number",
+            "address",
+            "preferred_comms",
+            "num_children",
+        ]
+
+    def get_num_children(self, obj):
+        return obj.children.count()
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -113,6 +105,19 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError("Student data is invalid")
         return super().validate(attrs)
 
+class FieldListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        iterable = data.all() if isinstance(data, models.Manager) else data
+        fields = dict()
+
+        for role_choice in Field.ROLE_CHOICES:
+            role = role_choice[0]
+            fields[f"{role.lower()}_fields"] = super().to_representation(
+                iterable.filter(role=role).order_by("order")
+            )
+
+        return [fields]
+
 
 class FieldSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -126,3 +131,4 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
             "is_default",
             "order",
         ]
+        list_serializer_class = FieldListSerializer
