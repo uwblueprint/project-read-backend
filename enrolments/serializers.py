@@ -27,9 +27,6 @@ class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
             "students",
         ]
 
-    # def get_test():
-    #     return self
-
 
 class ClassListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -38,14 +35,7 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
-    families = FamilyAttendanceSerializer(source='familyattendance_set', many=True, read_only=True)
-    # source='stylecolor_set',
-    #                               many=True, read_only=True
-    # families = FamilyAttendanceSerializer.get_test
-    # serializers.SerializerMethodField(method_name = )
-    # families = serializers.HyperlinkedRelatedField(
-    #     view_name="families-detail", read_only=True
-    # )
+    families = serializers.SerializerMethodField()  # defaults to get_families
 
     class Meta:
         model = Class
@@ -58,16 +48,12 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             "families",
         ]
 
-# class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
-#     families = FamilyAttendanceSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Enrolment
-#         fields = [
-#             "id",
-#             "name",
-#             "session_id",
-#             "facilitator_id",
-#             "attendance",
-#             "families",
-#         ]
+    def get_families(self, obj):
+        e_set = Enrolment.objects.filter(enrolled_class=obj)
+        return [
+            FamilyAttendanceSerializer(
+                enrolment.family, read_only=True, context={"request": None}
+            ).data
+            for enrolment in e_set
+            if enrolment.active == True
+        ]
