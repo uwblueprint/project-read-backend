@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from registration.models import Field
-from registration.serializers import FieldSerializer
+from registration.serializers import FieldSerializer, FieldListSerializer
 
 
 class FieldTestCase(APITestCase):
@@ -41,15 +41,11 @@ class FieldTestCase(APITestCase):
         response = self.client.get(url)
         payload = response.json()
 
+        serializer = FieldListSerializer(child=FieldSerializer(), data=Field.objects)
+        serializer.is_valid()
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            payload,
-            [
-                FieldSerializer(self.parent_field).data,
-                FieldSerializer(self.child_field).data,
-                FieldSerializer(self.guest_field).data,
-            ],
-        )
+        self.assertEqual(payload, serializer.data)
 
     def test_method_not_allowed(self):
         url = reverse("fields-list")
