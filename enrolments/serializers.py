@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from registration.models import Family
 from registration.serializers import StudentSerializer
-from enrolments.models import Enrolment
-from .models import Session, Class
+from .models import Session, Class, Enrolment
 
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
@@ -49,11 +48,10 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_families(self, obj):
-        e_set = Enrolment.objects.filter(enrolled_class=obj)
+        e_set = Enrolment.objects.filter(enrolled_class=obj, active=True)
         return [
             FamilyAttendanceSerializer(
                 enrolment.family, read_only=True, context={"request": None}
             ).data
             for enrolment in e_set
-            if enrolment.active == True
         ]

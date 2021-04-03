@@ -12,7 +12,6 @@ from .serializers import (
 
 class SessionViewSet(
     viewsets.GenericViewSet,
-    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
 ):
     queryset = Session.objects.all()
