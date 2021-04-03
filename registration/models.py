@@ -3,6 +3,15 @@ from .validators import validate_family_parent, validate_student
 
 
 class Family(models.Model):
+    HOME_NUMBER = "Home"
+    CELL_NUMBER = "Cell"
+    WORK_NUMBER = "Work"
+    NUMBER_PREF_CHOICES = [
+        (HOME_NUMBER, "Home"),
+        (CELL_NUMBER, "Cell"),
+        (WORK_NUMBER, "Work"),
+    ]
+
     parent = models.ForeignKey(
         "Student",
         null=True,
@@ -11,7 +20,10 @@ class Family(models.Model):
         validators=[validate_family_parent],
     )
     email = models.EmailField(blank=True)
-    phone_number = models.CharField(max_length=128, blank=True)
+    home_number = models.CharField(max_length=128, blank=True, default='') #todo: should we enforce one of these 3 to be mandatory?
+    cell_number = models.CharField(max_length=128, blank=True, default='')
+    work_number = models.CharField(max_length=128, blank=True, default='')
+    preferred_number = models.CharField(max_length=4, choices=NUMBER_PREF_CHOICES)
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
