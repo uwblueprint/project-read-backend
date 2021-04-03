@@ -1,10 +1,75 @@
 from django.test import TestCase
-from registration.models import Student
-from enrolments.validators import validate_attendance, validate_schema
+from registration.models import Student, Family
+from accounts.models import User
+from enrolments.models import Enrolment, Class, Session
+from enrolments.validators import (
+    validate_attendance,
+    validate_schema,
+    validate_class_in_session,
+    validate_enrolment,
+)
 from django.core.exceptions import ValidationError
+from unittest.mock import patch
 
 
-class ValidatorsTestCase(TestCase):
+class EnrolmentValidatorTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(email="test@staff.com")
+        self.family = Family.objects.create(
+            email="fam1@test.com",
+            phone_number="123456789",
+            address="1 Fam Ave",
+            preferred_comms="email",
+        )
+        self.session = Session.objects.create(season=Session.FALL, year="2020")
+        self.class_in_session = Class.objects.create(
+            name="Class in session",
+            session=self.session,
+            facilitator=self.user,
+            attendance={},
+        )
+
+    def test_validate_classes_in_session(self):
+        class_no_sessions = Class.objects.create(
+            name="Class with no sessions",
+            session=None,
+            facilitator=self.user,
+            attendance={},
+        )
+        self.assertIsNone(
+            validate_class_in_session(self.class_in_session, self.session)
+        )
+        self.assertRaises(
+            ValidationError, validate_class_in_session, class_no_sessions, self.session
+        )
+
+    @patch("enrolments.validators.validate_class_in_session")
+    def test_validate_enrolments(self, mock_validate):
+        enrolment = Enrolment(
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+        )
+        self.assertIsNone(validate_enrolment(enrolment))
+        mock_validate.assert_called_with(self.class_in_session, self.session)
+
+    @patch(
+        "enrolments.validators.validate_class_in_session",
+        side_effect=ValidationError(""),
+    )
+    def test_validate_enrolments__invalid(self, mock_validate):
+        enrolment = Enrolment(
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+        )
+        self.assertRaises(ValidationError, validate_enrolment, enrolment)
+        mock_validate.assert_called_once_with(self.class_in_session, self.session)
+
+
+class AttendanceValidatorTestCase(TestCase):
     def setUp(self):
         Student.objects.bulk_create(
             [

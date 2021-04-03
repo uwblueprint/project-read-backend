@@ -1,5 +1,5 @@
 from django.db import models
-from .validators import validate_attendance
+from .validators import validate_attendance, validate_enrolment
 
 
 class Session(models.Model):
@@ -67,3 +67,7 @@ class Enrolment(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+
+    def clean(self):
+        validate_enrolment(self)
+        return super().clean()
