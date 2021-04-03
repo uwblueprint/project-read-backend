@@ -49,6 +49,8 @@ class FieldAdmin(admin.ModelAdmin):
         "id",
         "name",
         "question",
+        "role",
+        "is_default",
     )
     ordering = ("id", "order", "name")
     search_fields = ("name", "question")
