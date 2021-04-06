@@ -28,6 +28,7 @@ class StudentAdmin(admin.ModelAdmin):
         "first_name",
         "last_name",
         "family",
+        "role",
     )
     ordering = (
         "id",
@@ -37,12 +38,10 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = (
         "first_name",
         "last_name",
-        "family",
+        "family__parent__first_name",
+        "family__parent__last_name",
     )
-    list_filter = (
-        "family",
-        "role",
-    )
+    list_filter = ("role",)
 
 
 class FieldAdmin(admin.ModelAdmin):
@@ -50,6 +49,8 @@ class FieldAdmin(admin.ModelAdmin):
         "id",
         "name",
         "question",
+        "role",
+        "is_default",
     )
     ordering = ("id", "order", "name")
     search_fields = ("name", "question")
