@@ -4,7 +4,7 @@ from enrolments.models import Session, Enrolment
 from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
 from accounts.models import User
-from enrolments.serializers import FamilyAttendanceSerializer, ClassDetailSerializer
+from enrolments.serializers import FamilyAttendanceSerializer, ClassDetailSerializer, SessionDetailSerializer
 from registration.serializers import FamilySerializer, StudentSerializer
 
 context = {"request": None}
@@ -106,7 +106,8 @@ class SessionDetailSerializerTestCase(TestCase):
                     FamilySerializer(self.family, context=context).data,
                     FamilySerializer(self.other_family, context=context).data,
                 ],
-            }
+            },
+            SessionDetailSerializer(self.session, context=context).data,
         )
 
 
