@@ -6,32 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0009_auto_20210321_1836'),
+        ("registration", "0009_auto_20210321_1836"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='family',
-            name='phone_number',
+            model_name="family",
+            name="phone_number",
         ),
         migrations.AddField(
-            model_name='family',
-            name='cell_number',
-            field=models.CharField(blank=True, default='', max_length=128),
+            model_name="family",
+            name="cell_number",
+            field=models.CharField(blank=True, default="", max_length=128),
         ),
         migrations.AddField(
-            model_name='family',
-            name='home_number',
-            field=models.CharField(blank=True, default='', max_length=128),
+            model_name="family",
+            name="home_number",
+            field=models.CharField(blank=True, default="", max_length=128),
         ),
         migrations.AddField(
-            model_name='family',
-            name='preferred_number',
-            field=models.CharField(choices=[('Home', 'Home'), ('Cell', 'Cell'), ('Work', 'Work')], default='Cell', max_length=4),
+            model_name="family",
+            name="preferred_number",
+            field=models.CharField(
+                choices=[("Home", "Home"), ("Cell", "Cell"), ("Work", "Work")],
+                default="Cell",
+                max_length=4,
+            ),
         ),
         migrations.AddField(
-            model_name='family',
-            name='work_number',
-            field=models.CharField(blank=True, default='', max_length=128),
+            model_name="family",
+            name="work_number",
+            field=models.CharField(blank=True, default="", max_length=128),
         ),
     ]

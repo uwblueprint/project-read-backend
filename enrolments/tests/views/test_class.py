@@ -15,7 +15,7 @@ class ClassesTestCase(APITestCase):
         self.session2 = Session.objects.create(season=Session.FALL, year=2020)
         self.family1 = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="1 Fam St",
             preferred_comms="email",
         )

@@ -78,7 +78,7 @@ def create_family(has_guests=False):
     last_name = fake.unique.last_name()
     family = Family.objects.create(
         email=f"{last_name.lower()}@test.com",
-        phone_number=fake.phone_number(),
+        cell_number=fake.phone_number(),
         address=fake.address(),
         preferred_comms=fake.random_element(elements=preferred_comms),
     )

@@ -8,6 +8,14 @@ class LoadInitialRegDataTestCase(TestCase):
     def setUp(self):
         # Create objects to ensure they're deleted by the management command
         Family.objects.create()
+        # Family.objects.create(
+        #     email="fam1@test.com",
+        #     cell_number="123456789",
+        #     home_number="123056789",
+        #     work_number="123956789",
+        #     address="1 Fam Ave",
+        #     preferred_comms="email",
+        # )
         Student.objects.bulk_create(
             [
                 Student(first_name="Marlin", last_name="Fish", role=Student.PARENT),
