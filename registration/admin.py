@@ -8,7 +8,10 @@ class FamilyAdmin(admin.ModelAdmin):
         "id",
         "parent",
         "email",
-        "phone_number",
+        "home_number",
+        "cell_number",
+        "work_number",
+        "preferred_number",
         "address",
     )
     ordering = ("-id",)
@@ -16,7 +19,10 @@ class FamilyAdmin(admin.ModelAdmin):
         "parent__first_name",
         "parent__last_name",
         "email",
-        "phone_number",
+        "home_number",
+        "cell_number",
+        "work_number",
+        "preferred_number",
         "address",
     )
     list_filter = ("preferred_comms",)

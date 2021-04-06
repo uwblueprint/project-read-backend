@@ -23,7 +23,7 @@ class Family(models.Model):
     home_number = models.CharField(max_length=128, blank=True, default='') #todo: should we enforce one of these 3 to be mandatory?
     cell_number = models.CharField(max_length=128, blank=True, default='')
     work_number = models.CharField(max_length=128, blank=True, default='')
-    preferred_number = models.CharField(max_length=4, choices=NUMBER_PREF_CHOICES)
+    preferred_number = models.CharField(max_length=4, choices=NUMBER_PREF_CHOICES, default="Cell")
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
