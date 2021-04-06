@@ -12,6 +12,8 @@ class FamilyAttendanceSerializerTestCase(TestCase):
         self.family1 = Family.objects.create(
             email="fam1@test.com",
             cell_number="123456789",
+            work_number="0000000000",
+            preferred_number="Work",
             address="1 Fam Ave",
             preferred_comms="email",
         )
@@ -41,7 +43,7 @@ class FamilyAttendanceSerializerTestCase(TestCase):
             {
                 "id": self.family1.id,
                 "email": self.family1.email,
-                "phone_number": self.family1.cell_number,
+                "phone_number": self.family1.work_number,
                 "students": [
                     StudentSerializer(self.student1, context={"request": None}).data,
                     StudentSerializer(self.student2, context={"request": None}).data,

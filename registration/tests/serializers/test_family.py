@@ -18,6 +18,8 @@ class FamilySerializerTestCase(TestCase):
             parent=self.parent2,
             email="justkeepswimming@ocean.com",
             cell_number="123456789",
+            home_number="1111111111",
+            preferred_number="Home",
             address="1 Django Boulevard",
             preferred_comms="Shark Tune",
         )
@@ -56,6 +58,23 @@ class FamilySerializerTestCase(TestCase):
             last_name="Tuna",
             role=Student.CHILD,
             family=self.family_without_parent,
+        )
+
+    def test_family_number(self):
+        self.maxDiff = None
+        self.assertDictEqual(
+            {
+                "id": self.family.id,
+                "parent": StudentSerializer(
+                    self.family.parent, context={"request": None}
+                ).data,
+                "email": self.family.email,
+                "phone_number": self.family.home_number,
+                "address": self.family.address,
+                "preferred_comms": self.family.preferred_comms,
+                "num_children": 2,
+            },
+            FamilySerializer(self.family, context={"request": None}).data,
         )
 
     def test_family_serializer_parent(self):
