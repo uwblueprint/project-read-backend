@@ -48,26 +48,24 @@ def validate_attendance(class_obj):
             )
 
 
-def validate_fields(fields_obj):
+def validate_fields(fields_list):
     """
     Validates against the fields column for the Session model.
     The expected structure is:
-    {
-        "fields": [
-            // field IDs
-            1, 2, 3, 4, 5
-        ]
-    },
+    [
+        // field IDs
+        1, 2, 3, 4, 5
+    ]
     """
-    schema = {"fields": ["int"]}
-    if not validate_schema(fields_obj, schema):
+    schema = ["int"]
+    if not validate_schema(fields_list, schema):
         raise ValidationError("invalid json structure", code="invalid_schema")
-    fields = fields_obj["fields"]
-    if fields and not set(
-        Field.objects.filter(pk__in=fields).values_list("id", flat=True)
-    ) == set(fields):
+    if fields_list and not set(
+        Field.objects.filter(pk__in=fields_list).values_list("id", flat=True)
+    ) == set(fields_list):
         raise ValidationError(
-            "one or more of the following attendee IDs do not exist: " + str(fields),
+            "one or more of the following attendee IDs do not exist: "
+            + str(fields_list),
             code="invalid_field",
         )
 
