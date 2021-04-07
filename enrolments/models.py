@@ -1,5 +1,6 @@
 from django.db import models
-from .validators import validate_attendance, validate_enrolment, validate_fields
+from .validators import validate_attendance, validate_enrolment, validate_fields, validate_students_in_enrolment
+from django.contrib.postgres.fields import ArrayField
 
 
 class Session(models.Model):
@@ -64,6 +65,11 @@ class Enrolment(models.Model):
     ]
     active = models.BooleanField()
     family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
+    students = ArrayField(
+        models.PositiveIntegerField(),
+        default=list,
+        validators=[validate_students_in_enrolment],
+    )
     session = models.ForeignKey(
         "enrolments.Session",
         null=True,

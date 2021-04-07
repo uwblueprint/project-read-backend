@@ -4,6 +4,17 @@ from registration.models import Student, Field
 from django.apps import apps
 
 
+def validate_students_in_enrolment(enrolment, student_list):
+    Student = apps.get_model("registration", "Student")
+    if (
+        len(student_list)
+        != Student.objects.filter(id__in=student_list, family=enrolment__family).count()
+    ):
+        raise ValidationError(
+            f"Enroled student IDs do not completely match with students under this family"
+        )
+
+
 def validate_class_in_session(class_obj, session):
     if class_obj.session != session:
         raise ValidationError(
