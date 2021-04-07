@@ -44,7 +44,7 @@ class ValidatorsTestCase(TestCase):
         self.field_ids = list(Field.objects.values_list("id", flat=True))
         self.student_ids = list(Student.objects.values_list("id", flat=True))
         self.session = Session.objects.create(
-            season=Session.SPRING, year=2021, fields=[{"fields": self.field_ids}]
+            season=Session.SPRING, year=2021, fields={"fields": self.field_ids}
         )
 
     def test_attendance_date_format(self):
@@ -64,12 +64,12 @@ class ValidatorsTestCase(TestCase):
         self.assertRaises(ValidationError, validate_attendance, obj3)
 
     def test_fields_exist(self):
-        obj1 = [{"fields": self.field_ids}]
-        obj2 = [{"fields": [self.field_ids] + [999]}]
+        obj1 = self.session.fields
+        obj2 = {"fields": [self.field_ids] + [999]}
         obj3 = None
         self.assertEqual(validate_fields(obj1), None)
-        self.assertRaises(ValidationError, validate_attendance, obj2)
-        self.assertRaises(ValidationError, validate_attendance, obj3)
+        self.assertRaises(ValidationError, validate_fields, obj2)
+        self.assertRaises(ValidationError, validate_fields, obj3)
 
 
 class SchemaValidatorTestCase(TestCase):
