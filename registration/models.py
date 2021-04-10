@@ -48,6 +48,15 @@ class Family(models.Model):
     def guests(self):
         return self.students.filter(role=Student.GUEST)
 
+    @property
+    def phone_number(self):
+        if self.preferred_number == "Cell":
+            return self.cell_number
+        elif self.preferred_number == "Home":
+            return self.home_number
+        elif self.preferred_number == "Work":
+            return self.work_number
+
     def __str__(self):
         if self.parent is not None:
             return f"{self.id} - {self.parent.first_name} {self.parent.last_name} - {self.email}"

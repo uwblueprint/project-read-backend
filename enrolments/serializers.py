@@ -16,7 +16,6 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
 
 class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
     students = StudentSerializer(many=True, read_only=True)
-    phone_number = serializers.SerializerMethodField()
 
     class Meta:
         model = Family
@@ -26,14 +25,6 @@ class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
             "phone_number",
             "students",
         ]
-
-    def get_phone_number(self, obj):
-        if obj.preferred_number == "Cell":
-            return obj.cell_number
-        elif obj.preferred_number == "Home":
-            return obj.home_number
-        elif obj.preferred_number == "Work":
-            return obj.work_number
 
 
 class ClassListSerializer(serializers.HyperlinkedModelSerializer):

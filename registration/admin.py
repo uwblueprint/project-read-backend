@@ -22,7 +22,6 @@ class FamilyAdmin(admin.ModelAdmin):
         "home_number",
         "cell_number",
         "work_number",
-        "preferred_number",
         "address",
     )
     list_filter = ("preferred_comms",)

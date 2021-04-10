@@ -33,7 +33,6 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
-    phone_number = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -49,14 +48,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_num_children(self, obj):
         return obj.children.count()
-
-    def get_phone_number(self, obj):
-        if obj.preferred_number == "Cell":
-            return obj.cell_number
-        elif obj.preferred_number == "Home":
-            return obj.home_number
-        elif obj.preferred_number == "Work":
-            return obj.work_number
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
