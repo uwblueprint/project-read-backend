@@ -1,7 +1,9 @@
 from django.test import TestCase
 
 from registration.models import Family, Student
-from enrolments.serializers import FamilyAttendanceSerializer
+from enrolments.models import Class, Session, Enrolment
+from accounts.models import User
+from enrolments.serializers import FamilyAttendanceSerializer, ClassDetailSerializer
 from registration.serializers import StudentSerializer
 
 
@@ -59,4 +61,115 @@ class FamilyAttendanceSerializerTestCase(TestCase):
             FamilyAttendanceSerializer(
                 self.empty_family, context={"request": None}
             ).data,
+        )
+
+
+class ClassDetailSerializerTestCase(TestCase):
+    def setUp(self):
+        self.family1 = Family.objects.create(
+            email="fam1@test.com",
+            phone_number="123456789",
+            address="1 Fam St",
+            preferred_comms="email",
+        )
+        self.family2 = Family.objects.create(
+            email="fam2@test.com",
+            phone_number="123456789",
+            address="2 Fam St",
+            preferred_comms="email",
+        )
+        self.inactive_family = Family.objects.create(
+            email="fam3@test.com",
+            phone_number="123406789",
+            address="3 Fam St",
+            preferred_comms="email",
+        )
+        self.session1 = Session.objects.create(
+            season="Fall",
+            year="2019",
+        )
+        self.session2 = Session.objects.create(
+            season="Spring",
+            year="2021",
+        )
+        self.student1 = Student.objects.create(
+            first_name="Student1 FirstName",
+            last_name="Student1 LastName",
+            role="Child",
+            family=self.family1,
+            information="null",
+        )
+        self.student2 = Student.objects.create(
+            first_name="Student2 FirstName",
+            last_name="Student2 LastName",
+            role="Child",
+            family=self.family2,
+            information="null",
+        )
+        self.facilitator = User.objects.create(email="user@staff.com")
+        self.class1 = Class.objects.create(
+            name="Test Class 1",
+            session_id=self.session1.id,
+            facilitator_id=self.facilitator.id,
+            attendance=[{"date": "2020-01-01", "attendees": [1, 2]}],
+        )
+        self.empty_class = Class.objects.create(
+            name="Test Empty Class",
+            session_id=self.session2.id,
+            facilitator_id=self.facilitator.id,
+            attendance=[{"date": "2020-01-01", "attendees": []}],
+        )
+        self.enrolment1 = Enrolment.objects.create(
+            active=True,
+            family=self.family1,
+            session=self.session1,
+            preferred_class=self.class1,
+            enrolled_class=self.class1,
+        )
+        self.enrolment2 = Enrolment.objects.create(
+            active=True,
+            family=self.family2,
+            session=self.session1,
+            preferred_class=self.class1,
+            enrolled_class=self.class1,
+        )
+        self.inactive_enrolment = Enrolment.objects.create(
+            active=False,
+            family=self.inactive_family,
+            session=self.session1,
+            preferred_class=self.class1,
+            enrolled_class=self.class1,
+        )
+
+    def test_serializer1(self):
+        self.assertEqual(
+            {
+                "id": self.class1.id,
+                "name": self.class1.name,
+                "session_id": self.class1.session_id,
+                "facilitator_id": self.class1.facilitator_id,
+                "attendance": self.class1.attendance,
+                "families": [
+                    FamilyAttendanceSerializer(
+                        self.family1, context={"request": None}
+                    ).data,
+                    FamilyAttendanceSerializer(
+                        self.family2, context={"request": None}
+                    ).data,
+                ],
+            },
+            ClassDetailSerializer(self.class1, context={"request": None}).data,
+        )
+
+    def test_empty_class(self):
+        self.assertEqual(
+            {
+                "id": self.empty_class.id,
+                "name": self.empty_class.name,
+                "session_id": self.empty_class.session_id,
+                "facilitator_id": self.empty_class.facilitator_id,
+                "attendance": self.empty_class.attendance,
+                "families": [],
+            },
+            ClassDetailSerializer(self.empty_class, context={"request": None}).data,
         )
