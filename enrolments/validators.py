@@ -16,6 +16,18 @@ def validate_enrolment(enrolment):
     validate_class_in_session(enrolment.enrolled_class, enrolment.session)
 
 
+def validate_class_in_session(class_obj, session):
+    if class_obj.session != session:
+        raise ValidationError(
+            f"Class {class_obj.name} is not in session with ID {session.id}"
+        )
+
+
+def validate_enrolment(enrolment):
+    validate_class_in_session(enrolment.preferred_class, enrolment.session)
+    validate_class_in_session(enrolment.enrolled_class, enrolment.session)
+
+
 def validate_attendance(class_obj):
     """
     Validates against the attendance column for the Class model.

@@ -58,6 +58,7 @@ class EnrolmentValidatorTestCase(TestCase):
         )
         self.assertIsNone(validate_enrolment(enrolment))
         mock_validate.assert_called_with(self.class_in_session, self.session)
+
     @patch(
         "enrolments.validators.validate_class_in_session",
         side_effect=ValidationError(""),
