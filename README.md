@@ -64,4 +64,18 @@ black .
 ```
 
 ## Updating Secrets
+
 If you have not set up secrets management, please refer to steps 4 and 5 in the *Run the code* section of this README.
+
+## Generating Dummy Data
+
+### Generating Family Data ex.
+1. Start up the container
+    ```bash
+    docker-compose up -d
+    ```
+2. Run the python script to generate family data
+    ```bash
+    docker-compose exec web python manage.py load_initial_reg_data --num_families 30
+    # replace 30 with however many families you want to generate
+    ```
