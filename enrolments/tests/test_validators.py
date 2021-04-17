@@ -45,7 +45,10 @@ class EnrolmentValidatorTestCase(TestCase):
             ValidationError, validate_class_in_session, class_no_sessions, self.session
         )
         self.assertRaises(
-            ValidationError, validate_class_in_session, self.class_in_session, session_other
+            ValidationError,
+            validate_class_in_session,
+            self.class_in_session,
+            session_other,
         )
 
     @patch("enrolments.validators.validate_class_in_session")
