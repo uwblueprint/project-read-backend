@@ -1,10 +1,12 @@
 from django.core.management import call_command
 from django.test import TestCase
+from unittest.mock import patch
 
-from ..models import Family, Field, Student
+from enrolments.models import Session, Class, Enrolment
+from registration.models import Family, Field, Student
 
 
-class LoadInitialRegDataTestCase(TestCase):
+class LoadInitialDataTestCase(TestCase):
     def setUp(self):
         # Create objects to ensure they're deleted by the management command
         Family.objects.create()
@@ -43,21 +45,25 @@ class LoadInitialRegDataTestCase(TestCase):
                 ),
             ]
         )
-        self.num_fields = 12
 
-    def test_load_initial_reg_data(self):
-        num_families = 30
+    @patch("registration.tests.utils.utils.create_test_fields")
+    def test_load_initial_data(
+        self,
+        mock_create_fields,
+    ):
+        # Default values
+        num_families = 100
+        num_sessions = 5
+        num_classes_per_session = 3
+        num_classes = num_sessions * num_classes_per_session
+
         call_command(
-            "load_initial_reg_data",
-            num_families=num_families,
+            "load_initial_data",
             verbose=False,
         )
-        self.assertEqual(Field.objects.all().count(), self.num_fields)
+
+        mock_create_fields.assert_called_once()
         self.assertEqual(Family.objects.all().count(), num_families)
-        self.assertEqual(
-            Student.objects.filter(role=Student.PARENT).count(), num_families
-        )
-        self.assertGreaterEqual(
-            Student.objects.filter(role=Student.CHILD).count(), num_families
-        )
-        self.assertGreaterEqual(Student.objects.filter(role=Student.GUEST).count(), 1)
+        self.assertEqual(Session.objects.all().count(), num_sessions)
+        self.assertEqual(Class.objects.all().count(), num_classes)
+        self.assertEqual(Enrolment.objects.all().count(), num_families)
