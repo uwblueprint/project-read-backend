@@ -1,9 +1,34 @@
 from datetime import datetime
 from django.core.exceptions import ValidationError
-from registration.models import Student
+from registration.models import Student, Field
+from django.apps import apps
 
 
-def validate_attendance(classObj):
+def validate_class_in_session(class_obj, session):
+    if class_obj.session != session:
+        raise ValidationError(
+            f"Class {class_obj.name} is not in session with ID {session.id}"
+        )
+
+
+def validate_enrolment(enrolment):
+    validate_class_in_session(enrolment.preferred_class, enrolment.session)
+    validate_class_in_session(enrolment.enrolled_class, enrolment.session)
+
+
+def validate_class_in_session(class_obj, session):
+    if class_obj.session != session:
+        raise ValidationError(
+            f"Class {class_obj.name} is not in session with ID {session.id}"
+        )
+
+
+def validate_enrolment(enrolment):
+    validate_class_in_session(enrolment.preferred_class, enrolment.session)
+    validate_class_in_session(enrolment.enrolled_class, enrolment.session)
+
+
+def validate_attendance(class_obj):
     """
     Validates against the attendance column for the Class model.
     The expected structure is:
@@ -26,9 +51,9 @@ def validate_attendance(classObj):
     """
 
     schema = [{"date": "str", "attendees": ["int"]}]
-    if not validate_schema(classObj, schema):
+    if not validate_schema(class_obj, schema):
         raise ValidationError("invalid json structure", code="invalid_schema")
-    for session in classObj:
+    for session in class_obj:
         date = session["date"]
         attendees = session["attendees"]
         try:
@@ -46,6 +71,28 @@ def validate_attendance(classObj):
                 + str(attendees),
                 code="invalid_attendee",
             )
+
+
+def validate_fields(fields_list):
+    """
+    Validates against the fields column for the Session model.
+    The expected structure is:
+    [
+        // field IDs
+        1, 2, 3, 4, 5
+    ]
+    """
+    schema = ["int"]
+    if not validate_schema(fields_list, schema):
+        raise ValidationError("invalid json structure", code="invalid_schema")
+    if fields_list and not set(
+        Field.objects.filter(pk__in=fields_list).values_list("id", flat=True)
+    ) == set(fields_list):
+        raise ValidationError(
+            "one or more of the following attendee IDs do not exist: "
+            + str(fields_list),
+            code="invalid_field",
+        )
 
 
 def validate_schema(json, schema, strict=False):
