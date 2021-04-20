@@ -1,5 +1,10 @@
 from django.db import models
-from .validators import validate_attendance, validate_enrolment, validate_fields, validate_students_in_enrolment
+from .validators import (
+    validate_attendance,
+    validate_enrolment,
+    validate_fields,
+    validate_students_in_enrolment,
+)
 from django.contrib.postgres.fields import ArrayField
 
 

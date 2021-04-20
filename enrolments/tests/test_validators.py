@@ -8,6 +8,7 @@ from enrolments.validators import (
     validate_class_in_session,
     validate_enrolment,
     validate_fields,
+    validate_students_in_enrolment,
 )
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
@@ -75,6 +76,43 @@ class EnrolmentValidatorTestCase(TestCase):
         )
         self.assertRaises(ValidationError, validate_enrolment, enrolment)
         mock_validate.assert_called_once_with(self.class_in_session, self.session)
+
+    def test_validate_students_in_enrolment(self):
+        parent = Student.objects.create(
+            first_name="Daddy",
+            last_name="McDonald",
+            role=Student.PARENT,
+            family=self.family,
+        )
+        child1 = Student.objects.create(
+            first_name="Lil Tom",
+            last_name="McDonald",
+            role=Student.CHILD,
+            family=self.family,
+        )
+        child2 = Student.objects.create(
+            first_name="Yohan Wilkshire",
+            last_name="McDonald",
+            role=Student.CHILD,
+            family=self.family,
+        )
+        student_ids = list(map((lambda student: student.id), [parent, child1, child2]))
+        enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+            students=student_ids,
+        )
+
+        self.assertRaises(
+            ValidationError, validate_students_in_enrolment, enrolment, []
+        )
+        self.assertRaises(
+            ValidationError, validate_students_in_enrolment, enrolment, student_ids[1:]
+        )
+        self.assertEqual(enrolment.students, student_ids)
 
 
 class AttendanceValidatorTestCase(TestCase):
