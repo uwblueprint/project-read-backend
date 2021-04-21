@@ -38,6 +38,7 @@ class EnrolmentAdmin(admin.ModelAdmin):
         "active",
         "family",
         "session",
+        "status",
         "created_at",
         "updated_at",
         "preferred_class",
