@@ -18,7 +18,7 @@ class EnrolmentValidatorTestCase(TestCase):
         self.user = User.objects.create(email="test@staff.com")
         self.family = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="1 Fam Ave",
             preferred_comms="email",
         )

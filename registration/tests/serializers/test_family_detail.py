@@ -10,7 +10,8 @@ class FamilyDetailSerializerTestCase(TestCase):
     def setUp(self):
         self.family = Family.objects.create(
             email="closets@pritchett.com",
-            phone_number="123456789",
+            cell_number="123456789",
+            preferred_number="Cell",
             address="10 Modern Lane",
             preferred_comms="Phone",
         )

@@ -60,7 +60,10 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "email",
-            "phone_number",
+            "home_number",
+            "cell_number",
+            "work_number",
+            "preferred_number",
             "address",
             "preferred_comms",
             "parent",

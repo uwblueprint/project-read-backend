@@ -11,13 +11,15 @@ class FamilyAttendanceSerializerTestCase(TestCase):
     def setUp(self):
         self.family1 = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
+            work_number="0000000000",
+            preferred_number="Work",
             address="1 Fam Ave",
             preferred_comms="email",
         )
         self.empty_family = Family.objects.create(
             email="fam2@test.com",
-            phone_number="987654321",
+            cell_number="987654321",
             address="2 Fam Ave",
             preferred_comms="email",
         )
@@ -41,7 +43,7 @@ class FamilyAttendanceSerializerTestCase(TestCase):
             {
                 "id": self.family1.id,
                 "email": self.family1.email,
-                "phone_number": self.family1.phone_number,
+                "phone_number": self.family1.work_number,
                 "students": [
                     StudentSerializer(self.student1, context={"request": None}).data,
                     StudentSerializer(self.student2, context={"request": None}).data,
@@ -55,7 +57,7 @@ class FamilyAttendanceSerializerTestCase(TestCase):
             {
                 "id": self.empty_family.id,
                 "email": self.empty_family.email,
-                "phone_number": self.empty_family.phone_number,
+                "phone_number": self.empty_family.cell_number,
                 "students": [],
             },
             FamilyAttendanceSerializer(
@@ -68,19 +70,19 @@ class ClassDetailSerializerTestCase(TestCase):
     def setUp(self):
         self.family1 = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="1 Fam St",
             preferred_comms="email",
         )
         self.family2 = Family.objects.create(
             email="fam2@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="2 Fam St",
             preferred_comms="email",
         )
         self.inactive_family = Family.objects.create(
             email="fam3@test.com",
-            phone_number="123406789",
+            cell_number="123406789",
             address="3 Fam St",
             preferred_comms="email",
         )

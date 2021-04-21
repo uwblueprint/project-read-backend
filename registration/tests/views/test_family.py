@@ -12,7 +12,7 @@ class FamilyTestCase(APITestCase):
         self.user = User.objects.create(email="user@staff.com")
         self.family = Family.objects.create(
             email="test@example.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="1 Test Ave",
             preferred_comms="email",
         )
@@ -21,7 +21,7 @@ class FamilyTestCase(APITestCase):
         )
         self.other_family = Family.objects.create(
             email="example@test.com",
-            phone_number="987654321",
+            cell_number="987654321",
             address="2 Test Ave",
             preferred_comms="email",
         )
@@ -65,7 +65,7 @@ class FamilyTestCase(APITestCase):
             url,
             {
                 "email": "weasleys@theorder.com",
-                "phone_number": "123456789",
+                "cell_number": "123456789",
                 "address": "12 Grimmauld Place",
                 "preferred_comms": "Owl Post",
                 "parent": {
