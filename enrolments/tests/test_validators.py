@@ -116,7 +116,7 @@ class EnrolmentValidatorTestCase(TestCase):
             session=self.session,
             preferred_class=self.class_in_session,
             enrolled_class=self.class_in_session,
-            students=[child.id, other_child.id], 
+            students=[child.id, other_child.id],
         )
 
         self.assertIsNone(validate_students_in_enrolment(enrolment))
