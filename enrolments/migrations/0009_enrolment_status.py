@@ -6,13 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('enrolments', '0008_session_fields'),
+        ("enrolments", "0008_session_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='enrolment',
-            name='status',
-            field=models.CharField(choices=[('Waiting to enrol', 'Waiting to enrol'), ('Registered', 'Registered'), ('Confirmed', 'Confirmed'), ('Completed', 'Completed'), ('No show', 'No show'), ('Drop out', 'Drop out'), ('Waitlisted', 'Waitlisted')], default='Waiting to enrol', max_length=16),
+            model_name="enrolment",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("Waiting to enrol", "Waiting to enrol"),
+                    ("Registered", "Registered"),
+                    ("Confirmed", "Confirmed"),
+                    ("Completed", "Completed"),
+                    ("No show", "No show"),
+                    ("Drop out", "Drop out"),
+                    ("Waitlisted", "Waitlisted"),
+                ],
+                default="Waiting to enrol",
+                max_length=16,
+            ),
         ),
     ]
