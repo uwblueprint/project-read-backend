@@ -4,10 +4,10 @@ from registration.models import Student, Field
 from django.apps import apps
 
 
-def validate_students_in_enrolment(enrolment, student_list):
+def validate_students_in_enrolment(enrolment):
     Student = apps.get_model("registration", "Student")
     if (
-        len(student_list)
+        len(enrolment.students)
         != Student.objects.filter(
             id__in=enrolment.students, family=enrolment.family
         ).count()

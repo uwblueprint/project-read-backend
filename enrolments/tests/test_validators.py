@@ -84,35 +84,45 @@ class EnrolmentValidatorTestCase(TestCase):
             role=Student.PARENT,
             family=self.family,
         )
-        child1 = Student.objects.create(
+        child = Student.objects.create(
             first_name="Lil Tom",
             last_name="McDonald",
             role=Student.CHILD,
             family=self.family,
         )
-        child2 = Student.objects.create(
-            first_name="Yohan Wilkshire",
-            last_name="McDonald",
-            role=Student.CHILD,
-            family=self.family,
+        other_family = Family.objects.create(
+            email="fam2@test.com",
+            phone_number="923456789",
+            address="2 Fam Ave",
+            preferred_comms="email",
         )
-        student_ids = list(map((lambda student: student.id), [parent, child1, child2]))
+        other_child = Student.objects.create(
+            first_name="Yohan",
+            last_name="Wilkshire",
+            role=Student.CHILD,
+            family=other_family,
+        )
         enrolment = Enrolment.objects.create(
             active=True,
             family=self.family,
             session=self.session,
             preferred_class=self.class_in_session,
             enrolled_class=self.class_in_session,
-            students=student_ids,
+            students=[child.id],
+        )
+        enrolment_extra_student = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+            students=[child.id, other_child.id], 
         )
 
+        self.assertIsNone(validate_students_in_enrolment(enrolment))
         self.assertRaises(
-            ValidationError, validate_students_in_enrolment, enrolment, []
+            ValidationError, validate_students_in_enrolment, enrolment_extra_student
         )
-        self.assertRaises(
-            ValidationError, validate_students_in_enrolment, enrolment, student_ids[1:]
-        )
-        self.assertEqual(enrolment.students, student_ids)
 
 
 class AttendanceValidatorTestCase(TestCase):
