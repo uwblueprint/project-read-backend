@@ -87,12 +87,8 @@ class Enrolment(models.Model):
         null=True,
         on_delete=models.PROTECT,
     )
-    enrolled_class = models.ForeignKey(
-        "enrolments.Class", on_delete=models.PROTECT, related_name="enrolments"
-    )
-    status = models.CharField(
-        max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL
-    )
+    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
+    status = models.CharField(max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
