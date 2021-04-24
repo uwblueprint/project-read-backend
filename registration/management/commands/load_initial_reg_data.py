@@ -10,6 +10,7 @@ from registration.models import Family, Student, Field
 fake = Faker()
 
 # Sample options
+preferred_number = {"Home", "Work", "Cell"}
 preferred_comms = {"Phone", "Email"}
 technologies = {"Laptop", "Tablet", "Desktop"}
 education_levels = {"High School", "Trade School", "College/University", "Masters"}
@@ -78,7 +79,10 @@ def create_family(has_guests=False):
     last_name = fake.unique.last_name()
     family = Family.objects.create(
         email=f"{last_name.lower()}@test.com",
-        phone_number=fake.phone_number(),
+        cell_number=fake.phone_number(),
+        work_number=fake.phone_number(),
+        home_number=fake.phone_number(),
+        preferred_number=fake.random_element(elements=preferred_number),
         address=fake.address(),
         preferred_comms=fake.random_element(elements=preferred_comms),
     )
