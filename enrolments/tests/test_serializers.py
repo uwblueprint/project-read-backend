@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from enrolments.models import Session, Enrolment
 from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
 from accounts.models import User
