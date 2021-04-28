@@ -25,6 +25,7 @@ class SessionAdmin(admin.ModelAdmin):
 class ClassAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "session",
         "name",
         "attendance",
     )
