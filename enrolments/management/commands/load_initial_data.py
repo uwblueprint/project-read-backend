@@ -86,7 +86,9 @@ class Command(BaseCommand):
                     )
 
                 num_classes = num_sessions * num_classes_per_session
-                num_families_per_class = -(-num_families // num_classes)
+                num_families_per_class = -(
+                    -num_families // num_classes
+                )  # ceiling division (upside-down floor division)
                 for i, class_ in enumerate(classes):
                     enrolment_utils.create_test_enrolments(
                         session=class_.session,
