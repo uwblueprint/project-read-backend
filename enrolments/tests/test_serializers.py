@@ -4,7 +4,11 @@ from enrolments.models import Session, Enrolment
 from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
 from accounts.models import User
-from enrolments.serializers import FamilyAttendanceSerializer, ClassDetailSerializer, SessionDetailSerializer
+from enrolments.serializers import (
+    FamilyAttendanceSerializer,
+    ClassDetailSerializer,
+    SessionDetailSerializer,
+)
 from registration.serializers import FamilySerializer, StudentSerializer
 
 context = {"request": None}
@@ -75,7 +79,6 @@ class SessionDetailSerializerTestCase(TestCase):
         )
         self.family = Family.objects.create(
             email="weasleys@theorder.com",
-            phone_number="123456789",
             address="12 Grimmauld Pl",
             preferred_comms="Owl Post",
         )
@@ -86,7 +89,6 @@ class SessionDetailSerializerTestCase(TestCase):
         )
         self.other_family = Family.objects.create(
             email="spongebob@squarepants.com",
-            phone_number="123456789",
             address="1 Pine Apple",
             preferred_comms="Snail Delivery",
         )
