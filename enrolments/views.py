@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import Session, Class
 from .serializers import (
     SessionSerializer,
+    SessionDetailSerializer,
     ClassListSerializer,
     ClassDetailSerializer,
 )
@@ -21,6 +22,11 @@ class SessionViewSet(
         "get",
     ]
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return SessionDetailSerializer
+        return SessionSerializer
 
     @action(
         methods=["get"],
