@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from enrolments.models import Session
-from enrolments.serializers import SessionSerializer
+from enrolments.serializers import SessionSerializer, SessionDetailSerializer
 
 
 class SessionTestCase(APITestCase):
@@ -35,7 +35,7 @@ class SessionTestCase(APITestCase):
         payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(payload, SessionSerializer(self.session1).data)
+        self.assertEqual(payload, SessionDetailSerializer(self.session1).data)
 
     def test_method_not_allowed(self):
         url = reverse("sessions-detail", args=[self.session1.id])
