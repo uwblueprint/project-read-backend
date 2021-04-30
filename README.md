@@ -73,7 +73,7 @@ If you have not set up secrets management, please refer to steps 4 and 5 in the 
     ```bash
     docker-compose up -d
     ```
-2. Run the python script to generate family data
+2. Run the python script to generate dummy data
     ```bash
     docker-compose exec web python manage.py load_initial_reg_data 
     ```
