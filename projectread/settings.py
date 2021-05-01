@@ -34,6 +34,10 @@ ALLOWED_HOSTS = [] if DEBUG else ["project-read-backend.herokuapp.com"]
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"] if DEBUG else []
 
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"https:\/\/(deploy\-preview\-[0-9]+\-\-)?getsetlearn\.netlify\.com$"
+]
+
 # Application definition
 
 INSTALLED_APPS = [
