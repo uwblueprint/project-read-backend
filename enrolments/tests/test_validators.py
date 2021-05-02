@@ -92,7 +92,7 @@ class EnrolmentValidatorTestCase(TestCase):
         )
         other_family = Family.objects.create(
             email="fam2@test.com",
-            phone_number="923456789",
+            home_number="923456789",
             address="2 Fam Ave",
             preferred_comms="email",
         )
