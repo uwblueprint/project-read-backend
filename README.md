@@ -31,7 +31,7 @@ Django backend for the GSL Hub. Check out the client code [here](https://github.
    ```
 1. Retrieve the environment variables & secrets from the team's Vault (shoutout to the Internal Tools team!).
    1. Follow these [docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#a93b3e62a9a2459fa4990bf68b3dbc49) to get set up with Vault!
-      - Skip the section *Create a GitHub team* – if you haven't been added to the Github team yet, message @brittanylau on Slack.
+      - Skip the section *Create a GitHub team* – if you haven't been added to the Github team yet, message #project-read-devs on Slack.
       - For the section *Configure dev tools for your project repo*, setup.sh exists in /scripts, so run `./scripts/setup.sh` instead of `./setup.sh`.
    1. Pull the secrets into `.env`:
        ```
@@ -52,7 +52,7 @@ The [Django admin](https://docs.djangoproject.com/en/3.2/ref/contrib/admin/) pro
    ```
    docker-compose exec web ./manage.py createsuperuser
    ```
-2. Open [localhost:8080/admin](localhost:8080/admin) and sign in.
+1. Open [localhost:8080/admin](localhost:8080/admin) and sign in.
 
 ### Generating seed data
 
@@ -76,7 +76,7 @@ When adding new Python packages to the project, you'll need to define it as a de
     docker-compose exec web pip install [package]
     docker-compose exec web pip freeze > requirements.txt
     ```
-2. Rebuild the container:
+1. Rebuild the container:
     ```bash
     docker-compose build
     docker-compose up -d
@@ -128,7 +128,7 @@ docker-compose exec web ./manage.py test
 
 #### Manual testing
 
-To test authenticated endpoints locally, you'll need a token from our team's Firebase authentication server. If you don't yet have an account on our Firebase app, message @brittanylau on Slack to get added!
+To test authenticated endpoints locally, you'll need a token from our team's Firebase authentication server. If you don't yet have an account on our Firebase app, message #project-read-devs on Slack to get added!
 
 1. Sync your Firebase user with your Django superuser, and retrieve a token:
     ```bash
