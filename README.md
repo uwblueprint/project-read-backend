@@ -19,10 +19,10 @@ Django backend for the GSL Hub. Check out the client code [here](https://github.
 
 ## Setup
 
-### Requirements 📥
+### Requirements
 * [Docker](https://docs.docker.com/get-docker/)
 
-### Running the code 🏃
+### Running the code
 
 1. Clone this repository and open the project folder:
    ```
@@ -44,7 +44,7 @@ Django backend for the GSL Hub. Check out the client code [here](https://github.
 
 ## Development workflow
 
-### Accessing the Django admin 🗃
+### Accessing the Django admin
 
 The [Django admin](https://docs.djangoproject.com/en/3.2/ref/contrib/admin/) provides a content management interface for us to manage our data. This will be helpful for doing manual testing, as you can create test data really easily!
 
@@ -54,7 +54,7 @@ The [Django admin](https://docs.djangoproject.com/en/3.2/ref/contrib/admin/) pro
    ```
 2. Open [localhost:8080/admin](localhost:8080/admin) and sign in.
 
-### Generating seed data 🌱
+### Generating seed data
 
 [This management command](https://github.com/uwblueprint/project-read-backend/blob/main/enrolments/management/commands/load_initial_data.py) will delete all existing records in your database, and populate it with randomly-generated seed data:
 ```bash
@@ -67,7 +67,7 @@ docker-compose exec web python manage.py load_initial_data \
     --families X --sessions X --classes_per_session X
 ```
 
-### Installing new packages 📦
+### Installing new packages
 
 When adding new Python packages to the project, you'll need to define it as a dependency and rebuild the Docker container.
 
@@ -82,7 +82,7 @@ When adding new Python packages to the project, you'll need to define it as a de
     docker-compose up -d
     ```
 
-### Database migrations 🗃
+### Database migrations
 
 When making changes to a `models.py` file, you may need to create a database migration so that other machines know to apply your changes. Here are some useful commands!
 
@@ -108,7 +108,7 @@ To undo all migrations:
 ```bash
 docker-compose exec web ./manage.py migrate [app name] zero
 ```
-### Updating secrets 🔐
+### Updating secrets
 
 To pull the latest secrets from Vault:
 ```bash
@@ -117,7 +117,7 @@ vault kv get -format=json kv/project-read | python ./scripts/update_secret_files
 
 To update our team secrets, see the [Vault docs](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e#3008f54889ab4b0cacfa276cbc43e613).
 
-### Testing ✅
+### Testing
 
 #### Run automated tests
 
@@ -137,7 +137,7 @@ To test authenticated endpoints locally, you'll need a token from our team's Fir
     * This token expires after 60 minutes, at which point you should re-run this command to get a new one!
 1. You can use this token and pass it as a bearer token for your API requests (using curl, Postman, etc).
 
-### Lint 🧹
+### Lint
 
 ```bash
 docker-compose exec web black .
