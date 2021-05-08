@@ -20,6 +20,7 @@ class Session(models.Model):
 
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
+    start_date = models.DateTimeField(null=True)
     fields = models.JSONField(default=list, validators=[validate_fields])
 
     def __str__(self):
@@ -86,15 +87,11 @@ class Enrolment(models.Model):
         null=True,
         on_delete=models.PROTECT,
     )
-    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
+    enrolled_class = models.ForeignKey(
+        "enrolments.Class", on_delete=models.PROTECT, related_name="enrolments"
+    )
     status = models.CharField(
         max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL
-    )
-    enrolled_class = models.ForeignKey(
-        "enrolments.Class",
-        null=True,
-        on_delete=models.PROTECT,
-        related_name="enrolments",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
