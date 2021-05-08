@@ -47,7 +47,7 @@ class ClassesTestCase(APITestCase):
         )
 
     def test_get_class(self):
-        url = reverse("classes-detail", args=[self.class1.id])
+        url = reverse("class-detail", args=[self.class1.id])
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -59,7 +59,7 @@ class ClassesTestCase(APITestCase):
         )
 
     def test_get_classes(self):
-        url = reverse("classes-list")
+        url = reverse("class-list")
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -74,13 +74,16 @@ class ClassesTestCase(APITestCase):
         )
 
     def test_method_not_allowed(self):
-        url = reverse("classes-detail", args=[self.class1.id])
         self.client.force_authenticate(self.user)
 
-        response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        url = reverse("class-list")
 
         response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        url = reverse("class-detail", args=[self.class1.id])
+
+        response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         response = self.client.patch(url)
@@ -90,20 +93,20 @@ class ClassesTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
-        url = reverse("classes-list")
+        url = reverse("class-list")
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        url = reverse("classes-detail", args=[self.class1.id])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        url = reverse("class-detail", args=[self.class1.id])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.patch(url)

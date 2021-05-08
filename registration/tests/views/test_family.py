@@ -27,7 +27,7 @@ class FamilyTestCase(APITestCase):
         )
 
     def test_get_families(self):
-        url = reverse("families-list")
+        url = reverse("family-list")
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -49,7 +49,7 @@ class FamilyTestCase(APITestCase):
         )
 
     def test_get_family(self):
-        url = reverse("families-detail", args=[self.family.id])
+        url = reverse("family-detail", args=[self.family.id])
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -59,7 +59,7 @@ class FamilyTestCase(APITestCase):
         self.assertEqual(payload, FamilyDetailSerializer(self.family).data)
 
     def test_post_family(self):
-        url = reverse("families-list")
+        url = reverse("family-list")
         self.client.force_authenticate(self.user)
         response = self.client.post(
             url,
@@ -80,7 +80,7 @@ class FamilyTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_method_not_allowed(self):
-        url = reverse("families-detail", args=[self.family.id])
+        url = reverse("family-detail", args=[self.family.id])
         self.client.force_authenticate(self.user)
 
         response = self.client.put(url)
@@ -93,7 +93,7 @@ class FamilyTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
-        url = reverse("families-list")
+        url = reverse("family-list")
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -101,7 +101,7 @@ class FamilyTestCase(APITestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        url = reverse("families-detail", args=[self.family.id])
+        url = reverse("family-detail", args=[self.family.id])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
