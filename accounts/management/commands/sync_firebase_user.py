@@ -1,5 +1,6 @@
-import environ
 from django.core.management.base import BaseCommand
+import environ
+from getpass import getpass
 import requests
 
 from accounts.models import User
@@ -14,23 +15,9 @@ FIREBASE_VERIFY_PASSWORD_URL = (
 class Command(BaseCommand):
     help = "Syncs a Firebase user with a Django user"
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "email",
-            type=str,
-            nargs=1,
-            help="Firebase & Django account email",
-        )
-        parser.add_argument(
-            "password",
-            type=str,
-            nargs=1,
-            help="Firebase account password",
-        )
-
     def handle(self, *args, **options):
-        email = options.get("email")[0]
-        password = options.get("password")[0]
+        email = input("User email: ")
+        password = getpass()
 
         json = requests.post(
             f"{FIREBASE_VERIFY_PASSWORD_URL}?key={env.str('FIREBASE_WEB_API_KEY')}",
