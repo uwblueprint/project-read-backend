@@ -8,7 +8,7 @@ from .validators import validate_student_information_role
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     family = serializers.HyperlinkedRelatedField(
-        view_name="families-detail", read_only=True
+        view_name="family-detail", read_only=True
     )
 
     class Meta:
