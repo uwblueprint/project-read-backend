@@ -27,12 +27,17 @@ urlpatterns = [
     path("", include("enrolments.urls")),
     path("api/auth/", include("rest_framework.urls")),
     path("admin/", admin.site.urls),
-    path('openapi/', get_schema_view(
-        title="GSL Hub Server",
-        description="API Documentation"
-    ), name='openapi-schema'),
-    path('docs/', TemplateView.as_view(
-        template_name='documentation.html',
-        extra_context={'schema_url':'openapi-schema'}
-    ), name='swagger-ui'),
+    path(
+        "openapi/",
+        get_schema_view(title="GSL Hub Server", description="API Documentation"),
+        name="openapi-schema",
+    ),
+    path(
+        "docs/",
+        TemplateView.as_view(
+            template_name="documentation.html",
+            extra_context={"schema_url": "openapi-schema"},
+        ),
+        name="swagger-ui",
+    ),
 ]
