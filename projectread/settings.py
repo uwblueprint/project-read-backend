@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework_swagger",
     "corsheaders",
     "accounts.apps.AccountsConfig",
     "enrolments.apps.EnrolmentsConfig",
