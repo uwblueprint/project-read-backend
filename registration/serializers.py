@@ -33,6 +33,11 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
+    # children = SerializerMethodField()
+    children = StudentSerializer(many=True)
+    enrolled = SerializerMethodField()
+    current_class = SerializerMethodField()
+    status = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -44,11 +49,38 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
             "num_children",
+            "children",
+            "enrolled",
+            "current_class",
+            "status",
         ]
 
     def get_num_children(self, obj):
         return obj.children.count()
 
+    # def get_children(self, obj):
+    #     return obj.children
+
+    def get_enrolled(self, obj):
+        # sessions = Session.objects.all() # filter(active=True) # gets all current sessions
+        # enrolments = Enrolment.objects.filter(active=True) # gets all current sessions
+        # sessions = Session.objects.order_by('-start_date')[0]
+        # enrolments = Enrolment.objects.order_by('created_at')[0]
+        # for e in enrolments:
+        #     if (e.family.id == self.id):
+        #         return "True"
+        # classes = ClassDetailSerializer()
+        # for family in sessions.families: # gets all families in active classes
+        #     if (self.id == family.id):
+        #         return True
+        
+        return "False" # obj.children.count()
+
+    def get_current_class(self, obj):
+        return "Tues/Thurs" # obj.children.count()
+    
+    def get_status(self, obj):
+        return "todo" # obj.children.count()
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
