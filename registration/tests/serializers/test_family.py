@@ -72,6 +72,9 @@ class FamilySerializerTestCase(TestCase):
                 "address": self.family.address,
                 "preferred_comms": self.family.preferred_comms,
                 "num_children": 2,
+                "enrolled": "No",
+                "current_class": "N/A",
+                "status": "Unassigned",
             },
             FamilySerializer(self.family, context={"request": None}).data,
         )

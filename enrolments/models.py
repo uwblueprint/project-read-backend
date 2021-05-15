@@ -87,7 +87,12 @@ class Enrolment(models.Model):
         null=True,
         on_delete=models.PROTECT,
     )
-    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
+    enrolled_class = models.ForeignKey(
+        "enrolments.Class",
+        on_delete=models.PROTECT,
+        related_name="enrolments",
+        null=True,
+    )
     status = models.CharField(
         max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL
     )
