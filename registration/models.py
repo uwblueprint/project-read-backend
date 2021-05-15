@@ -1,8 +1,6 @@
 from django.db import models
 from .validators import validate_family_parent, validate_student
 
-# from enrolments.models import Session, Enrolment
-
 
 class Family(models.Model):
     HOME_NUMBER = "Home"
@@ -41,18 +39,6 @@ class Family(models.Model):
 
     class Meta:
         verbose_name_plural = "families"
-
-    # @property
-    # def is_enrolled(self):
-    #     most_recent_session = None
-    #     if Session.objects.order_by("-start_date"):
-    #         most_recent_session = Session.objects.order_by("-start_date")[0]
-    # enrolments = Enrolment.objects.filter(family=self)
-    # for e in enrolments:
-    #     if e.session == most_recent_session:
-    #         return True
-
-    # return False
 
     @property
     def children(self):
