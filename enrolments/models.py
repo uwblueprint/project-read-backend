@@ -1,5 +1,11 @@
 from django.db import models
-from .validators import validate_attendance, validate_enrolment, validate_fields
+from .validators import (
+    validate_attendance,
+    validate_enrolment,
+    validate_fields,
+    validate_students_in_enrolment,
+)
+from django.contrib.postgres.fields import ArrayField
 
 
 class Session(models.Model):
@@ -14,10 +20,11 @@ class Session(models.Model):
 
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
+    start_date = models.DateTimeField(null=True)
     fields = models.JSONField(default=list, validators=[validate_fields])
 
     def __str__(self):
-        return self.season
+        return f"{self.season} {self.year}"
 
 
 class Class(models.Model):
@@ -64,18 +71,25 @@ class Enrolment(models.Model):
     ]
     active = models.BooleanField()
     family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
+    students = ArrayField(
+        models.PositiveIntegerField(),
+        default=list,
+        validators=[validate_students_in_enrolment],
+    )
     session = models.ForeignKey(
         "enrolments.Session",
         null=True,
         on_delete=models.PROTECT,
+        related_name="enrolments",
     )
     preferred_class = models.ForeignKey(
         "enrolments.Class",
         null=True,
         on_delete=models.PROTECT,
-        related_name="preferred_enrolment",
     )
-    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
+    enrolled_class = models.ForeignKey(
+        "enrolments.Class", on_delete=models.PROTECT, related_name="enrolments"
+    )
     status = models.CharField(
         max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL
     )

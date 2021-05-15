@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from enrolments.models import Session
-from enrolments.serializers import SessionSerializer
+from enrolments.serializers import SessionSerializer, SessionDetailSerializer
 
 
 class SessionTestCase(APITestCase):
@@ -14,7 +14,7 @@ class SessionTestCase(APITestCase):
         self.session2 = Session.objects.create(season=Session.SUMMER, year=2021)
 
     def test_get_all_sessions(self):
-        url = reverse("sessions-list")
+        url = reverse("session-list")
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -29,16 +29,16 @@ class SessionTestCase(APITestCase):
         )
 
     def test_get_session(self):
-        url = reverse("sessions-detail", args=[self.session1.id])
+        url = reverse("session-detail", args=[self.session1.id])
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(payload, SessionSerializer(self.session1).data)
+        self.assertEqual(payload, SessionDetailSerializer(self.session1).data)
 
     def test_method_not_allowed(self):
-        url = reverse("sessions-detail", args=[self.session1.id])
+        url = reverse("session-detail", args=[self.session1.id])
         self.client.force_authenticate(self.user)
 
         response = self.client.post(url)
@@ -54,7 +54,7 @@ class SessionTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
-        url = reverse("sessions-list")
+        url = reverse("session-list")
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -62,7 +62,7 @@ class SessionTestCase(APITestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        url = reverse("sessions-detail", args=[self.session1.id])
+        url = reverse("session-detail", args=[self.session1.id])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

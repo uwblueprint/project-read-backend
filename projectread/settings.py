@@ -32,7 +32,17 @@ DEBUG = env.str("DJANGO_DEBUG") == "True"
 
 ALLOWED_HOSTS = [] if DEBUG else ["project-read-backend.herokuapp.com"]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"] if DEBUG else []
+CORS_ALLOWED_ORIGINS = [
+    "https://getsetlearn.herokuapp.com",
+    "https://getsetlearn.netlify.app",
+]
+
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += ["http://localhost:3000"]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"https://(deploy-preview-[\d]+--)?getsetlearn\.netlify\.app$"
+]
 
 # Application definition
 
@@ -122,8 +132,11 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
         "accounts.authentication.FirebaseAuthentication",
-    ],
+    ]
+    if DEBUG
+    else ["accounts.authentication.FirebaseAuthentication"],
 }
 
 # Internationalization

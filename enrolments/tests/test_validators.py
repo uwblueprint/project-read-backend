@@ -8,6 +8,7 @@ from enrolments.validators import (
     validate_class_in_session,
     validate_enrolment,
     validate_fields,
+    validate_students_in_enrolment,
 )
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
@@ -75,6 +76,53 @@ class EnrolmentValidatorTestCase(TestCase):
         )
         self.assertRaises(ValidationError, validate_enrolment, enrolment)
         mock_validate.assert_called_once_with(self.class_in_session, self.session)
+
+    def test_validate_students_in_enrolment(self):
+        parent = Student.objects.create(
+            first_name="Daddy",
+            last_name="McDonald",
+            role=Student.PARENT,
+            family=self.family,
+        )
+        child = Student.objects.create(
+            first_name="Lil Tom",
+            last_name="McDonald",
+            role=Student.CHILD,
+            family=self.family,
+        )
+        other_family = Family.objects.create(
+            email="fam2@test.com",
+            home_number="923456789",
+            address="2 Fam Ave",
+            preferred_comms="email",
+        )
+        other_child = Student.objects.create(
+            first_name="Yohan",
+            last_name="Wilkshire",
+            role=Student.CHILD,
+            family=other_family,
+        )
+        enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+            students=[child.id],
+        )
+        enrolment_extra_student = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+            students=[child.id, other_child.id],
+        )
+
+        self.assertIsNone(validate_students_in_enrolment(enrolment))
+        self.assertRaises(
+            ValidationError, validate_students_in_enrolment, enrolment_extra_student
+        )
 
 
 class AttendanceValidatorTestCase(TestCase):

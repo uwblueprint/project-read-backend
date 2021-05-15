@@ -3,12 +3,13 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
+from enrolments.models import Session, Enrolment
 from .validators import validate_student_information_role
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     family = serializers.HyperlinkedRelatedField(
-        view_name="families-detail", read_only=True
+        view_name="family-detail", read_only=True
     )
 
     class Meta:
@@ -33,11 +34,14 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
-    # children = SerializerMethodField()
-    children = StudentSerializer(many=True)
     enrolled = SerializerMethodField()
     current_class = SerializerMethodField()
     status = SerializerMethodField()
+    most_recent_session = (
+        Session.objects.order_by("-start_date")[0]
+        if Session.objects.order_by("-start_date")
+        else None
+    )
 
     class Meta:
         model = Family
@@ -49,7 +53,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
             "num_children",
-            "children",
             "enrolled",
             "current_class",
             "status",
@@ -58,29 +61,30 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     def get_num_children(self, obj):
         return obj.children.count()
 
-    # def get_children(self, obj):
-    #     return obj.children
-
     def get_enrolled(self, obj):
-        # sessions = Session.objects.all() # filter(active=True) # gets all current sessions
-        # enrolments = Enrolment.objects.filter(active=True) # gets all current sessions
-        # sessions = Session.objects.order_by('-start_date')[0]
-        # enrolments = Enrolment.objects.order_by('created_at')[0]
-        # for e in enrolments:
-        #     if (e.family.id == self.id):
-        #         return "True"
-        # classes = ClassDetailSerializer()
-        # for family in sessions.families: # gets all families in active classes
-        #     if (self.id == family.id):
-        #         return True
-        
-        return "False" # obj.children.count()
+        most_recent_enrolment = Enrolment.objects.filter(
+            family=obj, session=self.most_recent_session
+        )
+        return "Yes" if most_recent_enrolment else "No"
 
     def get_current_class(self, obj):
-        return "Tues/Thurs" # obj.children.count()
-    
+        most_recent_enrolment = Enrolment.objects.filter(
+            family=obj, session=self.most_recent_session
+        )
+        return (
+            most_recent_enrolment[0].enrolled_class.name
+            if most_recent_enrolment
+            else "N/A"
+        )
+
     def get_status(self, obj):
-        return "todo" # obj.children.count()
+        most_recent_enrolment = Enrolment.objects.filter(
+            family=obj, session=self.most_recent_session
+        )
+        return (
+            most_recent_enrolment[0].status if most_recent_enrolment else "Unassigned"
+        )
+
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
