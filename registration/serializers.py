@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
+from enrolments.models import Session, Enrolment
 from .validators import validate_student_information_role
 
 
@@ -33,6 +34,14 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
+    enrolled = SerializerMethodField()
+    current_class = SerializerMethodField()
+    status = SerializerMethodField()
+    most_recent_session = (
+        Session.objects.order_by("-start_date")[0]
+        if Session.objects.order_by("-start_date")
+        else None
+    )
 
     class Meta:
         model = Family
@@ -44,10 +53,37 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
             "num_children",
+            "enrolled",
+            "current_class",
+            "status",
         ]
 
     def get_num_children(self, obj):
         return obj.children.count()
+
+    def get_enrolled(self, obj):
+        most_recent_enrolment = Enrolment.objects.filter(
+            family=obj, session=self.most_recent_session
+        )
+        return "Yes" if most_recent_enrolment else "No"
+
+    def get_current_class(self, obj):
+        most_recent_enrolment = Enrolment.objects.filter(
+            family=obj, session=self.most_recent_session
+        )
+        return (
+            most_recent_enrolment[0].enrolled_class.name
+            if most_recent_enrolment
+            else "N/A"
+        )
+
+    def get_status(self, obj):
+        most_recent_enrolment = Enrolment.objects.filter(
+            family=obj, session=self.most_recent_session
+        )
+        return (
+            most_recent_enrolment[0].status if most_recent_enrolment else "Unassigned"
+        )
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
