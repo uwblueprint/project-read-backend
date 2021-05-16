@@ -42,7 +42,6 @@ class SessionViewSet(
 
 class ClassViewSet(
     viewsets.GenericViewSet,
-    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
 ):
     queryset = Class.objects.all()
