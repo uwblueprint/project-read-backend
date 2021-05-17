@@ -3,7 +3,6 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
-from enrolments.models import Session, Enrolment
 from .validators import validate_student_information_role
 
 
@@ -37,11 +36,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     enrolled = SerializerMethodField()
     current_class = SerializerMethodField()
     status = SerializerMethodField()
-    most_recent_session = (
-        Session.objects.order_by("-start_date")[0]
-        if Session.objects.order_by("-start_date")
-        else None
-    )
 
     class Meta:
         model = Family
@@ -62,27 +56,18 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
         return obj.children.count()
 
     def get_enrolled(self, obj):
-        most_recent_enrolment = Enrolment.objects.filter(
-            family=obj, session=self.most_recent_session
-        )
-        return "Yes" if most_recent_enrolment else "No"
+        return "Yes" if obj.current_enrolment else "No"
 
     def get_current_class(self, obj):
-        most_recent_enrolment = Enrolment.objects.filter(
-            family=obj, session=self.most_recent_session
-        )
         return (
-            most_recent_enrolment[0].enrolled_class.name
-            if most_recent_enrolment
+            obj.current_enrolment[0].enrolled_class.name
+            if obj.current_enrolment
             else "N/A"
         )
 
     def get_status(self, obj):
-        most_recent_enrolment = Enrolment.objects.filter(
-            family=obj, session=self.most_recent_session
-        )
         return (
-            most_recent_enrolment[0].status if most_recent_enrolment else "Unassigned"
+            obj.current_enrolment[0].status if obj.current_enrolment else "Unassigned"
         )
 
 
