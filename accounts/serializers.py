@@ -30,7 +30,9 @@ class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
         try:
             firebase_user = auth.create_user(email=validated_data["email"])
         except auth.EmailAlreadyExistsError:
-            raise serializers.ValidationError(detail="user already exists in Firebase", code="default_firebase_user")
+            raise serializers.ValidationError(
+                detail="user already exists in Firebase", code="default_firebase_user"
+            )
 
         try:
             user = User.objects.create(**validated_data, firebase_uid=firebase_user.uid)
