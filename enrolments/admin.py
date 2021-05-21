@@ -6,6 +6,7 @@ class SessionAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "season",
+        "start_date",
         "year",
     )
     ordering = (
@@ -15,6 +16,7 @@ class SessionAdmin(admin.ModelAdmin):
     search_fields = (
         "season",
         "year",
+        "start_date",
     )
     list_filter = (
         "season",
