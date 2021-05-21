@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.db import models
 from .validators import validate_family_parent, validate_student
 
@@ -56,6 +57,17 @@ class Family(models.Model):
             return self.home_number
         elif self.preferred_number == "Work":
             return self.work_number
+
+    @property
+    def current_enrolment(self):
+        most_recent_session = (
+            apps.get_model("enrolments", "Session").objects.order_by("-start_date")[0]
+            if apps.get_model("enrolments", "Session").objects.order_by("-start_date")
+            else None
+        )
+        return apps.get_model("enrolments", "Enrolment").objects.filter(
+            family=self, session=most_recent_session
+        )
 
     def __str__(self):
         if self.parent is not None:
