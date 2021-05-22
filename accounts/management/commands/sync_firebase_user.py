@@ -16,8 +16,8 @@ class Command(BaseCommand):
     help = "Syncs a Firebase user with a Django user"
 
     def handle(self, *args, **options):
-        email = input("User email: ")
-        password = getpass()
+        email = input("Email: ")
+        password = getpass("Firebase password: ")
 
         json = requests.post(
             f"{FIREBASE_VERIFY_PASSWORD_URL}?key={env.str('FIREBASE_WEB_API_KEY')}",
