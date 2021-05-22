@@ -71,8 +71,7 @@ class FamilySerializerTestCase(TestCase):
                 "address": self.family.address,
                 "preferred_comms": self.family.preferred_comms,
                 "num_children": 2,
-                "children":
-                [
+                "children": [
                     StudentSerializer(self.child1, context={"request": None}).data,
                     StudentSerializer(self.child2, context={"request": None}).data,
                 ],
