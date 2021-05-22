@@ -33,6 +33,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
+    children = StudentSerializer(many=True)
 
     class Meta:
         model = Family
@@ -44,6 +45,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
             "num_children",
+            "children",
         ]
 
     def get_num_children(self, obj):
