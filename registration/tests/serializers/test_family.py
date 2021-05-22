@@ -60,8 +60,7 @@ class FamilySerializerTestCase(TestCase):
         )
 
     def test_family_number(self):
-        self.maxDiff = None
-        self.assertDictEqual(
+        self.assertEqual(
             {
                 "id": self.family.id,
                 "parent": StudentSerializer(
@@ -73,7 +72,6 @@ class FamilySerializerTestCase(TestCase):
                 "preferred_comms": self.family.preferred_comms,
                 "num_children": 2,
                 "children":
-                # self.family.children,
                 [
                     StudentSerializer(self.child1, context={"request": None}).data,
                     StudentSerializer(self.child2, context={"request": None}).data,
