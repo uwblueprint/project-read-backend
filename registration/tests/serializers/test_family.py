@@ -19,7 +19,6 @@ class FamilySerializerTestCase(TestCase):
         self.parent3 = Student.objects.create(
             first_name="Gollum", last_name="Goat", role=Student.PARENT
         )
-
         self.family = Family.objects.create(
             parent=self.parent2,
             email="justkeepswimming@ocean.com",
@@ -29,7 +28,6 @@ class FamilySerializerTestCase(TestCase):
             address="1 Django Boulevard",
             preferred_comms="Shark Tune",
         )
-
         self.family_without_children = Family.objects.create(
             parent=self.parent1,
             email="justkeepswimming@ocean.com",
@@ -37,7 +35,6 @@ class FamilySerializerTestCase(TestCase):
             address="42 Wallaby Way",
             preferred_comms="Whale Song",
         )
-
         self.family_status = Family.objects.create(
             parent=self.parent3,
             email="justkeepswimming@ocean.com",
@@ -45,21 +42,18 @@ class FamilySerializerTestCase(TestCase):
             address="1 Test Ave",
             preferred_comms="Dolphin Whistle",
         )
-
         self.child1 = Student.objects.create(
             first_name="Albus",
             last_name="Whale",
             role=Student.CHILD,
             family=self.family,
         )
-
         self.child2 = Student.objects.create(
             first_name="Lily",
             last_name="Whale",
             role=Student.CHILD,
             family=self.family,
         )
-
         self.child3 = Student.objects.create(
             first_name="Harry",
             last_name="Tuna",
@@ -83,25 +77,39 @@ class FamilySerializerTestCase(TestCase):
             facilitator_id=self.facilitator.id,
             attendance=[{"date": "2019-11-01", "attendees": [1, 2]}],
         )
-        self.best_class = Class.objects.create(
-            name="Best Class Ever",
+        self.class2_0 = Class.objects.create(
+            name="Best Class",
             session_id=self.session2.id,
             facilitator_id=self.facilitator.id,
             attendance=[{"date": "2021-05-01", "attendees": [3]}],
         )
-        self.enrolment1 = Enrolment.objects.create(
+        self.class2_1 = Class.objects.create(
+            name="Second Best Class",
+            session_id=self.session2.id,
+            facilitator_id=self.facilitator.id,
+            attendance=[{"date": "2021-05-01", "attendees": [3]}],
+        )
+        self.enrolment_2019 = Enrolment.objects.create(
             active=False,
             family=self.family_status,
             session=self.session1,
             preferred_class=self.class1,
             enrolled_class=self.class1,
         )
-        self.enrolment2 = Enrolment.objects.create(
+        self.enrolment_2021_0 = Enrolment.objects.create(
             active=True,
             family=self.family_status,
             session=self.session2,
-            preferred_class=self.best_class,
-            enrolled_class=self.best_class,
+            preferred_class=self.class2_0,
+            enrolled_class=self.class2_0,
+            status="Confirmed",
+        )
+        self.enrolment_2021_1 = Enrolment.objects.create(
+            active=True,
+            family=self.family_status,
+            session=self.session2,
+            preferred_class=self.class2_1,
+            enrolled_class=self.class2_1,
             status="Confirmed",
         )
 
@@ -138,7 +146,7 @@ class FamilySerializerTestCase(TestCase):
                 "preferred_comms": self.family_status.preferred_comms,
                 "num_children": 1,
                 "enrolled": "Yes",
-                "current_class": "Best Class Ever",
+                "current_class": "Best Class",
                 "status": "Confirmed",
             },
             FamilySerializer(self.family_status, context={"request": None}).data,
