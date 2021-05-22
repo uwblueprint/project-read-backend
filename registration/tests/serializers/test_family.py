@@ -69,13 +69,12 @@ class FamilySerializerTestCase(TestCase):
         self.session1 = Session.objects.create(
             season="Fall",
             year="2019",
-            start_date=datetime(2019, 9, 20, 20, 8, 7, 127325, tzinfo=pytz.UTC)
-
+            start_date=datetime(2019, 9, 20, 20, 8, 7, 127325, tzinfo=pytz.UTC),
         )
         self.session2 = Session.objects.create(
             season="Spring",
             year="2021",
-            start_date=datetime(2021, 5, 20, 20, 8, 7, 127325, tzinfo=pytz.UTC)
+            start_date=datetime(2021, 5, 20, 20, 8, 7, 127325, tzinfo=pytz.UTC),
         )
         self.facilitator = User.objects.create(email="user@staff.com")
         self.class1 = Class.objects.create(
