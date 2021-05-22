@@ -18,7 +18,7 @@ def validate_students_in_enrolment(enrolment):
 
 
 def validate_class_in_session(class_obj, session):
-    if class_obj.session != session:
+    if class_obj is not None and class_obj.session != session:
         raise ValidationError(
             f"Class {class_obj.name} is not in session with ID {session.id}"
         )

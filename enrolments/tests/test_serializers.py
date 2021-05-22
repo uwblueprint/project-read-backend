@@ -76,13 +76,6 @@ class SessionDetailSerializerTestCase(TestCase):
             season=Session.SPRING,
             year=2020,
         )
-        self.facilitator = User.objects.create(email="user@staff.com")
-        self.class1 = Class.objects.create(
-            name="Cool Class",
-            session_id=self.session.id,
-            facilitator_id=self.facilitator.id,
-            attendance=[{"date": "2020-01-01", "attendees": [1, 2]}],
-        )
         self.family = Family.objects.create(
             email="weasleys@theorder.com",
             address="12 Grimmauld Pl",
@@ -92,7 +85,6 @@ class SessionDetailSerializerTestCase(TestCase):
             active=True,
             family=self.family,
             session=self.session,
-            enrolled_class=self.class1,
         )
         self.other_family = Family.objects.create(
             email="spongebob@squarepants.com",
@@ -103,7 +95,6 @@ class SessionDetailSerializerTestCase(TestCase):
             active=True,
             family=self.other_family,
             session=self.session,
-            enrolled_class=self.class1,
         )
 
     def test_session_detail_serializer(self):

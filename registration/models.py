@@ -61,9 +61,10 @@ class Family(models.Model):
     @property
     def current_enrolment(self):
         most_recent_session = (
-            apps.get_model("enrolments", "Session").objects.order_by("-start_date")[0]
-            if apps.get_model("enrolments", "Session").objects.order_by("-start_date")
-            else None
+            apps.get_model("enrolments", "Session")
+            .objects.filter(start_date__isnull=False)
+            .order_by("-start_date")
+            .first()
         )
         return apps.get_model("enrolments", "Enrolment").objects.filter(
             family=self, session=most_recent_session
