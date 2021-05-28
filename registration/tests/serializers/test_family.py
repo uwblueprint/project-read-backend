@@ -22,7 +22,7 @@ class FamilySerializerTestCase(TestCase):
             cell_number="123456789",
             home_number="1111111111",
             preferred_number="Home",
-            address="1 Django Boulevard",
+            address="1 Django Court",
             preferred_comms="Shark Tune",
         )
         self.family_without_children = Family.objects.create(
