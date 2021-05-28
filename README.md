@@ -52,7 +52,7 @@ The [Django admin](https://docs.djangoproject.com/en/3.2/ref/contrib/admin/) pro
    ```
    docker-compose exec web ./manage.py createsuperuser
    ```
-1. Open [localhost:8080/admin](localhost:8080/admin) and sign in.
+1. Open [localhost:8000/admin](localhost:8000/admin) and sign in.
 
 ### Generating seed data
 
