@@ -91,6 +91,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "parent",
             "children",
             "guests",
+            "notes",
         ]
 
     def create(self, validated_data):

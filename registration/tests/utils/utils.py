@@ -29,6 +29,7 @@ def create_test_family(last_name):
         preferred_number=fake.random_element(elements=Family.NUMBER_PREF_CHOICES)[1],
         address=fake.address(),
         preferred_comms=fake.random_element(elements=preferred_comms),
+        notes=fake.text(max_nb_chars=60),
     )
 
 
