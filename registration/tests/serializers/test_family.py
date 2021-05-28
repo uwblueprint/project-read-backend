@@ -73,7 +73,7 @@ class FamilySerializerTestCase(TestCase):
         self.parent_with_enrolment = Student.objects.create(
             first_name="Gollum", last_name="Goat", role=Student.PARENT
         )
-        self.family_status = Family.objects.create(
+        self.family_with_multiple_enrolments = Family.objects.create(
             parent=self.parent_with_enrolment,
             email="justkeepswimming@ocean.com",
             cell_number="123456789",
@@ -106,36 +106,38 @@ class FamilySerializerTestCase(TestCase):
         # These ensure that families with multiple enrolments show the correct enrolment status fields
         self.first_family_enrolment = Enrolment.objects.create(
             active=False,
-            family=self.family_status,
+            family=self.family_with_multiple_enrolments,
             session=self.session1,
             preferred_class=self.class_from_session1,
             enrolled_class=self.class_from_session1,
         )
         self.second_family_enrolment = Enrolment.objects.create(
             active=True,
-            family=self.family_status,
+            family=self.family_with_multiple_enrolments,
             session=self.session2,
             preferred_class=self.class_from_session2,
             enrolled_class=self.class_from_session2,
             status="Confirmed",
         )
-        self.maxDiff = None
-        self.assertDictEqual(
+        self.assertEqual(
             {
-                "id": self.family_status.id,
+                "id": self.family_with_multiple_enrolments.id,
                 "parent": StudentSerializer(
-                    self.family_status.parent, context={"request": None}
+                    self.family_with_multiple_enrolments.parent,
+                    context={"request": None},
                 ).data,
-                "email": self.family_status.email,
-                "phone_number": self.family_status.cell_number,
-                "address": self.family_status.address,
-                "preferred_comms": self.family_status.preferred_comms,
+                "email": self.family_with_multiple_enrolments.email,
+                "phone_number": self.family_with_multiple_enrolments.cell_number,
+                "address": self.family_with_multiple_enrolments.address,
+                "preferred_comms": self.family_with_multiple_enrolments.preferred_comms,
                 "num_children": 0,
                 "enrolled": "Yes",
                 "current_class": "Best Class",
                 "status": "Confirmed",
             },
-            FamilySerializer(self.family_status, context={"request": None}).data,
+            FamilySerializer(
+                self.family_with_multiple_enrolments, context={"request": None}
+            ).data,
         )
 
     def test_family_serializer_parent(self):
