@@ -132,7 +132,7 @@ To test authenticated endpoints locally, you'll need a token from our team's Fir
 
 1. Sync your Firebase user with your Django superuser, and retrieve a token:
     ```bash
-    docker-compose exec web ./manage.py sync_firebase_user [email] [password]
+    docker-compose exec web ./manage.py sync_firebase_user
     ```
     * This token expires after 60 minutes, at which point you should re-run this command to get a new one!
 1. You can use this token and pass it as a bearer token for your API requests (using curl, Postman, etc).
