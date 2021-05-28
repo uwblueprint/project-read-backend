@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/python:3.9
+      - image: circleci/python:3.9.2
         environment:
           DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=disable
       - image: circleci/postgres:13.1
