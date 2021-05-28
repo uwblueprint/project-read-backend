@@ -18,6 +18,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "first_name",
             "last_name",
             "role",
+            "date_of_birth",
             "family",
             "information",
         ]

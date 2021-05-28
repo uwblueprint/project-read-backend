@@ -3,15 +3,21 @@ from django.test.testcases import TestCase
 from registration.models import Family, Student
 from registration.serializers import FamilySerializer, StudentSerializer
 
+from datetime import date
+
 
 class FamilySerializerTestCase(TestCase):
     def setUp(self):
         self.parent1 = Student.objects.create(
-            first_name="Merlin", last_name="Fish", role=Student.PARENT
+            first_name="Merlin",
+            last_name="Fischer",
+            role=Student.PARENT,
         )
 
         self.parent2 = Student.objects.create(
-            first_name="Gandalf", last_name="Whale", role=Student.PARENT
+            first_name="Gandalf",
+            last_name="Whale",
+            role=Student.PARENT,
         )
 
         self.family = Family.objects.create(
@@ -44,6 +50,7 @@ class FamilySerializerTestCase(TestCase):
             last_name="Whale",
             role=Student.CHILD,
             family=self.family,
+            date_of_birth=date.today(),
         )
 
         self.child2 = Student.objects.create(
@@ -57,6 +64,7 @@ class FamilySerializerTestCase(TestCase):
             first_name="Harry",
             last_name="Tuna",
             role=Student.CHILD,
+            date_of_birth=date(2002, 9, 28),
         )
 
     def test_family_number(self):

@@ -76,6 +76,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     role = models.CharField(max_length=6, choices=ROLE_CHOICES)
+    date_of_birth = models.DateField(auto_now=False, auto_now_add=False, null=True)
     family = models.ForeignKey(
         "Family",
         null=True,
