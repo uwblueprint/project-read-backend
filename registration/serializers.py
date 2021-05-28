@@ -60,15 +60,13 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_current_class(self, obj):
         return (
-            obj.current_enrolment[0].enrolled_class.name
+            obj.current_enrolment.enrolled_class.name
             if obj.current_enrolment
             else "N/A"
         )
 
     def get_status(self, obj):
-        return (
-            obj.current_enrolment[0].status if obj.current_enrolment else "Unassigned"
-        )
+        return obj.current_enrolment.status if obj.current_enrolment else "Unassigned"
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):

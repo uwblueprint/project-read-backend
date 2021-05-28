@@ -66,9 +66,7 @@ class Family(models.Model):
             .order_by("-start_date")
             .first()
         )
-        return apps.get_model("enrolments", "Enrolment").objects.filter(
-            family=self, session=most_recent_session
-        )
+        return self.enrolments.filter(session=most_recent_session).first()
 
     def __str__(self):
         if self.parent is not None:

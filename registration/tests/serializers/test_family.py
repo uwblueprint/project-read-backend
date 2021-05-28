@@ -1,11 +1,11 @@
 from django.test.testcases import TestCase
-from datetime import datetime
+from datetime import date
+from django.db import models
 
 from registration.models import Family, Student
 from enrolments.models import Enrolment, Session, Class
 from accounts.models import User
 from registration.serializers import FamilySerializer, StudentSerializer
-import pytz
 
 
 class FamilySerializerTestCase(TestCase):
@@ -15,9 +15,6 @@ class FamilySerializerTestCase(TestCase):
         )
         self.parent2 = Student.objects.create(
             first_name="Gandalf", last_name="Whale", role=Student.PARENT
-        )
-        self.parent3 = Student.objects.create(
-            first_name="Gollum", last_name="Goat", role=Student.PARENT
         )
         self.family = Family.objects.create(
             parent=self.parent2,
@@ -35,13 +32,6 @@ class FamilySerializerTestCase(TestCase):
             address="42 Wallaby Way",
             preferred_comms="Whale Song",
         )
-        self.family_status = Family.objects.create(
-            parent=self.parent3,
-            email="justkeepswimming@ocean.com",
-            cell_number="123456789",
-            address="1 Test Ave",
-            preferred_comms="Dolphin Whistle",
-        )
         self.child1 = Student.objects.create(
             first_name="Albus",
             last_name="Whale",
@@ -58,59 +48,6 @@ class FamilySerializerTestCase(TestCase):
             first_name="Harry",
             last_name="Tuna",
             role=Student.CHILD,
-            family=self.family_status,
-        )
-        self.session1 = Session.objects.create(
-            season="Fall",
-            year="2019",
-            start_date=datetime(2019, 9, 20, 20, 8, 7, 127325, tzinfo=pytz.UTC),
-        )
-        self.session2 = Session.objects.create(
-            season="Spring",
-            year="2021",
-            start_date=datetime(2021, 5, 20, 20, 8, 7, 127325, tzinfo=pytz.UTC),
-        )
-        self.facilitator = User.objects.create(email="user@staff.com")
-        self.class1 = Class.objects.create(
-            name="Test Class 1",
-            session_id=self.session1.id,
-            facilitator_id=self.facilitator.id,
-            attendance=[{"date": "2019-11-01", "attendees": [1, 2]}],
-        )
-        self.class2_0 = Class.objects.create(
-            name="Best Class",
-            session_id=self.session2.id,
-            facilitator_id=self.facilitator.id,
-            attendance=[{"date": "2021-05-01", "attendees": [3]}],
-        )
-        self.class2_1 = Class.objects.create(
-            name="Second Best Class",
-            session_id=self.session2.id,
-            facilitator_id=self.facilitator.id,
-            attendance=[{"date": "2021-05-01", "attendees": [3]}],
-        )
-        self.enrolment_2019 = Enrolment.objects.create(
-            active=False,
-            family=self.family_status,
-            session=self.session1,
-            preferred_class=self.class1,
-            enrolled_class=self.class1,
-        )
-        self.enrolment_2021_0 = Enrolment.objects.create(
-            active=True,
-            family=self.family_status,
-            session=self.session2,
-            preferred_class=self.class2_0,
-            enrolled_class=self.class2_0,
-            status="Confirmed",
-        )
-        self.enrolment_2021_1 = Enrolment.objects.create(
-            active=True,
-            family=self.family_status,
-            session=self.session2,
-            preferred_class=self.class2_1,
-            enrolled_class=self.class2_1,
-            status="Confirmed",
         )
 
     def test_family_number(self):
@@ -133,6 +70,55 @@ class FamilySerializerTestCase(TestCase):
         )
 
     def test_family_status(self):
+        self.parent_with_enrolment = Student.objects.create(
+            first_name="Gollum", last_name="Goat", role=Student.PARENT
+        )
+        self.family_status = Family.objects.create(
+            parent=self.parent_with_enrolment,
+            email="justkeepswimming@ocean.com",
+            cell_number="123456789",
+            address="1 Test Ave",
+            preferred_comms="Dolphin Whistle",
+        )
+        self.facilitator = User.objects.create(email="user@staff.com")
+        self.session1 = Session.objects.create(
+            season="Fall",
+            year="2019",
+            start_date=date(2019, 1, 23),
+        )
+        self.session2 = Session.objects.create(
+            season="Spring",
+            year="2021",
+            start_date=date(2021, 5, 15),
+        )
+        self.class_from_session1 = Class.objects.create(
+            name="Test Class 1",
+            session_id=self.session1.id,
+            facilitator_id=self.facilitator.id,
+            attendance=[],
+        )
+        self.class_from_session2 = Class.objects.create(
+            name="Best Class",
+            session_id=self.session2.id,
+            facilitator_id=self.facilitator.id,
+            attendance=[],
+        )
+        # These ensure that families with multiple enrolments show the correct enrolment status fields
+        self.first_family_enrolment = Enrolment.objects.create(
+            active=False,
+            family=self.family_status,
+            session=self.session1,
+            preferred_class=self.class_from_session1,
+            enrolled_class=self.class_from_session1,
+        )
+        self.second_family_enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.family_status,
+            session=self.session2,
+            preferred_class=self.class_from_session2,
+            enrolled_class=self.class_from_session2,
+            status="Confirmed",
+        )
         self.maxDiff = None
         self.assertDictEqual(
             {
@@ -144,7 +130,7 @@ class FamilySerializerTestCase(TestCase):
                 "phone_number": self.family_status.cell_number,
                 "address": self.family_status.address,
                 "preferred_comms": self.family_status.preferred_comms,
-                "num_children": 1,
+                "num_children": 0,
                 "enrolled": "Yes",
                 "current_class": "Best Class",
                 "status": "Confirmed",
