@@ -20,7 +20,7 @@ class Session(models.Model):
 
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
-    start_date = models.DateTimeField(null=True)
+    start_date = models.DateField(null=True)
     fields = models.JSONField(default=list, validators=[validate_fields])
 
     def __str__(self):
@@ -70,7 +70,9 @@ class Enrolment(models.Model):
         (WAITLISTED, "Waitlisted"),
     ]
     active = models.BooleanField()
-    family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
+    family = models.ForeignKey(
+        "registration.Family", on_delete=models.PROTECT, related_name="enrolments"
+    )
     students = ArrayField(
         models.PositiveIntegerField(),
         default=list,
