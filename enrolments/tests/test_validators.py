@@ -6,6 +6,7 @@ from enrolments.validators import (
     validate_attendance,
     validate_schema,
     validate_class_in_session,
+    validate_enrolment_in_session,
     validate_enrolment,
     validate_fields,
     validate_students_in_enrolment,
@@ -51,6 +52,73 @@ class EnrolmentValidatorTestCase(TestCase):
             self.class_in_session,
             session_other,
         )
+
+    def test_validate_enrolment_in_session(self):
+        session1 = Session.objects.create(season=Session.SPRING, year="2020")
+        session2 = Session.objects.create(season=Session.FALL, year="2019")
+        class1_in_session1 = Class.objects.create(
+            name="Class 1 in Session 1",
+            session=session1,
+            facilitator=self.user,
+            attendance={},
+        )
+        class2_in_session1 = Class.objects.create(
+            name="Class 2 in Session 1",
+            session=session1,
+            facilitator=self.user,
+            attendance={},
+        )
+        class1_in_session2 = Class.objects.create(
+            name="Class 1 in Session 2",
+            session=session2,
+            facilitator=self.user,
+            attendance={},
+        )
+        family1 = Family.objects.create(
+            email="fam1@test.com",
+            cell_number="123456789",
+            address="1 Fam St",
+            preferred_comms="email",
+        )
+        family2 = Family.objects.create(
+            email="fam2@test.com",
+            cell_number="123456789",
+            address="2 Fam St",
+            preferred_comms="email",
+        )
+        enrolment1_for_family1 = Enrolment.objects.create(
+            active=True,
+            family=family1,
+            session=session1,
+            enrolled_class=class1_in_session1,
+        )
+        enrolment2_for_family1 = Enrolment.objects.create(
+            active=False,
+            family=family1,
+            session=session2,
+            enrolled_class=class1_in_session2,
+        )
+        enrolment1_for_family2 = Enrolment.objects.create(
+            active=True,
+            family=family2,
+            session=session1,
+            enrolled_class=class1_in_session1,
+        )
+        duplicate_enrolment = Enrolment.objects.create(
+            active=True,
+            family=family1,
+            session=session1,
+            enrolled_class=class2_in_session1,
+        )
+
+        # Duplicate class enrolments for family1 in session1
+        self.assertRaises(
+            ValidationError, validate_enrolment_in_session, session1, family1
+        )
+        # Many families can enrol in a session
+        self.assertIsNone(validate_enrolment_in_session(session1, family2))
+        # A family can have multiple enrolments across different sessions
+        self.assertIsNone(validate_enrolment_in_session(session2, family2))
 
     @patch("enrolments.validators.validate_class_in_session")
     def test_validate_enrolments(self, mock_validate):
