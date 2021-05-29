@@ -7,13 +7,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('enrolments', '0012_session_start_date'),
+        ("enrolments", "0012_session_start_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='enrolment',
-            name='enrolled_class',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='enrolments', to='enrolments.class'),
+            model_name="enrolment",
+            name="enrolled_class",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="enrolments",
+                to="enrolments.class",
+            ),
         ),
     ]
