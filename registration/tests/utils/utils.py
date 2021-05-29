@@ -87,8 +87,7 @@ def create_test_children(
                 role=Student.CHILD,
                 information={
                     "8": fake.random_element(elements=genders),
-                    "9": fake.date_this_decade().strftime("%m/%d/%Y"),
-                    "10": fake.random_element(elements=dietary_restrictions),
+                    "9": fake.random_element(elements=dietary_restrictions),
                 }
                 if with_fields
                 else {},
@@ -113,8 +112,8 @@ def create_test_guests(
                 first_name=fake.first_name(),
                 role=Student.GUEST,
                 information={
-                    "11": fake.random_element(elements=family_relations),
-                    "12": fake.phone_number(),
+                    "10": fake.random_element(elements=family_relations),
+                    "11": fake.phone_number(),
                 }
                 if with_fields
                 else {},

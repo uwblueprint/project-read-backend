@@ -59,7 +59,7 @@ class RegistrationUtilsTestCase(TestCase):
         )
 
         children = Student.objects.all()
-        field_ids = [8, 9, 10]
+        field_ids = [8, 9]
         for child in children:
             self.assertEqual(len(child.information), len(field_ids))
             self.assertTrue(
@@ -86,7 +86,7 @@ class RegistrationUtilsTestCase(TestCase):
         )
 
         guests = Student.objects.all()
-        field_ids = [11, 12]
+        field_ids = [10, 11]
         for guest in guests:
             self.assertEqual(len(guest.information), len(field_ids))
             self.assertTrue(

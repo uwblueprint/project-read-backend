@@ -7,14 +7,20 @@ from enrolments.models import Enrolment, Session, Class
 from accounts.models import User
 from registration.serializers import FamilySerializer, StudentSerializer
 
+from datetime import date
+
 
 class FamilySerializerTestCase(TestCase):
     def setUp(self):
         self.parent1 = Student.objects.create(
-            first_name="Merlin", last_name="Fish", role=Student.PARENT
+            first_name="Merlin",
+            last_name="Fischer",
+            role=Student.PARENT,
         )
         self.parent2 = Student.objects.create(
-            first_name="Gandalf", last_name="Whale", role=Student.PARENT
+            first_name="Gandalf",
+            last_name="Whale",
+            role=Student.PARENT,
         )
         self.family = Family.objects.create(
             parent=self.parent2,
@@ -37,6 +43,7 @@ class FamilySerializerTestCase(TestCase):
             last_name="Whale",
             role=Student.CHILD,
             family=self.family,
+            date_of_birth=date.today(),
         )
         self.child2 = Student.objects.create(
             first_name="Lily",
@@ -48,6 +55,7 @@ class FamilySerializerTestCase(TestCase):
             first_name="Harry",
             last_name="Tuna",
             role=Student.CHILD,
+            date_of_birth=date(2002, 9, 28),
         )
 
     def test_family_number(self):
@@ -62,6 +70,10 @@ class FamilySerializerTestCase(TestCase):
                 "address": self.family.address,
                 "preferred_comms": self.family.preferred_comms,
                 "num_children": 2,
+                "children": [
+                    StudentSerializer(self.child1, context={"request": None}).data,
+                    StudentSerializer(self.child2, context={"request": None}).data,
+                ],
                 "enrolled": "No",
                 "current_class": "N/A",
                 "status": "Unassigned",
@@ -131,6 +143,7 @@ class FamilySerializerTestCase(TestCase):
                 "address": self.family_with_multiple_enrolments.address,
                 "preferred_comms": self.family_with_multiple_enrolments.preferred_comms,
                 "num_children": 0,
+                "children": [],
                 "enrolled": "Yes",
                 "current_class": "Best Class",
                 "status": "Confirmed",
@@ -146,7 +159,7 @@ class FamilySerializerTestCase(TestCase):
         self.assertEqual(data["parent"], StudentSerializer(self.parent1).data)
 
     def test_family_serializer_children(self):
-        data = FamilySerializer(self.family).data
+        data = FamilySerializer(self.family, context={"request": None}).data
         self.assertEqual(data.get("num_children"), 2)
 
     def test_family_serializer_children_none(self):

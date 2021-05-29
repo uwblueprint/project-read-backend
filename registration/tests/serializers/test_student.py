@@ -5,6 +5,8 @@ from unittest.mock import patch
 from registration.models import Student, Field
 from registration.serializers import StudentSerializer
 
+from datetime import date
+
 
 class StudentSerializerTestCase(TestCase):
     def setUp(self):
@@ -22,6 +24,7 @@ class StudentSerializerTestCase(TestCase):
             "last_name": "Weasley",
             "information": {f"{self.field.id}": "yes"},
             "role": Student.PARENT,
+            "date_of_birth": date.today(),
         }
 
     @patch("registration.serializers.validate_student_information_role")

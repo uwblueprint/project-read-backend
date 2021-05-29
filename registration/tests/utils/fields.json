@@ -66,21 +66,13 @@
   {
     "id": 9,
     "role": "Child",
-    "name": "DOB",
-    "question_type": "Text",
-    "is_default": true,
-    "order": 2
-  },
-  {
-    "id": 10,
-    "role": "Child",
     "name": "Allergies",
     "question_type": "Text",
     "is_default": true,
     "order": 3
   },
   {
-    "id": 11,
+    "id": 10,
     "role": "Guest",
     "name": "Relation to Family",
     "question_type": "Multiple Choice",
@@ -88,7 +80,7 @@
     "order": 1
   },
   {
-    "id": 12,
+    "id": 11,
     "role": "Guest",
     "name": "Phone Number",
     "question_type": "Text",

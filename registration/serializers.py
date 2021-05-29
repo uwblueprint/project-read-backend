@@ -18,6 +18,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "first_name",
             "last_name",
             "role",
+            "date_of_birth",
             "family",
             "information",
         ]
@@ -33,6 +34,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
+    children = StudentSerializer(many=True)
     enrolled = SerializerMethodField()
     current_class = SerializerMethodField()
     status = SerializerMethodField()
@@ -47,6 +49,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
             "num_children",
+            "children",
             "enrolled",
             "current_class",
             "status",
