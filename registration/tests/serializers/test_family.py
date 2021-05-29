@@ -143,6 +143,7 @@ class FamilySerializerTestCase(TestCase):
                 "address": self.family_with_multiple_enrolments.address,
                 "preferred_comms": self.family_with_multiple_enrolments.preferred_comms,
                 "num_children": 0,
+                "children": [],
                 "enrolled": "Yes",
                 "current_class": "Best Class",
                 "status": "Confirmed",
