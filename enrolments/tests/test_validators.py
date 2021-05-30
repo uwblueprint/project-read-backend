@@ -24,7 +24,7 @@ class EnrolmentValidatorTestCase(TestCase):
             address="1 Fam Ave",
             preferred_comms="email",
         )
-        self.session = Session.objects.create(season=Session.FALL, year="2020")
+        self.session = Session.objects.create(season=Session.FALL, year="2019")
         self.class_in_session = Class.objects.create(
             name="Class in session",
             session=self.session,
@@ -54,8 +54,8 @@ class EnrolmentValidatorTestCase(TestCase):
         )
 
     def test_validate_enrolment_in_session(self):
-        session1 = Session.objects.create(season=Session.SPRING, year="2020")
-        session2 = Session.objects.create(season=Session.FALL, year="2019")
+        session1 = Session.objects.create(season=Session.SPRING, year="2019")
+        session2 = self.session
         class1_in_session1 = Class.objects.create(
             name="Class 1 in Session 1",
             session=session1,
@@ -68,18 +68,8 @@ class EnrolmentValidatorTestCase(TestCase):
             facilitator=self.user,
             attendance={},
         )
-        class1_in_session2 = Class.objects.create(
-            name="Class 1 in Session 2",
-            session=session2,
-            facilitator=self.user,
-            attendance={},
-        )
-        family1 = Family.objects.create(
-            email="fam1@test.com",
-            cell_number="123456789",
-            address="1 Fam St",
-            preferred_comms="email",
-        )
+        class1_in_session2 = self.class_in_session
+        family1 = self.family
         family2 = Family.objects.create(
             email="fam2@test.com",
             cell_number="123456789",
