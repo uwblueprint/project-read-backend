@@ -98,7 +98,9 @@ def create_test_guests(
                 first_name=fake.first_name(),
                 role=Student.GUEST,
                 information={
-                    "10": fake.random_element(elements=Field.objects.get(id=10).options),
+                    "10": fake.random_element(
+                        elements=Field.objects.get(id=10).options
+                    ),
                     "11": fake.phone_number(),
                 }
                 if with_fields

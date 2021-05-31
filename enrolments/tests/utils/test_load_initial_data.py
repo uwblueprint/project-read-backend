@@ -51,12 +51,14 @@ class LoadInitialDataTestCase(TestCase):
         num_sessions = 5
         num_classes_per_session = 3
         num_classes = num_sessions * num_classes_per_session
+        num_fields = 11
 
         call_command(
             "load_initial_data",
             verbose=False,
         )
 
+        self.assertEqual(Field.objects.all().count(), num_fields)
         self.assertEqual(Family.objects.all().count(), num_families)
         self.assertEqual(Session.objects.all().count(), num_sessions)
         self.assertEqual(Class.objects.all().count(), num_classes)

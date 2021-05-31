@@ -5,7 +5,7 @@
     "name": "DOB",
     "question_type": "Text",
     "is_default": true,
-    "options": null,
+    "options": [],
     "order": 1
   },
   {
@@ -14,7 +14,7 @@
     "name": "Marital Status",
     "question_type": "Text",
     "is_default": false,
-    "options": null,
+    "options": [],
     "order": 2
   },
   {
@@ -104,7 +104,7 @@
     "name": "Phone Number",
     "question_type": "Text",
     "is_default": false,
-    "options": null,
+    "options": [],
     "order": 2
   }
 ]

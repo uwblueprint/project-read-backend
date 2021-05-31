@@ -130,8 +130,8 @@ class Field(models.Model):
     is_default = models.BooleanField()
     options = ArrayField(
         models.CharField(max_length=64, blank=False),
+        default=list,
         validators=[validate_mc_options],
-        null=True,
         blank=True,
     )
     order = models.PositiveSmallIntegerField()

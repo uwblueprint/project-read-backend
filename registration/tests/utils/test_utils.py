@@ -8,10 +8,12 @@ from . import utils
 class RegistrationUtilsTestCase(TestCase):
     def setUp(self):
         self.last_name = "Test"
-
-    def create_test_fields(self):
         utils.create_test_fields()
-        self.assertEqual(Field.objects.all().count(), 12)
+
+    def test_create_test_fields(self):
+        Field.objects.all().delete()
+        utils.create_test_fields()
+        self.assertEqual(Field.objects.all().count(), 11)
 
     def test_create_test_family(self):
         utils.create_test_family(last_name=self.last_name)
@@ -22,7 +24,6 @@ class RegistrationUtilsTestCase(TestCase):
         )
 
     def test_create_test_parent(self):
-        utils.create_test_fields()
         family = utils.create_test_family(last_name=self.last_name)
         utils.create_test_parent(
             family=family,
@@ -45,7 +46,6 @@ class RegistrationUtilsTestCase(TestCase):
     def test_create_test_children(self):
         num_children = 3
         family = utils.create_test_family(last_name=self.last_name)
-        utils.create_test_fields()
         utils.create_test_children(
             family=family,
             last_name=self.last_name,
@@ -73,7 +73,6 @@ class RegistrationUtilsTestCase(TestCase):
     def test_create_test_guests(self):
         num_guests = 3
         family = utils.create_test_family(last_name=self.last_name)
-        utils.create_test_fields()
         utils.create_test_guests(
             family=family,
             last_name=self.last_name,
