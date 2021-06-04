@@ -28,6 +28,7 @@ class ValidatorsTestCase(TestCase):
             question="Do they have any allergies?",
             question_type=Field.MULTIPLE_CHOICE,
             is_default=True,
+            options=["Yes", "No"],
             order=1,
         )
         self.guest_field = Field.objects.create(
@@ -149,3 +150,12 @@ class ValidatorsTestCase(TestCase):
             student,
         )
         mock_validate.assert_called_once_with(student.information, student.role)
+
+    def test_validate_mc_options(self):
+        test_field = self.child_field
+        self.assertIsNone(
+            validators.validate_mc_options(test_field),
+            f"Test field options: {test_field.options}",
+        )
+        test_field.options.append(1)
+        self.assertRaises(ValidationError, validators.validate_mc_options, test_field)

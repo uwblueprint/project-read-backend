@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.db import models
-from .validators import validate_family_parent, validate_student
+from .validators import validate_family_parent, validate_student, validate_mc_options
+from django.contrib.postgres.fields import ArrayField
 
 
 class Family(models.Model):
@@ -127,6 +128,12 @@ class Field(models.Model):
     question = models.CharField(max_length=512)
     question_type = models.CharField(max_length=15, choices=QUESTION_CHOICES)
     is_default = models.BooleanField()
+    options = ArrayField(
+        models.CharField(max_length=64, blank=False),
+        default=list,
+        validators=[validate_mc_options],
+        blank=True,
+    )
     order = models.PositiveSmallIntegerField()
 
     def __str__(self):

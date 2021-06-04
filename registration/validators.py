@@ -35,3 +35,8 @@ def validate_student_information_role(information, role):
 
 def validate_student(student):
     validate_student_information_role(student.information, student.role)
+
+
+def validate_mc_options(field):
+    if not all(isinstance(option, str) for option in field.options):
+        raise ValidationError("One of the provided options is not a string")

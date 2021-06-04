@@ -8,10 +8,12 @@ from . import utils
 class RegistrationUtilsTestCase(TestCase):
     def setUp(self):
         self.last_name = "Test"
-
-    def create_test_fields(self):
         utils.create_test_fields()
-        self.assertEqual(Field.objects.all().count(), 12)
+
+    def test_create_test_fields(self):
+        Field.objects.all().delete()
+        utils.create_test_fields()
+        self.assertEqual(Field.objects.all().count(), 11)
 
     def test_create_test_family(self):
         utils.create_test_family(last_name=self.last_name)

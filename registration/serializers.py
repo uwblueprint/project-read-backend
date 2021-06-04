@@ -155,6 +155,7 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
             "question",
             "question_type",
             "is_default",
+            "options",
             "order",
         ]
         list_serializer_class = FieldListSerializer

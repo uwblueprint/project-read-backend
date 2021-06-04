@@ -1,6 +1,5 @@
 from django.core.management import call_command
 from django.test import TestCase
-from unittest.mock import patch
 
 from enrolments.models import Session, Class, Enrolment
 from registration.models import Family, Field, Student
@@ -46,23 +45,20 @@ class LoadInitialDataTestCase(TestCase):
             ]
         )
 
-    @patch("registration.tests.utils.utils.create_test_fields")
-    def test_load_initial_data(
-        self,
-        mock_create_fields,
-    ):
+    def test_load_initial_data(self):
         # Default values
         num_families = 100
         num_sessions = 5
         num_classes_per_session = 3
         num_classes = num_sessions * num_classes_per_session
+        num_fields = 11
 
         call_command(
             "load_initial_data",
             verbose=False,
         )
 
-        mock_create_fields.assert_called_once()
+        self.assertEqual(Field.objects.all().count(), num_fields)
         self.assertEqual(Family.objects.all().count(), num_families)
         self.assertEqual(Session.objects.all().count(), num_sessions)
         self.assertEqual(Class.objects.all().count(), num_classes)

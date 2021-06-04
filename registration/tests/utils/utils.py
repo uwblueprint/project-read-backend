@@ -8,20 +8,6 @@ fake = Faker()
 
 # Sample options
 preferred_comms = {"Phone", "Email"}
-technologies = {"Laptop", "Tablet", "Desktop"}
-education_levels = {"High School", "Trade School", "College/University", "Masters"}
-genders = {"Man", "Woman", "Non-binary", "Other"}
-dietary_restrictions = {"Peanuts", "Dairy", "Eggs", "Nuts", "Vegetarian", "Vegan"}
-family_relations = {
-    "Grandmother",
-    "Grandfather",
-    "Mother",
-    "Father",
-    "Aunt",
-    "Uncle",
-    "Sibling",
-    "Friend",
-}
 
 
 def create_test_fields():
@@ -56,10 +42,10 @@ def create_test_parent(
         role=Student.PARENT,
         information={
             "1": fake.date(),
-            "4": fake.random_element(elements=technologies),
-            "5": "Yes" if fake.pybool() else "No",
-            "6": "Yes" if fake.pybool() else "No",
-            "7": fake.random_element(elements=education_levels),
+            "4": fake.random_element(elements=Field.objects.get(id=4).options),
+            "5": fake.random_element(elements=Field.objects.get(id=5).options),
+            "6": fake.random_element(elements=Field.objects.get(id=6).options),
+            "7": fake.random_element(elements=Field.objects.get(id=7).options),
         }
         if with_fields
         else {},
@@ -86,8 +72,8 @@ def create_test_children(
                 first_name=fake.first_name(),
                 role=Student.CHILD,
                 information={
-                    "8": fake.random_element(elements=genders),
-                    "9": fake.random_element(elements=dietary_restrictions),
+                    "8": fake.random_element(elements=Field.objects.get(id=8).options),
+                    "9": fake.random_element(elements=Field.objects.get(id=9).options),
                 }
                 if with_fields
                 else {},
@@ -112,7 +98,9 @@ def create_test_guests(
                 first_name=fake.first_name(),
                 role=Student.GUEST,
                 information={
-                    "10": fake.random_element(elements=family_relations),
+                    "10": fake.random_element(
+                        elements=Field.objects.get(id=10).options
+                    ),
                     "11": fake.phone_number(),
                 }
                 if with_fields
