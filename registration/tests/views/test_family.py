@@ -25,13 +25,8 @@ class FamilyTestCase(APITestCase):
             address="2 Test Ave",
             preferred_comms="email",
         )
-        self.parent = Student.objects.create(
-            first_name="Marlin", last_name="Fish"
-        )
-        self.other_parent = Student.objects.create(
-            first_name="Marlin", last_name="Cow"
-        )
-
+        self.parent = Student.objects.create(first_name="Marlin", last_name="Fish")
+        self.other_parent = Student.objects.create(first_name="Marlin", last_name="Cow")
 
     def test_get_families(self):
         url = reverse("family-list")
@@ -85,7 +80,7 @@ class FamilyTestCase(APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    
+
     def test_search_familes_no_params(self):
         url = reverse("family-list") + "search/"
         self.client.force_authenticate(self.user)
@@ -95,24 +90,35 @@ class FamilyTestCase(APITestCase):
         self.family.save()
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
-    
+
     def test_search_familes_first_and_last_name(self):
         self.family.parent = self.parent
         self.family.save()
 
-        query_params = {
-            "first_name": "Marlin",
-            "last_name": "Fish"
-        }
-        url = reverse("family-list") + "search/?first_name=" + query_params["first_name"] + "&last_name=" + query_params["last_name"]
+        query_params = {"first_name": "Marlin", "last_name": "Fish"}
+        url = (
+            reverse("family-list")
+            + "search/?first_name="
+            + query_params["first_name"]
+            + "&last_name="
+            + query_params["last_name"]
+        )
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             payload,
-            [{'first_name': self.parent.first_name, 'last_name': self.parent.last_name, 'id': self.family.id, 'email': self.family.email, 'phone_number': self.family.phone_number, 'num_children': 0}],
+            [
+                {
+                    "first_name": self.parent.first_name,
+                    "last_name": self.parent.last_name,
+                    "id": self.family.id,
+                    "email": self.family.email,
+                    "phone_number": self.family.phone_number,
+                    "num_children": 0,
+                }
+            ],
         )
 
     def test_search_familes_first_name(self):
@@ -124,7 +130,9 @@ class FamilyTestCase(APITestCase):
         query_params = {
             "first_name": "Marlin",
         }
-        url = reverse("family-list") + "search/?first_name=" + query_params["first_name"]
+        url = (
+            reverse("family-list") + "search/?first_name=" + query_params["first_name"]
+        )
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
@@ -132,12 +140,24 @@ class FamilyTestCase(APITestCase):
         self.assertEqual(
             payload,
             [
-            {'first_name': self.parent.first_name, 'last_name': self.parent.last_name, 'id': self.family.id, 'email': self.family.email, 'phone_number': self.family.phone_number, 'num_children': 0},
-            {'first_name': self.other_parent.first_name, 'last_name': self.other_parent.last_name, 'id': self.other_family.id, 'email': self.other_family.email, 'phone_number': self.other_family.phone_number, 'num_children': 0}
-             ],
+                {
+                    "first_name": self.parent.first_name,
+                    "last_name": self.parent.last_name,
+                    "id": self.family.id,
+                    "email": self.family.email,
+                    "phone_number": self.family.phone_number,
+                    "num_children": 0,
+                },
+                {
+                    "first_name": self.other_parent.first_name,
+                    "last_name": self.other_parent.last_name,
+                    "id": self.other_family.id,
+                    "email": self.other_family.email,
+                    "phone_number": self.other_family.phone_number,
+                    "num_children": 0,
+                },
+            ],
         )
-       
-
 
     def test_method_not_allowed(self):
         url = reverse("family-detail", args=[self.family.id])

@@ -130,31 +130,31 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError("Student data is invalid")
         return super().validate(attrs)
 
-class FamilySearchSerializer(serializers.HyperlinkedModelSerializer): 
-        first_name = SerializerMethodField()
-        last_name = SerializerMethodField()
-        num_children = SerializerMethodField()
 
-        class Meta:
-            model = Family
-            fields = [
-                "first_name",
-                "last_name",
-                "id",
-                "email",
-                "phone_number",
-                "num_children",
-            ]
-        def get_first_name(self, obj): 
-            return obj.parent.first_name
-        
-        def get_last_name(self, obj): 
-            return obj.parent.last_name
+class FamilySearchSerializer(serializers.HyperlinkedModelSerializer):
+    first_name = SerializerMethodField()
+    last_name = SerializerMethodField()
+    num_children = SerializerMethodField()
 
-        def get_num_children(self, obj):
-            return obj.children.count()            
+    class Meta:
+        model = Family
+        fields = [
+            "first_name",
+            "last_name",
+            "id",
+            "email",
+            "phone_number",
+            "num_children",
+        ]
 
+    def get_first_name(self, obj):
+        return obj.parent.first_name
 
+    def get_last_name(self, obj):
+        return obj.parent.last_name
+
+    def get_num_children(self, obj):
+        return obj.children.count()
 
 
 class FieldListSerializer(serializers.ListSerializer):

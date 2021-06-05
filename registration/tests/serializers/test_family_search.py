@@ -5,6 +5,7 @@ from registration.serializers import FamilySearchSerializer
 
 context = {"request": None}
 
+
 class FamilyDetailSerializerTestCase(TestCase):
     def setUp(self):
         self.family = Family.objects.create(
@@ -28,13 +29,12 @@ class FamilyDetailSerializerTestCase(TestCase):
             role=Student.CHILD,
             family=self.family,
         )
-    
+
     def test_family_search_serializer_parent_fields(self):
         data = FamilySearchSerializer(self.family, context=context).data
         self.assertEqual(data["first_name"], self.parent.first_name)
         self.assertEqual(data["last_name"], self.parent.last_name)
-    
+
     def test_family_search_serializer_num_children(self):
         data = FamilySearchSerializer(self.family, context=context).data
         self.assertEqual(data["num_children"], 1)
-    
