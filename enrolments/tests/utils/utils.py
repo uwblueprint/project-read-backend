@@ -6,12 +6,23 @@ from registration.models import Field
 fake = Faker()
 Faker.seed(0)
 
+ENROLMENT_STATUSES = [
+    "Waiting to enrol",
+    "Registered",
+    "Confirmed",
+    "Completed",
+    "No show",
+    "Drop out",
+    "Waitlisted",
+]
+
 
 def create_test_sessions(num_sessions, with_fields=False):
     sessions = []
     for i in range(num_sessions):
         sessions.append(
             Session(
+                start_date=fake.date_this_decade(),
                 season=Session.SEASON_CHOICES[i % len(Session.SEASON_CHOICES)][1],
                 year=2020 - i // len(Session.SEASON_CHOICES),
                 fields=(
@@ -54,6 +65,7 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 session=session,
                 enrolled_class=enrolled_class,
                 active=active,
+                status=fake.random_element(elements=ENROLMENT_STATUSES),
             )
         )
 
