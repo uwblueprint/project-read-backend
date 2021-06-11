@@ -12,7 +12,7 @@ class UserTestCase(APITestCase):
 
     @patch("accounts.serializers.UserCreateSerializer.create")
     def test_post_user(self, mock_method):
-        url = reverse("users-list")
+        url = reverse("user-list")
         self.client.force_authenticate(self.user)
         response = self.client.post(
             url,
@@ -21,11 +21,11 @@ class UserTestCase(APITestCase):
             },
             format="json",
         )
-        self.assertTrue(mock_method.called)
+        mock_method.assert_called_with({'email': 'test@user.com'})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_method_not_allowed(self):
-        url = reverse("users-list")
+        url = reverse("user-detail", args=[self.user.id])
         self.client.force_authenticate(self.user)
 
         response = self.client.put(url)
@@ -38,6 +38,9 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
-        url = reverse("users-list")
+        url = reverse("user-list")
         response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
