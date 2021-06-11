@@ -25,6 +25,7 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
             "season",
             "year",
             "families",
+            "fields",
         ]
 
     def get_families(self, obj):

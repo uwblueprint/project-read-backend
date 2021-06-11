@@ -21,7 +21,9 @@ class Session(models.Model):
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
     start_date = models.DateField(null=True)
-    fields = models.JSONField(default=list, validators=[validate_fields])
+    fields = ArrayField(
+        models.IntegerField(), default=list, validators=[validate_fields]
+    )
 
     def __str__(self):
         return f"{self.season} {self.year}"

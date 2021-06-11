@@ -1,3 +1,4 @@
+from registration.models import Field
 from django.test import TestCase
 
 from enrolments.models import Session, Class, Enrolment
@@ -11,6 +12,19 @@ class EnrolmentUtilsTestCase(TestCase):
         create_test_sessions(num_sessions=num_sessions)
         self.assertEqual(
             Session.objects.all().count(),
+            num_sessions,
+        )
+        self.assertEqual(
+            Session.objects.filter(fields__len=0).count(),
+            num_sessions,
+        )
+
+    def test_create_test_sessions__with_fields(self):
+        field = Field.objects.create(is_default=True, order=1)
+        num_sessions = 10
+        create_test_sessions(num_sessions=num_sessions, with_fields=True)
+        self.assertEqual(
+            Session.objects.filter(fields__contains=[field.id]).count(),
             num_sessions,
         )
 

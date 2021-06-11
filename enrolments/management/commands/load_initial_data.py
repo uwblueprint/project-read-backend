@@ -74,7 +74,10 @@ class Command(BaseCommand):
                         num_guests=fake.pyint(max_value=1),
                     )
 
-                sessions = enrolment_utils.create_test_sessions(num_sessions)
+                sessions = enrolment_utils.create_test_sessions(
+                    num_sessions,
+                    with_fields=True,
+                )
                 classes = []
 
                 for session in sessions:
