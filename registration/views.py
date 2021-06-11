@@ -49,7 +49,6 @@ class FamilyViewSet(
         if last_name:
             result = result.filter(parent__last_name__iexact=last_name)
 
-        # how granular / accepting is our search, do we want to be able to search by parts of first names / last names ?
         return Response(
             FamilySearchSerializer(result, many=True, context={"request": None}).data
         )
