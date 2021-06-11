@@ -15,6 +15,7 @@ Django backend for the GSL Hub. Check out the client code [here](https://github.
     - [Testing ✅](#testing)
       - [Run automated tests](#run-automated-tests)
       - [Manual testing](#manual-testing)
+      - [Code Coverage](#code-coverage)
     - [Linting 🧹](#linting)
 
 ## Setup
@@ -136,6 +137,25 @@ To test authenticated endpoints locally, you'll need a token from our team's Fir
     ```
     * This token expires after 60 minutes, at which point you should re-run this command to get a new one!
 1. You can use this token and pass it as a bearer token for your API requests (using curl, Postman, etc).
+
+#### Code coverage
+
+A code coverage report tells you how much of the application is being tested.
+To generate and view a code coverage report:
+1. Build and start up the container with `docker-compose up --build -d`
+2. Generate the report with this command.
+    ```bash
+    docker-compose exec web coverage run --source='.' manage.py test
+    ```
+3. View the report in the terminal with this command
+    ```bash
+    docker-compose exec web coverage report
+    ```
+4. (Optional) Generate an HTML view with this command.
+    ```bash
+    docker-compose exec web coverage html
+    ```
+    Then open the file `/htmlcov/index.html` in your browser.
 
 ### Lint
 
