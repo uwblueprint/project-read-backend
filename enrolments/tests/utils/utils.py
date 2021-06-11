@@ -6,16 +6,6 @@ from registration.models import Field
 fake = Faker()
 Faker.seed(0)
 
-ENROLMENT_STATUSES = [
-    "Waiting to enrol",
-    "Registered",
-    "Confirmed",
-    "Completed",
-    "No show",
-    "Drop out",
-    "Waitlisted",
-]
-
 
 def create_test_sessions(num_sessions, with_fields=False):
     sessions = []
@@ -65,7 +55,9 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 session=session,
                 enrolled_class=enrolled_class,
                 active=active,
-                status=fake.random_element(elements=ENROLMENT_STATUSES),
+                status=fake.random_element(
+                    elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
+                ),
             )
         )
 
