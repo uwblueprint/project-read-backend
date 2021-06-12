@@ -71,6 +71,7 @@ def create_test_children(
             Student(
                 first_name=fake.first_name(),
                 role=Student.CHILD,
+                date_of_birth=fake.date_this_decade().strftime("%Y-%m-%d"),
                 information={
                     "8": fake.random_element(elements=Field.objects.get(id=8).options),
                     "9": fake.random_element(elements=Field.objects.get(id=9).options),
