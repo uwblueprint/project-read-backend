@@ -12,12 +12,7 @@ class LoadInitialDataTestCase(TestCase):
         Student.objects.bulk_create(
             [
                 Student(first_name="Marlin", last_name="Fish", role=Student.PARENT),
-                Student(
-                    first_name="Nemo",
-                    last_name="Fish",
-                    role=Student.CHILD,
-                    date_of_birth="2002-09-28",
-                ),
+                Student(first_name="Nemo", last_name="Fish", role=Student.CHILD),
                 Student(first_name="Dory", last_name="Fish", role=Student.GUEST),
             ]
         )
