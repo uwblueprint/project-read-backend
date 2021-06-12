@@ -55,7 +55,10 @@ class RegistrationUtilsTestCase(TestCase):
         self.assertEqual(Student.objects.all().count(), num_children)
         self.assertEqual(
             Student.objects.filter(
-                family=family, last_name=self.last_name, role=Student.CHILD
+                family=family,
+                last_name=self.last_name,
+                role=Student.CHILD,
+                date_of_birth__isnull=False,
             ).count(),
             num_children,
         )

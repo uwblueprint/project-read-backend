@@ -19,14 +19,6 @@ class LoadInitialDataTestCase(TestCase):
         Field.objects.bulk_create(
             [
                 Field(
-                    role=Field.PARENT,
-                    name="DOB",
-                    question="What's your date of birth?",
-                    question_type=Field.TEXT,
-                    is_default=True,
-                    order=1,
-                ),
-                Field(
                     role=Field.CHILD,
                     name="Allergies",
                     question="Do they have any allergies?",
