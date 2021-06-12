@@ -75,6 +75,7 @@ class SessionDetailSerializerTestCase(TestCase):
         self.session = Session.objects.create(
             season=Session.SPRING,
             year=2020,
+            fields=[1, 2, 3],
         )
         self.family = Family.objects.create(
             email="weasleys@theorder.com",
@@ -107,6 +108,7 @@ class SessionDetailSerializerTestCase(TestCase):
                     FamilySerializer(self.family, context=context).data,
                     FamilySerializer(self.other_family, context=context).data,
                 ],
+                "fields": self.session.fields,
             },
             SessionDetailSerializer(self.session, context=context).data,
         )
