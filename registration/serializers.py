@@ -47,7 +47,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "preferred_comms",
             "num_children",
             "children",
-            "enrolled",
+            "is_enrolled",
             "current_class",
             "status",
         ]
@@ -75,7 +75,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "parent",
             "children",
             "guests",
-            "enrolled",
+            "is_enrolled",
             "current_class",
             "status",
         ]

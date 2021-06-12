@@ -70,7 +70,7 @@ class Family(models.Model):
         return self.enrolments.filter(session=most_recent_session).first()
 
     @property
-    def enrolled(self):
+    def is_enrolled(self):
         return "Yes" if self.current_enrolment else "No"
 
     @property
