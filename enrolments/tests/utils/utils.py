@@ -12,6 +12,7 @@ def create_test_sessions(num_sessions, with_fields=False):
     for i in range(num_sessions):
         sessions.append(
             Session(
+                start_date=fake.date_this_decade(),
                 season=Session.SEASON_CHOICES[i % len(Session.SEASON_CHOICES)][1],
                 year=2020 - i // len(Session.SEASON_CHOICES),
                 fields=(
@@ -54,6 +55,9 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 session=session,
                 enrolled_class=enrolled_class,
                 active=active,
+                status=fake.random_element(
+                    elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
+                ),
             )
         )
 

@@ -35,9 +35,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
     children = StudentSerializer(many=True)
-    enrolled = SerializerMethodField()
-    current_class = SerializerMethodField()
-    status = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -50,26 +47,13 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "preferred_comms",
             "num_children",
             "children",
-            "enrolled",
+            "is_enrolled",
             "current_class",
             "status",
         ]
 
     def get_num_children(self, obj):
         return obj.children.count()
-
-    def get_enrolled(self, obj):
-        return "Yes" if obj.current_enrolment else "No"
-
-    def get_current_class(self, obj):
-        return (
-            obj.current_enrolment.enrolled_class.name
-            if obj.current_enrolment
-            else "N/A"
-        )
-
-    def get_status(self, obj):
-        return obj.current_enrolment.status if obj.current_enrolment else "Unassigned"
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -91,6 +75,9 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "parent",
             "children",
             "guests",
+            "is_enrolled",
+            "current_class",
+            "status",
         ]
 
     def create(self, validated_data):
