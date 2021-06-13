@@ -30,6 +30,7 @@ class Family(models.Model):
     )
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
+    notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(

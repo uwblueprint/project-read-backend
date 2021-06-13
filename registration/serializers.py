@@ -75,6 +75,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "parent",
             "children",
             "guests",
+            "notes",
             "is_enrolled",
             "current_class",
             "status",
