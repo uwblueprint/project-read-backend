@@ -83,6 +83,18 @@ class Family(models.Model):
         )
 
     @property
+    def current_session(self):
+        return str(self.current_enrolment.session) if self.current_enrolment else "N/A"
+
+    @property
+    def current_preferred_class(self):
+        return (
+            self.current_enrolment.preferred_class.name
+            if self.current_enrolment
+            else "N/A"
+        )
+
+    @property
     def status(self):
         return self.current_enrolment.status if self.current_enrolment else "Unassigned"
 

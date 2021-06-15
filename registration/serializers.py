@@ -78,6 +78,8 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "notes",
             "is_enrolled",
             "current_class",
+            "current_session",
+            "current_preferred_class",
             "status",
         ]
 
