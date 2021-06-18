@@ -18,7 +18,6 @@ class SessionViewSet(
     mixins.RetrieveModelMixin,
 ):
     queryset = Session.objects.all().order_by(F("start_date").desc(nulls_last=True))
-
     serializer_class = SessionSerializer
     http_method_names = [
         "get",
