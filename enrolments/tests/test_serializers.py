@@ -200,12 +200,8 @@ class ClassDetailSerializerTestCase(TestCase):
                 "facilitator_id": self.class1.facilitator_id,
                 "attendance": self.class1.attendance,
                 "families": [
-                    FamilyAttendanceSerializer(
-                        self.family1, context={"request": None}
-                    ).data,
-                    FamilyAttendanceSerializer(
-                        self.family2, context={"request": None}
-                    ).data,
+                    FamilySerializer(self.family1, context={"request": None}).data,
+                    FamilySerializer(self.family2, context={"request": None}).data,
                 ],
             },
             ClassDetailSerializer(self.class1, context={"request": None}).data,
