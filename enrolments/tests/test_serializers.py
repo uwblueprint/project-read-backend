@@ -3,21 +3,29 @@ from django.test import TestCase
 from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
 from accounts.models import User
-from enrolments.serializers import FamilyAttendanceSerializer, ClassDetailSerializer
-from registration.serializers import StudentSerializer
+from enrolments.serializers import (
+    FamilyAttendanceSerializer,
+    ClassDetailSerializer,
+    SessionDetailSerializer,
+)
+from registration.serializers import FamilySerializer, StudentSerializer
+
+context = {"request": None}
 
 
 class FamilyAttendanceSerializerTestCase(TestCase):
     def setUp(self):
         self.family1 = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
+            work_number="0000000000",
+            preferred_number="Work",
             address="1 Fam Ave",
             preferred_comms="email",
         )
         self.empty_family = Family.objects.create(
             email="fam2@test.com",
-            phone_number="987654321",
+            cell_number="987654321",
             address="2 Fam Ave",
             preferred_comms="email",
         )
@@ -36,31 +44,73 @@ class FamilyAttendanceSerializerTestCase(TestCase):
             information="null",
         )
 
-    def test_serializer1(self):
+    def test_family_attendance_serializer(self):
         self.assertEqual(
             {
                 "id": self.family1.id,
                 "email": self.family1.email,
-                "phone_number": self.family1.phone_number,
+                "phone_number": self.family1.work_number,
                 "students": [
-                    StudentSerializer(self.student1, context={"request": None}).data,
-                    StudentSerializer(self.student2, context={"request": None}).data,
+                    StudentSerializer(self.student1, context=context).data,
+                    StudentSerializer(self.student2, context=context).data,
                 ],
             },
-            FamilyAttendanceSerializer(self.family1, context={"request": None}).data,
+            FamilyAttendanceSerializer(self.family1, context=context).data,
         )
 
-    def test_serializer2(self):
+    def test_family_attendance_serializer__no_students(self):
         self.assertEqual(
             {
                 "id": self.empty_family.id,
                 "email": self.empty_family.email,
-                "phone_number": self.empty_family.phone_number,
+                "phone_number": self.empty_family.cell_number,
                 "students": [],
             },
-            FamilyAttendanceSerializer(
-                self.empty_family, context={"request": None}
-            ).data,
+            FamilyAttendanceSerializer(self.empty_family, context=context).data,
+        )
+
+
+class SessionDetailSerializerTestCase(TestCase):
+    def setUp(self):
+        self.session = Session.objects.create(
+            season=Session.SPRING,
+            year=2020,
+            fields=[1, 2, 3],
+        )
+        self.family = Family.objects.create(
+            email="weasleys@theorder.com",
+            address="12 Grimmauld Pl",
+            preferred_comms="Owl Post",
+        )
+        self.enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+        )
+        self.other_family = Family.objects.create(
+            email="spongebob@squarepants.com",
+            address="1 Pine Apple",
+            preferred_comms="Snail Delivery",
+        )
+        self.other_enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.other_family,
+            session=self.session,
+        )
+
+    def test_session_detail_serializer(self):
+        self.assertEqual(
+            {
+                "id": self.session.id,
+                "season": self.session.season,
+                "year": self.session.year,
+                "families": [
+                    FamilySerializer(self.family, context=context).data,
+                    FamilySerializer(self.other_family, context=context).data,
+                ],
+                "fields": self.session.fields,
+            },
+            SessionDetailSerializer(self.session, context=context).data,
         )
 
 
@@ -68,19 +118,19 @@ class ClassDetailSerializerTestCase(TestCase):
     def setUp(self):
         self.family1 = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="1 Fam St",
             preferred_comms="email",
         )
         self.family2 = Family.objects.create(
             email="fam2@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="2 Fam St",
             preferred_comms="email",
         )
         self.inactive_family = Family.objects.create(
             email="fam3@test.com",
-            phone_number="123406789",
+            cell_number="123406789",
             address="3 Fam St",
             preferred_comms="email",
         )

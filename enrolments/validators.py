@@ -4,28 +4,41 @@ from registration.models import Student, Field
 from django.apps import apps
 
 
+def validate_students_in_enrolment(enrolment):
+    Student = apps.get_model("registration", "Student")
+    if (
+        len(enrolment.students)
+        != Student.objects.filter(
+            id__in=enrolment.students, family=enrolment.family
+        ).count()
+    ):
+        raise ValidationError(
+            f"Enroled student IDs do not completely match with students under this family"
+        )
+
+
 def validate_class_in_session(class_obj, session):
-    if class_obj.session != session:
+    if class_obj is not None and class_obj.session != session:
         raise ValidationError(
             f"Class {class_obj.name} is not in session with ID {session.id}"
+        )
+
+
+def validate_enrolment_in_session(session, family):
+    Enrolment = apps.get_model("enrolments", "Enrolment")
+    family_enrolments_in_session = Enrolment.objects.filter(
+        session=session, family=family
+    )
+    if len(family_enrolments_in_session) > 1:
+        raise ValidationError(
+            f"Family with ID {family.id} has multiple enrolments per Session with ID {session.id}"
         )
 
 
 def validate_enrolment(enrolment):
     validate_class_in_session(enrolment.preferred_class, enrolment.session)
     validate_class_in_session(enrolment.enrolled_class, enrolment.session)
-
-
-def validate_class_in_session(class_obj, session):
-    if class_obj.session != session:
-        raise ValidationError(
-            f"Class {class_obj.name} is not in session with ID {session.id}"
-        )
-
-
-def validate_enrolment(enrolment):
-    validate_class_in_session(enrolment.preferred_class, enrolment.session)
-    validate_class_in_session(enrolment.enrolled_class, enrolment.session)
+    validate_enrolment_in_session(enrolment.session, enrolment.family)
 
 
 def validate_attendance(class_obj):

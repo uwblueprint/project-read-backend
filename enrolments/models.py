@@ -1,5 +1,11 @@
 from django.db import models
-from .validators import validate_attendance, validate_enrolment, validate_fields
+from .validators import (
+    validate_attendance,
+    validate_enrolment,
+    validate_fields,
+    validate_students_in_enrolment,
+)
+from django.contrib.postgres.fields import ArrayField
 
 
 class Session(models.Model):
@@ -14,10 +20,13 @@ class Session(models.Model):
 
     season = models.CharField(max_length=6, choices=SEASON_CHOICES)
     year = models.PositiveSmallIntegerField()
-    fields = models.JSONField(default=list, validators=[validate_fields])
+    start_date = models.DateField(null=True)
+    fields = ArrayField(
+        models.IntegerField(), default=list, validators=[validate_fields]
+    )
 
     def __str__(self):
-        return self.season
+        return f"{self.season} {self.year}"
 
 
 class Class(models.Model):
@@ -46,20 +55,51 @@ class Class(models.Model):
 
 
 class Enrolment(models.Model):
+    WAITING_TO_ENROL = "Waiting to enrol"
+    REGISTERED = "Registered"
+    CONFIRMED = "Confirmed"
+    COMLETED = "Completed"
+    NO_SHOW = "No show"
+    DROP_OUT = "Drop out"
+    WAITLISTED = "Waitlisted"
+    ENROLMENT_STATUSES = [
+        (WAITING_TO_ENROL, "Waiting to enrol"),
+        (REGISTERED, "Registered"),
+        (CONFIRMED, "Confirmed"),
+        (COMLETED, "Completed"),
+        (NO_SHOW, "No show"),
+        (DROP_OUT, "Drop out"),
+        (WAITLISTED, "Waitlisted"),
+    ]
     active = models.BooleanField()
-    family = models.ForeignKey("registration.Family", on_delete=models.PROTECT)
+    family = models.ForeignKey(
+        "registration.Family", on_delete=models.PROTECT, related_name="enrolments"
+    )
+    students = ArrayField(
+        models.PositiveIntegerField(),
+        default=list,
+        validators=[validate_students_in_enrolment],
+    )
     session = models.ForeignKey(
         "enrolments.Session",
         null=True,
         on_delete=models.PROTECT,
+        related_name="enrolments",
     )
     preferred_class = models.ForeignKey(
         "enrolments.Class",
         null=True,
         on_delete=models.PROTECT,
-        related_name="preferred_enrolment",
     )
-    enrolled_class = models.ForeignKey("enrolments.Class", on_delete=models.PROTECT)
+    enrolled_class = models.ForeignKey(
+        "enrolments.Class",
+        on_delete=models.PROTECT,
+        related_name="enrolments",
+        null=True,
+    )
+    status = models.CharField(
+        max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(

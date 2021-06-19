@@ -1,8 +1,19 @@
+from django.apps import apps
 from django.db import models
-from .validators import validate_family_parent, validate_student
+from .validators import validate_family_parent, validate_student, validate_mc_options
+from django.contrib.postgres.fields import ArrayField
 
 
 class Family(models.Model):
+    HOME_NUMBER = "Home"
+    CELL_NUMBER = "Cell"
+    WORK_NUMBER = "Work"
+    NUMBER_PREF_CHOICES = [
+        (HOME_NUMBER, "Home"),
+        (CELL_NUMBER, "Cell"),
+        (WORK_NUMBER, "Work"),
+    ]
+
     parent = models.ForeignKey(
         "Student",
         null=True,
@@ -11,9 +22,15 @@ class Family(models.Model):
         validators=[validate_family_parent],
     )
     email = models.EmailField(blank=True)
-    phone_number = models.CharField(max_length=128, blank=True)
+    home_number = models.CharField(max_length=128, blank=True, default="")
+    cell_number = models.CharField(max_length=128, blank=True, default="")
+    work_number = models.CharField(max_length=128, blank=True, default="")
+    preferred_number = models.CharField(
+        max_length=4, choices=NUMBER_PREF_CHOICES, default="Cell"
+    )
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
+    notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
@@ -34,6 +51,41 @@ class Family(models.Model):
     def guests(self):
         return self.students.filter(role=Student.GUEST)
 
+    @property
+    def phone_number(self):
+        if self.preferred_number == "Cell":
+            return self.cell_number
+        elif self.preferred_number == "Home":
+            return self.home_number
+        elif self.preferred_number == "Work":
+            return self.work_number
+
+    @property
+    def current_enrolment(self):
+        most_recent_session = (
+            apps.get_model("enrolments", "Session")
+            .objects.filter(start_date__isnull=False)
+            .order_by("-start_date")
+            .first()
+        )
+        return self.enrolments.filter(session=most_recent_session).first()
+
+    @property
+    def is_enrolled(self):
+        return "Yes" if self.current_enrolment else "No"
+
+    @property
+    def current_class(self):
+        return (
+            self.current_enrolment.enrolled_class.name
+            if self.current_enrolment
+            else "N/A"
+        )
+
+    @property
+    def status(self):
+        return self.current_enrolment.status if self.current_enrolment else "Unassigned"
+
     def __str__(self):
         if self.parent is not None:
             return f"{self.id} - {self.parent.first_name} {self.parent.last_name} - {self.email}"
@@ -53,6 +105,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     role = models.CharField(max_length=6, choices=ROLE_CHOICES)
+    date_of_birth = models.DateField(null=True)
     family = models.ForeignKey(
         "Family",
         null=True,
@@ -92,6 +145,12 @@ class Field(models.Model):
     question = models.CharField(max_length=512)
     question_type = models.CharField(max_length=15, choices=QUESTION_CHOICES)
     is_default = models.BooleanField()
+    options = ArrayField(
+        models.CharField(max_length=64, blank=False),
+        default=list,
+        validators=[validate_mc_options],
+        blank=True,
+    )
     order = models.PositiveSmallIntegerField()
 
     def __str__(self):
