@@ -71,7 +71,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
     def get_families(self, obj):
         e_set = Enrolment.objects.filter(enrolled_class=obj, active=True)
         return [
-            FamilyAttendanceSerializer(
+            FamilySerializer(
                 enrolment.family, read_only=True, context={"request": None}
             ).data
             for enrolment in e_set
