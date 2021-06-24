@@ -4,6 +4,7 @@ from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
 from .validators import validate_student_information_role
+from enrolments.models import Enrolment
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,10 +32,17 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         return super().validate(attrs)
 
 
+class EnrolmentPropSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Enrolment
+        fields = ["id", "preferred_class", "enrolled_class", "status"]
+
+
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
     children = StudentSerializer(many=True)
+    current_enrolment = EnrolmentPropSerializer()
 
     class Meta:
         model = Family
@@ -48,8 +56,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "num_children",
             "children",
             "is_enrolled",
-            "current_class",
-            "status",
+            "current_enrolment",
         ]
 
     def get_num_children(self, obj):
@@ -60,6 +67,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
+    current_enrolment = EnrolmentPropSerializer()
 
     class Meta:
         model = Family
@@ -77,10 +85,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "guests",
             "notes",
             "is_enrolled",
-            "current_class",
-            "current_session",
-            "current_preferred_class",
-            "status",
+            "current_enrolment",
         ]
 
     def create(self, validated_data):

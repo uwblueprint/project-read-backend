@@ -74,30 +74,6 @@ class Family(models.Model):
     def is_enrolled(self):
         return "Yes" if self.current_enrolment else "No"
 
-    @property
-    def current_class(self):
-        return (
-            self.current_enrolment.enrolled_class.name
-            if self.current_enrolment
-            else "N/A"
-        )
-
-    @property
-    def current_session(self):
-        return str(self.current_enrolment.session) if self.current_enrolment else "N/A"
-
-    @property
-    def current_preferred_class(self):
-        return (
-            self.current_enrolment.preferred_class.name
-            if self.current_enrolment
-            else "N/A"
-        )
-
-    @property
-    def status(self):
-        return self.current_enrolment.status if self.current_enrolment else "Unassigned"
-
     def __str__(self):
         if self.parent is not None:
             return f"{self.id} - {self.parent.first_name} {self.parent.last_name} - {self.email}"
