@@ -4,8 +4,10 @@ from registration.models import Family
 from registration.serializers import FamilySerializer, StudentSerializer
 from .models import Session, Class, Enrolment
 
+
 class SessionListSerializer(serializers.HyperlinkedModelSerializer):
     from registration.serializers import FamilySerializer
+
     class Meta:
         model = Session
         fields = [
@@ -40,7 +42,14 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Session
-        fields = ["id", "season", "year", "fields", "classes", "families"]
+        fields = [
+            "id",
+            "season",
+            "year",
+            "families",
+            "fields",
+            "classes",
+        ]
 
     def get_families(self, obj):
         return [
