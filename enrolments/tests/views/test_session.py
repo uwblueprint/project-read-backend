@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from enrolments.models import Session
-from enrolments.serializers import SessionSerializer, SessionDetailSerializer
+from enrolments.serializers import SessionListSerializer, SessionDetailSerializer
 
 
 class SessionTestCase(APITestCase):
@@ -33,9 +33,9 @@ class SessionTestCase(APITestCase):
         self.assertEqual(
             payload,
             [
-                SessionSerializer(self.session).data,
-                SessionSerializer(self.older_session).data,
-                SessionSerializer(self.session_no_start_date).data,
+                SessionListSerializer(self.session).data,
+                SessionListSerializer(self.older_session).data,
+                SessionListSerializer(self.session_no_start_date).data,
             ],
         )
 

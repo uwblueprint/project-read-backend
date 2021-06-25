@@ -5,9 +5,8 @@ from rest_framework.response import Response
 
 from .models import Session, Class
 from .serializers import (
-    SessionSerializer,
+    SessionListSerializer,
     SessionDetailSerializer,
-    ClassListSerializer,
     ClassDetailSerializer,
 )
 
@@ -18,7 +17,6 @@ class SessionViewSet(
     mixins.RetrieveModelMixin,
 ):
     queryset = Session.objects.all().order_by(F("start_date").desc(nulls_last=True))
-    serializer_class = SessionSerializer
     http_method_names = [
         "get",
     ]
@@ -27,18 +25,7 @@ class SessionViewSet(
     def get_serializer_class(self):
         if self.action == "retrieve":
             return SessionDetailSerializer
-        return SessionSerializer
-
-    @action(
-        methods=["get"],
-        detail=True,
-        permission_classes=[permissions.IsAuthenticated],
-        url_path="classes",
-        url_name="classes",
-    )
-    def get_classes(self, request, pk=None):
-        classes = Session.objects.get(id=pk).classes
-        return Response(ClassListSerializer(classes, many=True).data)
+        return SessionListSerializer
 
 
 class ClassViewSet(

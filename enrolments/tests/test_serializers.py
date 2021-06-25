@@ -4,11 +4,13 @@ from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
 from accounts.models import User
 from enrolments.serializers import (
+    ClassListSerializer,
     FamilyAttendanceSerializer,
     ClassDetailSerializer,
     SessionDetailSerializer,
 )
 from registration.serializers import FamilySerializer, StudentSerializer
+from enrolments.tests.utils.utils import create_test_classes
 
 context = {"request": None}
 
@@ -77,6 +79,8 @@ class SessionDetailSerializerTestCase(TestCase):
             year=2020,
             fields=[1, 2, 3],
         )
+        self.session_class = create_test_classes(self.session, 1)[0]
+        self.other_session_class = create_test_classes(self.session, 1)[0]
         self.family = Family.objects.create(
             email="weasleys@theorder.com",
             address="12 Grimmauld Pl",
@@ -109,6 +113,10 @@ class SessionDetailSerializerTestCase(TestCase):
                     FamilySerializer(self.other_family, context=context).data,
                 ],
                 "fields": self.session.fields,
+                "classes": [
+                    ClassListSerializer(self.session_class).data,
+                    ClassListSerializer(self.other_session_class).data,
+                ],
             },
             SessionDetailSerializer(self.session, context=context).data,
         )
@@ -196,8 +204,6 @@ class ClassDetailSerializerTestCase(TestCase):
             {
                 "id": self.class1.id,
                 "name": self.class1.name,
-                "session_id": self.class1.session_id,
-                "facilitator_id": self.class1.facilitator_id,
                 "attendance": self.class1.attendance,
                 "families": [
                     FamilySerializer(self.family1, context={"request": None}).data,
@@ -212,8 +218,6 @@ class ClassDetailSerializerTestCase(TestCase):
             {
                 "id": self.empty_class.id,
                 "name": self.empty_class.name,
-                "session_id": self.empty_class.session_id,
-                "facilitator_id": self.empty_class.facilitator_id,
                 "attendance": self.empty_class.attendance,
                 "families": [],
             },
