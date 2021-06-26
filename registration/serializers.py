@@ -32,43 +32,11 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         return super().validate(attrs)
 
 
-class EnrolmentPropSerializer(serializers.HyperlinkedModelSerializer):
-
-    session = SerializerMethodField()
-    preferred_class = SerializerMethodField()
-    enrolled_class = SerializerMethodField()
-
-    class Meta:
-        model = Enrolment
-        fields = [
-            "id",
-            "session",
-            "preferred_class",
-            "enrolled_class",
-            "status",
-        ]
-
-    def get_session(self, obj):
-        from enrolments.serializers import SessionSerializer
-
-        return SessionSerializer(obj.session).data
-
-    def get_preferred_class(self, obj):
-        from enrolments.serializers import ClassListSerializer
-
-        return ClassListSerializer(obj.preferred_class).data
-
-    def get_enrolled_class(self, obj):
-        from enrolments.serializers import ClassListSerializer
-
-        return ClassListSerializer(obj.enrolled_class).data
-
-
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
     children = StudentSerializer(many=True)
-    current_enrolment = EnrolmentPropSerializer()
+    current_enrolment = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -88,12 +56,17 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     def get_num_children(self, obj):
         return obj.children.count()
 
+    def get_current_enrolment(self, obj):
+        from enrolments.serializers import EnrolmentSerializer
+
+        return EnrolmentSerializer(obj.current_enrolment).data
+
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
-    current_enrolment = EnrolmentPropSerializer()
+    current_enrolment = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -113,6 +86,11 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "is_enrolled",
             "current_enrolment",
         ]
+
+    def get_current_enrolment(self, obj):
+        from enrolments.serializers import EnrolmentSerializer
+
+        return EnrolmentSerializer(obj.current_enrolment).data
 
     def create(self, validated_data):
         students = validated_data.pop("students")

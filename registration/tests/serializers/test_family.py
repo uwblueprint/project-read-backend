@@ -1,6 +1,5 @@
 from django.test.testcases import TestCase
 from datetime import date
-from django.db import models
 
 from registration.models import Family, Student
 from enrolments.models import Enrolment, Session, Class
@@ -8,8 +7,8 @@ from accounts.models import User
 from registration.serializers import (
     FamilySerializer,
     StudentSerializer,
-    EnrolmentPropSerializer,
 )
+from enrolments.serializers import EnrolmentSerializer
 
 from datetime import date
 
@@ -79,7 +78,7 @@ class FamilySerializerTestCase(TestCase):
                     StudentSerializer(self.child2, context={"request": None}).data,
                 ],
                 "is_enrolled": "No",
-                "current_enrolment": None,
+                "current_enrolment": EnrolmentSerializer(None).data,
             },
             FamilySerializer(self.family, context={"request": None}).data,
         )
@@ -98,12 +97,12 @@ class FamilySerializerTestCase(TestCase):
         self.facilitator = User.objects.create(email="user@staff.com")
         self.session1 = Session.objects.create(
             season="Fall",
-            year="2019",
+            year=2019,
             start_date=date(2019, 1, 23),
         )
         self.session2 = Session.objects.create(
             season="Spring",
-            year="2021",
+            year=2021,
             start_date=date(2021, 5, 15),
         )
         self.class_from_session1 = Class.objects.create(
@@ -148,7 +147,7 @@ class FamilySerializerTestCase(TestCase):
                 "num_children": 0,
                 "children": [],
                 "is_enrolled": "Yes",
-                "current_enrolment": EnrolmentPropSerializer(
+                "current_enrolment": EnrolmentSerializer(
                     self.second_family_enrolment
                 ).data,
             },
