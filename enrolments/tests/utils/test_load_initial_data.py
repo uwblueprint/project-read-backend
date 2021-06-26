@@ -1,10 +1,11 @@
 from django.core.management import call_command
 from django.test import TestCase
 
-from ..models import Family, Field, Student
+from enrolments.models import Session, Class, Enrolment
+from registration.models import Family, Field, Student
 
 
-class LoadInitialRegDataTestCase(TestCase):
+class LoadInitialDataTestCase(TestCase):
     def setUp(self):
         # Create objects to ensure they're deleted by the management command
         Family.objects.create()
@@ -17,14 +18,6 @@ class LoadInitialRegDataTestCase(TestCase):
         )
         Field.objects.bulk_create(
             [
-                Field(
-                    role=Field.PARENT,
-                    name="DOB",
-                    question="What's your date of birth?",
-                    question_type=Field.TEXT,
-                    is_default=True,
-                    order=1,
-                ),
                 Field(
                     role=Field.CHILD,
                     name="Allergies",
@@ -43,21 +36,22 @@ class LoadInitialRegDataTestCase(TestCase):
                 ),
             ]
         )
-        self.num_fields = 12
 
-    def test_load_initial_reg_data(self):
-        num_families = 30
+    def test_load_initial_data(self):
+        # Default values
+        num_families = 100
+        num_sessions = 5
+        num_classes_per_session = 3
+        num_classes = num_sessions * num_classes_per_session
+        num_fields = 11
+
         call_command(
-            "load_initial_reg_data",
-            num_families=num_families,
+            "load_initial_data",
             verbose=False,
         )
-        self.assertEqual(Field.objects.all().count(), self.num_fields)
+
+        self.assertEqual(Field.objects.all().count(), num_fields)
         self.assertEqual(Family.objects.all().count(), num_families)
-        self.assertEqual(
-            Student.objects.filter(role=Student.PARENT).count(), num_families
-        )
-        self.assertGreaterEqual(
-            Student.objects.filter(role=Student.CHILD).count(), num_families
-        )
-        self.assertGreaterEqual(Student.objects.filter(role=Student.GUEST).count(), 1)
+        self.assertEqual(Session.objects.all().count(), num_sessions)
+        self.assertEqual(Class.objects.all().count(), num_classes)
+        self.assertEqual(Enrolment.objects.all().count(), num_families)

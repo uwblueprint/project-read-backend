@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 from registration.models import Family
-from registration.serializers import StudentSerializer
+from registration.serializers import FamilySerializer, StudentSerializer
 from .models import Session, Class, Enrolment
 
 
@@ -11,6 +12,26 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "season",
             "year",
+        ]
+
+
+class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
+    families = SerializerMethodField()
+
+    class Meta:
+        model = Session
+        fields = [
+            "id",
+            "season",
+            "year",
+            "families",
+            "fields",
+        ]
+
+    def get_families(self, obj):
+        return [
+            FamilySerializer(enrolment.family, context={"request": None}).data
+            for enrolment in obj.enrolments.filter(active=True)
         ]
 
 
@@ -50,7 +71,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
     def get_families(self, obj):
         e_set = Enrolment.objects.filter(enrolled_class=obj, active=True)
         return [
-            FamilyAttendanceSerializer(
+            FamilySerializer(
                 enrolment.family, read_only=True, context={"request": None}
             ).data
             for enrolment in e_set

@@ -34,7 +34,7 @@ class FamilyDetailSerializerTestCase(TestCase):
 
         self.family_data = {
             "email": "weasleys@theorder.com",
-            "phone_number": "123456789",
+            "cell_number": "123456789",
             "address": "12 Grimmauld Place",
             "preferred_comms": "Owl Post",
         }

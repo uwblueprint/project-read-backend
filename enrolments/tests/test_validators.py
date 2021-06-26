@@ -6,8 +6,10 @@ from enrolments.validators import (
     validate_attendance,
     validate_schema,
     validate_class_in_session,
+    validate_enrolment_in_session,
     validate_enrolment,
     validate_fields,
+    validate_students_in_enrolment,
 )
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
@@ -18,11 +20,11 @@ class EnrolmentValidatorTestCase(TestCase):
         self.user = User.objects.create(email="test@staff.com")
         self.family = Family.objects.create(
             email="fam1@test.com",
-            phone_number="123456789",
+            cell_number="123456789",
             address="1 Fam Ave",
             preferred_comms="email",
         )
-        self.session = Session.objects.create(season=Session.FALL, year="2020")
+        self.session = Session.objects.create(season=Session.FALL, year="2019")
         self.class_in_session = Class.objects.create(
             name="Class in session",
             session=self.session,
@@ -51,6 +53,63 @@ class EnrolmentValidatorTestCase(TestCase):
             session_other,
         )
 
+    def test_validate_enrolment_in_session(self):
+        session1 = Session.objects.create(season=Session.SPRING, year="2019")
+        session2 = self.session
+        class1_in_session1 = Class.objects.create(
+            name="Class 1 in Session 1",
+            session=session1,
+            facilitator=self.user,
+            attendance={},
+        )
+        class2_in_session1 = Class.objects.create(
+            name="Class 2 in Session 1",
+            session=session1,
+            facilitator=self.user,
+            attendance={},
+        )
+        class1_in_session2 = self.class_in_session
+        family1 = self.family
+        family2 = Family.objects.create(
+            email="fam2@test.com",
+            cell_number="123456789",
+            address="2 Fam St",
+            preferred_comms="email",
+        )
+        enrolment1_for_family1 = Enrolment.objects.create(
+            active=True,
+            family=family1,
+            session=session1,
+            enrolled_class=class1_in_session1,
+        )
+        enrolment2_for_family1 = Enrolment.objects.create(
+            active=False,
+            family=family1,
+            session=session2,
+            enrolled_class=class1_in_session2,
+        )
+        enrolment1_for_family2 = Enrolment.objects.create(
+            active=True,
+            family=family2,
+            session=session1,
+            enrolled_class=class1_in_session1,
+        )
+        duplicate_enrolment = Enrolment.objects.create(
+            active=True,
+            family=family1,
+            session=session1,
+            enrolled_class=class2_in_session1,
+        )
+
+        # Duplicate class enrolments for family1 in session1
+        self.assertRaises(
+            ValidationError, validate_enrolment_in_session, session1, family1
+        )
+        # Many families can enrol in a session
+        self.assertIsNone(validate_enrolment_in_session(session1, family2))
+        # A family can have multiple enrolments across different sessions
+        self.assertIsNone(validate_enrolment_in_session(session2, family2))
+
     @patch("enrolments.validators.validate_class_in_session")
     def test_validate_enrolments(self, mock_validate):
         enrolment = Enrolment(
@@ -75,6 +134,53 @@ class EnrolmentValidatorTestCase(TestCase):
         )
         self.assertRaises(ValidationError, validate_enrolment, enrolment)
         mock_validate.assert_called_once_with(self.class_in_session, self.session)
+
+    def test_validate_students_in_enrolment(self):
+        parent = Student.objects.create(
+            first_name="Daddy",
+            last_name="McDonald",
+            role=Student.PARENT,
+            family=self.family,
+        )
+        child = Student.objects.create(
+            first_name="Lil Tom",
+            last_name="McDonald",
+            role=Student.CHILD,
+            family=self.family,
+        )
+        other_family = Family.objects.create(
+            email="fam2@test.com",
+            home_number="923456789",
+            address="2 Fam Ave",
+            preferred_comms="email",
+        )
+        other_child = Student.objects.create(
+            first_name="Yohan",
+            last_name="Wilkshire",
+            role=Student.CHILD,
+            family=other_family,
+        )
+        enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+            students=[child.id],
+        )
+        enrolment_extra_student = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class_in_session,
+            enrolled_class=self.class_in_session,
+            students=[child.id, other_child.id],
+        )
+
+        self.assertIsNone(validate_students_in_enrolment(enrolment))
+        self.assertRaises(
+            ValidationError, validate_students_in_enrolment, enrolment_extra_student
+        )
 
 
 class AttendanceValidatorTestCase(TestCase):

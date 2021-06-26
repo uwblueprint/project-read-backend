@@ -8,7 +8,7 @@ from .validators import validate_student_information_role
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     family = serializers.HyperlinkedRelatedField(
-        view_name="families-detail", read_only=True
+        view_name="family-detail", read_only=True
     )
 
     class Meta:
@@ -18,6 +18,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "first_name",
             "last_name",
             "role",
+            "date_of_birth",
             "family",
             "information",
         ]
@@ -33,6 +34,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
+    children = StudentSerializer(many=True)
 
     class Meta:
         model = Family
@@ -44,6 +46,10 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "address",
             "preferred_comms",
             "num_children",
+            "children",
+            "is_enrolled",
+            "current_class",
+            "status",
         ]
 
     def get_num_children(self, obj):
@@ -60,12 +66,19 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "email",
-            "phone_number",
+            "home_number",
+            "cell_number",
+            "work_number",
+            "preferred_number",
             "address",
             "preferred_comms",
             "parent",
             "children",
             "guests",
+            "notes",
+            "is_enrolled",
+            "current_class",
+            "status",
         ]
 
     def create(self, validated_data):
@@ -106,6 +119,32 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return super().validate(attrs)
 
 
+class FamilySearchSerializer(serializers.HyperlinkedModelSerializer):
+    first_name = SerializerMethodField()
+    last_name = SerializerMethodField()
+    num_children = SerializerMethodField()
+
+    class Meta:
+        model = Family
+        fields = [
+            "first_name",
+            "last_name",
+            "id",
+            "email",
+            "phone_number",
+            "num_children",
+        ]
+
+    def get_first_name(self, obj):
+        return obj.parent.first_name
+
+    def get_last_name(self, obj):
+        return obj.parent.last_name
+
+    def get_num_children(self, obj):
+        return obj.children.count()
+
+
 class FieldListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         iterable = data.all() if isinstance(data, models.Manager) else data
@@ -130,6 +169,7 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
             "question",
             "question_type",
             "is_default",
+            "options",
             "order",
         ]
         list_serializer_class = FieldListSerializer

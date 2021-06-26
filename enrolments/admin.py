@@ -6,6 +6,7 @@ class SessionAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "season",
+        "start_date",
         "year",
     )
     ordering = (
@@ -15,6 +16,7 @@ class SessionAdmin(admin.ModelAdmin):
     search_fields = (
         "season",
         "year",
+        "start_date",
     )
     list_filter = (
         "season",
@@ -25,6 +27,7 @@ class SessionAdmin(admin.ModelAdmin):
 class ClassAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "session",
         "name",
         "attendance",
     )
@@ -38,6 +41,7 @@ class EnrolmentAdmin(admin.ModelAdmin):
         "active",
         "family",
         "session",
+        "status",
         "created_at",
         "updated_at",
         "preferred_class",
