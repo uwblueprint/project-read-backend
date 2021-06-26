@@ -35,16 +35,16 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 class EnrolmentPropSerializer(serializers.HyperlinkedModelSerializer):
 
     session = SerializerMethodField()
-    preferred_class_name = SerializerMethodField()
-    enrolled_class_name = SerializerMethodField()
+    preferred_class = SerializerMethodField()
+    enrolled_class = SerializerMethodField()
 
     class Meta:
         model = Enrolment
         fields = [
             "id",
             "session",
-            "preferred_class_name",
-            "enrolled_class_name",
+            "preferred_class",
+            "enrolled_class",
             "status",
         ]
 
@@ -53,11 +53,15 @@ class EnrolmentPropSerializer(serializers.HyperlinkedModelSerializer):
 
         return SessionSerializer(obj.session).data
 
-    def get_preferred_class_name(self, obj):
-        return obj.preferred_class.name
+    def get_preferred_class(self, obj):
+        from enrolments.serializers import ClassListSerializer
 
-    def get_enrolled_class_name(self, obj):
-        return obj.enrolled_class.name
+        return ClassListSerializer(obj.preferred_class).data
+
+    def get_enrolled_class(self, obj):
+        from enrolments.serializers import ClassListSerializer
+
+        return ClassListSerializer(obj.enrolled_class).data
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):

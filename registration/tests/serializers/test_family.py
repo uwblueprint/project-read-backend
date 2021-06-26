@@ -5,7 +5,11 @@ from django.db import models
 from registration.models import Family, Student
 from enrolments.models import Enrolment, Session, Class
 from accounts.models import User
-from registration.serializers import FamilySerializer, StudentSerializer
+from registration.serializers import (
+    FamilySerializer,
+    StudentSerializer,
+    EnrolmentPropSerializer,
+)
 
 from datetime import date
 
@@ -75,8 +79,7 @@ class FamilySerializerTestCase(TestCase):
                     StudentSerializer(self.child2, context={"request": None}).data,
                 ],
                 "is_enrolled": "No",
-                "current_class": "N/A",
-                "status": "Unassigned",
+                "current_enrolment": None,
             },
             FamilySerializer(self.family, context={"request": None}).data,
         )
@@ -145,8 +148,9 @@ class FamilySerializerTestCase(TestCase):
                 "num_children": 0,
                 "children": [],
                 "is_enrolled": "Yes",
-                "current_class": "Best Class",
-                "status": "Registered",
+                "current_enrolment": EnrolmentPropSerializer(
+                    self.second_family_enrolment
+                ).data,
             },
             FamilySerializer(
                 self.family_with_multiple_enrolments, context={"request": None}
