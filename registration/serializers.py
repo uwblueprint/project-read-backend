@@ -33,9 +33,31 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentPropSerializer(serializers.HyperlinkedModelSerializer):
+
+    session = SerializerMethodField()
+    preferred_class_name = SerializerMethodField()
+    enrolled_class_name = SerializerMethodField()
+
     class Meta:
         model = Enrolment
-        fields = ["id", "preferred_class", "enrolled_class", "status"]
+        fields = [
+            "id",
+            "session",
+            "preferred_class_name",
+            "enrolled_class_name",
+            "status",
+        ]
+
+    def get_session(self, obj):
+        from enrolments.serializers import SessionSerializer
+
+        return SessionSerializer(obj.session).data
+
+    def get_preferred_class_name(self, obj):
+        return obj.preferred_class.name
+
+    def get_enrolled_class_name(self, obj):
+        return obj.enrolled_class.name
 
 
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
