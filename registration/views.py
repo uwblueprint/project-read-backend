@@ -16,16 +16,18 @@ class FamilyViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
 ):
     queryset = Family.objects.all()
     http_method_names = [
         "get",
         "post",
+        "put",
     ]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action in ["retrieve", "create"]:
+        if self.action in ["retrieve", "create", "update"]:
             return FamilyDetailSerializer
         return FamilySerializer
 
