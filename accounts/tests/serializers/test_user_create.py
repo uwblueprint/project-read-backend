@@ -22,7 +22,7 @@ class UserCreateSerializerTestCase(TestCase):
         self.assertTrue(serializer.is_valid())
         user = serializer.save()
         self.assertEqual(user.firebase_uid, uid)
-        mock_create.assert_called_once_with(email='test@asd.com')
+        mock_create.assert_called_once_with(email="test@asd.com")
         mock_model_create.assert_called_once()
 
     @patch("accounts.models.User.objects.create")
@@ -34,7 +34,7 @@ class UserCreateSerializerTestCase(TestCase):
         serializer = UserCreateSerializer(data=self.data)
         self.assertTrue(serializer.is_valid())
         self.assertRaises(ValidationError, serializer.save)
-        mock_create.assert_called_once_with(email='test@asd.com')
+        mock_create.assert_called_once_with(email="test@asd.com")
         mock_model_create.assert_not_called()
 
     @patch("accounts.models.User.objects.create", side_effect=Exception(""))

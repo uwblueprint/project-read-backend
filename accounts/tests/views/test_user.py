@@ -21,7 +21,7 @@ class UserTestCase(APITestCase):
             },
             format="json",
         )
-        mock_method.assert_called_with({'email': 'test@user.com'})
+        mock_method.assert_called_with({"email": "test@user.com"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_method_not_allowed(self):
