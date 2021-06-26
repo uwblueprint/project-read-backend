@@ -6,8 +6,6 @@ from .models import Session, Class, Enrolment
 
 
 class SessionListSerializer(serializers.HyperlinkedModelSerializer):
-    from registration.serializers import FamilySerializer
-
     class Meta:
         model = Session
         fields = [
