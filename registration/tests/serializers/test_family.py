@@ -77,8 +77,7 @@ class FamilySerializerTestCase(TestCase):
                     StudentSerializer(self.child1, context={"request": None}).data,
                     StudentSerializer(self.child2, context={"request": None}).data,
                 ],
-                "is_enrolled": "No",
-                "current_enrolment": EnrolmentSerializer(None).data,
+                "current_enrolment": None,
             },
             FamilySerializer(self.family, context={"request": None}).data,
         )
@@ -146,7 +145,6 @@ class FamilySerializerTestCase(TestCase):
                 "preferred_comms": self.family_with_multiple_enrolments.preferred_comms,
                 "num_children": 0,
                 "children": [],
-                "is_enrolled": "Yes",
                 "current_enrolment": EnrolmentSerializer(
                     self.second_family_enrolment
                 ).data,

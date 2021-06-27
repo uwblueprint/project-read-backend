@@ -70,10 +70,6 @@ class Family(models.Model):
         )
         return self.enrolments.filter(session=most_recent_session).first()
 
-    @property
-    def is_enrolled(self):
-        return "Yes" if self.current_enrolment else "No"
-
     def __str__(self):
         if self.parent is not None:
             return f"{self.id} - {self.parent.first_name} {self.parent.last_name} - {self.email}"

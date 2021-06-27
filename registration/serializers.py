@@ -49,7 +49,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "preferred_comms",
             "num_children",
             "children",
-            "is_enrolled",
             "current_enrolment",
         ]
 
@@ -59,6 +58,8 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     def get_current_enrolment(self, obj):
         from enrolments.serializers import EnrolmentSerializer
 
+        if obj.current_enrolment is None:
+            return None
         return EnrolmentSerializer(obj.current_enrolment).data
 
 
@@ -83,13 +84,14 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "children",
             "guests",
             "notes",
-            "is_enrolled",
             "current_enrolment",
         ]
 
     def get_current_enrolment(self, obj):
         from enrolments.serializers import EnrolmentSerializer
 
+        if obj.current_enrolment is None:
+            return None
         return EnrolmentSerializer(obj.current_enrolment).data
 
     def create(self, validated_data):
