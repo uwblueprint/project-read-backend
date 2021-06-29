@@ -55,18 +55,18 @@ class Class(models.Model):
 
 
 class Enrolment(models.Model):
-    WAITING_TO_ENROL = "Waiting to enrol"
+    SIGNED_UP = "Signed up"
     REGISTERED = "Registered"
-    CONFIRMED = "Confirmed"
-    COMLETED = "Completed"
+    CLASS_ALLOCATED = "Class allocated"
+    COMPLETED = "Completed"
     NO_SHOW = "No show"
     DROP_OUT = "Drop out"
     WAITLISTED = "Waitlisted"
     ENROLMENT_STATUSES = [
-        (WAITING_TO_ENROL, "Waiting to enrol"),
+        (SIGNED_UP, "Signed up"),
         (REGISTERED, "Registered"),
-        (CONFIRMED, "Confirmed"),
-        (COMLETED, "Completed"),
+        (CLASS_ALLOCATED, "Class allocated"),
+        (COMPLETED, "Completed"),
         (NO_SHOW, "No show"),
         (DROP_OUT, "Drop out"),
         (WAITLISTED, "Waitlisted"),
@@ -98,7 +98,7 @@ class Enrolment(models.Model):
         null=True,
     )
     status = models.CharField(
-        max_length=16, choices=ENROLMENT_STATUSES, default=WAITING_TO_ENROL
+        max_length=16, choices=ENROLMENT_STATUSES, default=SIGNED_UP
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

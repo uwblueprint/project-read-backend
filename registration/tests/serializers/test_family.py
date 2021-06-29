@@ -129,7 +129,7 @@ class FamilySerializerTestCase(TestCase):
             session=self.session2,
             preferred_class=self.class_from_session2,
             enrolled_class=self.class_from_session2,
-            status="Confirmed",
+            status=Enrolment.REGISTERED,
         )
         self.assertEqual(
             {
@@ -146,7 +146,7 @@ class FamilySerializerTestCase(TestCase):
                 "children": [],
                 "is_enrolled": "Yes",
                 "current_class": "Best Class",
-                "status": "Confirmed",
+                "status": "Registered",
             },
             FamilySerializer(
                 self.family_with_multiple_enrolments, context={"request": None}
