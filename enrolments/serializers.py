@@ -5,33 +5,13 @@ from registration.serializers import FamilySerializer, StudentSerializer
 from .models import Session, Class, Enrolment
 
 
-class SessionSerializer(serializers.HyperlinkedModelSerializer):
+class SessionListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Session
         fields = [
             "id",
             "season",
             "year",
-        ]
-
-
-class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
-    families = SerializerMethodField()
-
-    class Meta:
-        model = Session
-        fields = [
-            "id",
-            "season",
-            "year",
-            "families",
-            "fields",
-        ]
-
-    def get_families(self, obj):
-        return [
-            FamilySerializer(enrolment.family, context={"request": None}).data
-            for enrolment in obj.enrolments.filter(active=True)
         ]
 
 
@@ -51,19 +31,39 @@ class FamilyAttendanceSerializer(serializers.HyperlinkedModelSerializer):
 class ClassListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Class
-        fields = ["id", "name", "facilitator_id"]
+        fields = ["id", "name"]
+
+
+class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
+    classes = ClassListSerializer(many=True)
+    families = SerializerMethodField()
+
+    class Meta:
+        model = Session
+        fields = [
+            "id",
+            "season",
+            "year",
+            "families",
+            "fields",
+            "classes",
+        ]
+
+    def get_families(self, obj):
+        return [
+            FamilySerializer(enrolment.family, context={"request": None}).data
+            for enrolment in obj.enrolments.filter(active=True)
+        ]
 
 
 class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
-    families = serializers.SerializerMethodField()  # defaults to get_families
+    families = serializers.SerializerMethodField()
 
     class Meta:
         model = Class
         fields = [
             "id",
             "name",
-            "session_id",
-            "facilitator_id",
             "attendance",
             "families",
         ]
