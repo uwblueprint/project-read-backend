@@ -66,7 +66,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = SessionSerializer()
+    session = SessionListSerializer()
     preferred_class = ClassListSerializer()
     enrolled_class = ClassListSerializer()
 
