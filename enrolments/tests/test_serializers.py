@@ -169,7 +169,7 @@ class ClassDetailSerializerTestCase(TestCase):
         )
 
 
-class EnrolmentPropSerializerTestCase(TestCase):
+class EnrolmentSerializerTestCase(TestCase):
     def setUp(self):
         self.parent = Student.objects.create(
             first_name="Gollum", last_name="Goat", role=Student.PARENT
@@ -204,7 +204,7 @@ class EnrolmentPropSerializerTestCase(TestCase):
             session=self.session,
             preferred_class=self.preferred_class,
             enrolled_class=self.enrolled_class,
-            status=Enrolment.CONFIRMED,
+            status=Enrolment.REGISTERED,
         )
 
     def test_enrolment_serializer(self):
@@ -219,12 +219,10 @@ class EnrolmentPropSerializerTestCase(TestCase):
                 "preferred_class": {
                     "id": self.preferred_class.id,
                     "name": self.preferred_class.name,
-                    "facilitator_id": None,
                 },
                 "enrolled_class": {
                     "id": self.enrolled_class.id,
                     "name": self.enrolled_class.name,
-                    "facilitator_id": None,
                 },
                 "status": self.enrolment.status,
             },
