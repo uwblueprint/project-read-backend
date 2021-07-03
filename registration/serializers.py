@@ -85,6 +85,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "guests",
             "notes",
             "current_enrolment",
+            "interactions",
         ]
 
     def get_current_enrolment(self, obj):

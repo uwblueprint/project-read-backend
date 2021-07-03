@@ -1,6 +1,11 @@
 from django.apps import apps
 from django.db import models
-from .validators import validate_family_parent, validate_student, validate_mc_options
+from .validators import (
+    validate_family_parent,
+    validate_student,
+    validate_mc_options,
+    validate_interactions,
+)
 from django.contrib.postgres.fields import ArrayField
 
 
@@ -31,6 +36,7 @@ class Family(models.Model):
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
     notes = models.TextField(blank=True)
+    interactions = models.JSONField(default=list, validators=[validate_interactions])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(

@@ -3,6 +3,7 @@ from django.test import TestCase
 from unittest.mock import patch
 
 from ..models import Student, Field
+from accounts.models import User
 from .. import validators
 
 
@@ -38,6 +39,9 @@ class ValidatorsTestCase(TestCase):
             question_type=Field.MULTIPLE_CHOICE,
             is_default=True,
             order=1,
+        )
+        self.test_user = User.objects.create(
+            email="user@test.com",
         )
 
     def test_validate_family_parent(self):
@@ -159,3 +163,33 @@ class ValidatorsTestCase(TestCase):
         )
         test_field.options.append(1)
         self.assertRaises(ValidationError, validators.validate_mc_options, test_field)
+
+    def test_validate_client_interaction(self):
+        interaction_valid = {
+            "type": "Phone Call",
+            "date": "2012-04-04",
+            "user_id": self.test_user.id,
+            "user_email": self.test_user.email,
+        }
+        interaction_invalid_schema = {
+            "date": "2012-04-04",
+            "user_id": self.test_user.id,
+            "user_email": self.test_user.email,
+        }
+        interaction_invalid_user = {
+            "type": "Phone Call",
+            "date": "2012-04-04",
+            "user_id": self.test_user.id + 1,
+            "user_email": self.test_user.email,
+        }
+        self.assertEqual(
+            validators.validate_client_interaction(interaction_valid), None
+        )
+        self.assertFalse(
+            validators.validate_client_interaction(interaction_invalid_schema)
+        )
+        self.assertRaises(
+            User.DoesNotExist,
+            validators.validate_client_interaction,
+            interaction_invalid_user,
+        )
