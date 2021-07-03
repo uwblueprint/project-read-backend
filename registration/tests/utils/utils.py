@@ -9,7 +9,7 @@ fake = Faker()
 
 # Sample options
 preferred_comms = {"Phone", "Email"}
-interaction_types = {"Phone Call", "Email", "In-person meeting"}
+interaction_types = {"Phone call", "Email"}
 
 
 def create_test_fields():
