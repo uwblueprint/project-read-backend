@@ -4,72 +4,14 @@ from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
 from accounts.models import User
 from enrolments.serializers import (
-    ClassListSerializer,
-    FamilyAttendanceSerializer,
     ClassDetailSerializer,
+    ClassListSerializer,
     SessionDetailSerializer,
 )
 from registration.serializers import FamilySerializer, StudentSerializer
 from enrolments.tests.utils.utils import create_test_classes
 
 context = {"request": None}
-
-
-class FamilyAttendanceSerializerTestCase(TestCase):
-    def setUp(self):
-        self.family1 = Family.objects.create(
-            email="fam1@test.com",
-            cell_number="123456789",
-            work_number="0000000000",
-            preferred_number="Work",
-            address="1 Fam Ave",
-            preferred_comms="email",
-        )
-        self.empty_family = Family.objects.create(
-            email="fam2@test.com",
-            cell_number="987654321",
-            address="2 Fam Ave",
-            preferred_comms="email",
-        )
-        self.student1 = Student.objects.create(
-            first_name="Student1 FirstName",
-            last_name="Student1 LastName",
-            role="Child",
-            family=self.family1,
-            information="null",
-        )
-        self.student2 = Student.objects.create(
-            first_name="Student2 FirstName",
-            last_name="Student2 LastName",
-            role="Guest",
-            family=self.family1,
-            information="null",
-        )
-
-    def test_family_attendance_serializer(self):
-        self.assertEqual(
-            {
-                "id": self.family1.id,
-                "email": self.family1.email,
-                "phone_number": self.family1.work_number,
-                "students": [
-                    StudentSerializer(self.student1, context=context).data,
-                    StudentSerializer(self.student2, context=context).data,
-                ],
-            },
-            FamilyAttendanceSerializer(self.family1, context=context).data,
-        )
-
-    def test_family_attendance_serializer__no_students(self):
-        self.assertEqual(
-            {
-                "id": self.empty_family.id,
-                "email": self.empty_family.email,
-                "phone_number": self.empty_family.cell_number,
-                "students": [],
-            },
-            FamilyAttendanceSerializer(self.empty_family, context=context).data,
-        )
 
 
 class SessionDetailSerializerTestCase(TestCase):
