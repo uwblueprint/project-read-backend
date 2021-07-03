@@ -7,6 +7,7 @@ from .validators import (
     validate_interactions,
 )
 from django.contrib.postgres.fields import ArrayField
+from .validators import validate_family_parent, validate_student, validate_interactions
 
 
 class Family(models.Model):
