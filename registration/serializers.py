@@ -25,6 +25,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "family",
             "information",
         ]
+        # read_only_fields = ["role", "family"]
 
     def validate(self, attrs):
         validate_student_information_role(
@@ -123,6 +124,37 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             family.save()
 
         return family
+
+    def update(self, instance, validated_data): 
+        students_data = validated_data.pop("students") # returns and removes a key from json object
+        
+
+        update_fields = [
+            "id",
+            "email",
+            "home_number",
+            "cell_number",
+            "work_number",
+            "preferred_number",
+            "address",
+            "preferred_comms",
+        ]
+
+        for field in update_fields:
+            instance.field = validated_data.get(field, instance[field])
+
+        # print(validated_data)
+        # family = Family.objects.filter(id=validated_data["id"])
+        # print(family)
+        # family.update(email = validated_data.email)
+        # Student.objects.bulk_update(Student(**student, family=family) for student in students)
+        #frontend pass back full json object (assume json is given by frontend - write in test)
+        #backend remakes family to be updated family 
+
+        # no need to save since, update() will take care of that
+
+        instance.save()
+        return instance
 
     def to_internal_value(self, data):
         parent = data.pop("parent", {})
