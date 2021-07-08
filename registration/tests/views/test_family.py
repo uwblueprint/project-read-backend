@@ -163,7 +163,6 @@ class FamilyTestCase(APITestCase):
         url = reverse("family-detail", args=[self.family.id])
         self.client.force_authenticate(self.user)
 
-
         response = self.client.patch(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
