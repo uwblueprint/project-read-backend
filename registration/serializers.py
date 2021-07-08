@@ -125,33 +125,35 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
         return family
 
-    def update(self, instance, validated_data): 
-        students_data = validated_data.pop("students") # returns and removes a key from json object
-        
+    def update(self, instance, validated_data):
+        students_data = validated_data.pop("students")
+        students = (
+            [instance.parent]
+            + list(instance.children.all())
+            + list(instance.guests.all())
+        )
 
-        update_fields = [
-            "id",
-            "email",
-            "home_number",
-            "cell_number",
-            "work_number",
-            "preferred_number",
-            "address",
-            "preferred_comms",
-        ]
+        instance.email = validated_data.get("email", instance.email)
+        instance.home_number = validated_data.get("home_number", instance.home_number)
+        instance.cell_number = validated_data.get("cell_number", instance.cell_number)
+        instance.work_number = validated_data.get("work_number", instance.work_number)
+        instance.preferred_number = validated_data.get(
+            "preferred_number", instance.preferred_number
+        )
+        instance.address = validated_data.get("address", instance.address)
+        instance.preferred_comms = validated_data.get(
+            "preferred_comms", instance.preferred_comms
+        )
+        instance.notes = validated_data.get("notes", instance.notes)
 
-        for field in update_fields:
-            instance.field = validated_data.get(field, instance[field])
-
-        # print(validated_data)
-        # family = Family.objects.filter(id=validated_data["id"])
-        # print(family)
-        # family.update(email = validated_data.email)
-        # Student.objects.bulk_update(Student(**student, family=family) for student in students)
-        #frontend pass back full json object (assume json is given by frontend - write in test)
-        #backend remakes family to be updated family 
-
-        # no need to save since, update() will take care of that
+        for student, student_data in zip(students, students_data):
+            student.first_name = student_data.get("first_name", student.first_name)
+            student.last_name = student_data.get("last_name", student.last_name)
+            student.date_of_birth = student_data.get(
+                "date_of_birth", student.date_of_birth
+            )
+            student.information = student_data.get("information", student.information)
+            student.save()
 
         instance.save()
         return instance
