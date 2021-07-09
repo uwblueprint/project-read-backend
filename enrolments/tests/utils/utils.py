@@ -54,6 +54,7 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 family=family,
                 session=session,
                 enrolled_class=enrolled_class,
+                preferred_class=enrolled_class,
                 active=active,
                 status=fake.random_element(
                     elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
