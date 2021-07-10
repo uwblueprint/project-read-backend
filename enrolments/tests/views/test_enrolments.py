@@ -1,0 +1,91 @@
+from django.urls import NoReverseMatch, reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+
+from accounts.models import User
+from enrolments.models import Enrolment, Session, Class
+from registration.models import Family
+
+
+class EnrolmentsTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(email="user@staff.com")
+        self.family = Family.objects.create(
+            email="fam1@test.com",
+            cell_number="123456789",
+            address="1 Fam St",
+            preferred_comms="email",
+        )
+        self.session = Session.objects.create(season=Session.SPRING, year=2021)
+        self.class1 = Class.objects.create(
+            name="Tuesday & Saturday",
+            session_id=self.session.id,
+            facilitator_id=self.user.id,
+            attendance=[{"date": "2020-01-01", "attendees": []}],
+        )
+        self.class2 = Class.objects.create(
+            name="Wednesday & Thursday",
+            session_id=self.session.id,
+            facilitator_id=self.user.id,
+            attendance=[{"date": "2020-01-01", "attendees": []}],
+        )
+        self.enrolment = Enrolment.objects.create(
+            active=True,
+            family=self.family,
+            session=self.session,
+            preferred_class=self.class1,
+            enrolled_class=self.class1,
+            status=Enrolment.REGISTERED,
+        )
+
+    def test_enrolment_list_url_fail(self):
+        with self.assertRaises(NoReverseMatch):
+            reverse("enrolment-list")
+
+    def test_update_enrolment(self):
+        url = reverse("enrolment-detail", args=[self.enrolment.id])
+        self.client.force_authenticate(self.user)
+        request = {
+            "id": self.enrolment.id,
+            "session": {
+                "id": self.session.id,
+                "season": self.session.season,
+                "year": self.session.year,
+            },
+            "preferred_class": {"id": self.class2.id, "name": self.class2.name},
+            "enrolled_class": {"id": self.class2.id, "name": self.class2.name},
+            "status": Enrolment.CLASS_ALLOCATED,
+        }
+        response = self.client.put(url, request, format="json")
+        payload = response.json()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(request, payload)
+
+    def test_method_not_allowed(self):
+        self.client.force_authenticate(self.user)
+        url = reverse("enrolment-detail", args=[self.enrolment.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_unauthorized(self):
+        url = reverse("enrolment-detail", args=[self.enrolment.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

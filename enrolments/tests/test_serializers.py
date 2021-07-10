@@ -186,15 +186,26 @@ class EnrolmentSerializerTestCase(TestCase):
             year=2021,
             start_date=date(2021, 5, 15),
         )
-        self.preferred_class = Class.objects.create(
-            name="Preferred Class",
+        self.other_session = Session.objects.create(
+            season="Fall",
+            year=2021,
+            start_date=date(2021, 5, 15),
+        )
+        self.class1 = Class.objects.create(
+            name="Tuesday & Saturday",
             session_id=self.session.id,
             facilitator_id=None,
             attendance=[],
         )
-        self.enrolled_class = Class.objects.create(
-            name="Enrolled Class",
+        self.class2 = Class.objects.create(
+            name="Wednesday & Thursday",
             session_id=self.session.id,
+            facilitator_id=None,
+            attendance=[],
+        )
+        self.class_not_in_session = Class.objects.create(
+            name="Wednesday & Thursday",
+            session_id=self.other_session.id,
             facilitator_id=None,
             attendance=[],
         )
@@ -202,10 +213,21 @@ class EnrolmentSerializerTestCase(TestCase):
             active=False,
             family=self.family,
             session=self.session,
-            preferred_class=self.preferred_class,
-            enrolled_class=self.enrolled_class,
+            preferred_class=self.class1,
+            enrolled_class=self.class2,
             status=Enrolment.REGISTERED,
         )
+        self.update_request = {
+            "id": self.enrolment.id,
+            "session": {
+                "id": self.session.id,
+                "season": self.session.season,
+                "year": self.session.year,
+            },
+            "preferred_class": {"id": self.class2.id, "name": self.class2.name},
+            "enrolled_class": {"id": self.class1.id, "name": self.class1.name},
+            "status": Enrolment.CLASS_ALLOCATED,
+        }
 
     def test_enrolment_serializer(self):
         self.assertEqual(
@@ -217,14 +239,37 @@ class EnrolmentSerializerTestCase(TestCase):
                     "year": self.session.year,
                 },
                 "preferred_class": {
-                    "id": self.preferred_class.id,
-                    "name": self.preferred_class.name,
+                    "id": self.class1.id,
+                    "name": self.class1.name,
                 },
                 "enrolled_class": {
-                    "id": self.enrolled_class.id,
-                    "name": self.enrolled_class.name,
+                    "id": self.class2.id,
+                    "name": self.class2.name,
                 },
                 "status": self.enrolment.status,
             },
             EnrolmentSerializer(self.enrolment).data,
         )
+
+    def test_enrolment_update(self):
+        serializer = EnrolmentSerializer(data=self.update_request)
+        self.assertTrue(serializer.is_valid())
+        updated_enrolment = EnrolmentSerializer.update(
+            self, self.enrolment, self.update_request
+        )
+        self.assertEqual(self.enrolment, updated_enrolment)
+
+    def test_enrolment_update_read_only_session(self):
+        data = dict(self.update_request)
+        data["session"]["year"] += 1
+        serializer = EnrolmentSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        updated_enrolment = EnrolmentSerializer.update(self, self.enrolment, data)
+        self.assertEqual(self.enrolment, updated_enrolment)
+
+    def test_enrolment_update__invalid_class(self):
+        data = dict(self.update_request)
+        data["preferred_class"]["id"] = self.class_not_in_session.id
+        data["preferred_class"]["name"] = self.class_not_in_session.name
+        serializer = EnrolmentSerializer(data=data)
+        self.assertFalse(serializer.is_valid())

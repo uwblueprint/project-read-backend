@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from registration.models import Family
-from registration.serializers import FamilySerializer, StudentSerializer
+from registration.serializers import FamilySerializer
 from .models import Session, Class, Enrolment
 
 
@@ -66,7 +65,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = SessionListSerializer()
+    session = SessionListSerializer(read_only=True)
     preferred_class = ClassListSerializer()
     enrolled_class = ClassListSerializer()
 
@@ -79,3 +78,30 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "enrolled_class",
             "status",
         ]
+
+    def update(self, instance, validated_data):
+        instance.preferred_class = Class.objects.get(
+            id=validated_data.pop("preferred_class_id"), session=instance.session
+        )
+        instance.enrolled_class = Class.objects.get(
+            id=validated_data.pop("enrolled_class_id"), session=instance.session
+        )
+        instance.status = validated_data.get("status", instance.status)
+        instance.save()
+        return instance
+
+    def to_internal_value(self, data):
+        data["preferred_class_id"] = data.pop("preferred_class", {})["id"]
+        data["enrolled_class_id"] = data.pop("enrolled_class", {})["id"]
+        return data
+
+    def validate(self, attrs):
+        class_ids = {attrs["preferred_class_id"], attrs["enrolled_class_id"]}
+        if (
+            len(class_ids)
+            != Class.objects.filter(
+                id__in=list(class_ids), session=attrs["session"]["id"]
+            ).count()
+        ):
+            raise serializers.ValidationError("Classes do not exist in Session")
+        return super().validate(attrs)
