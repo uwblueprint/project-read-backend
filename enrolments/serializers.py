@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from registration.models import Family
-from registration.serializers import FamilySerializer, StudentSerializer
+from registration.serializers import (
+    FamilyDetailSerializer,
+    FamilySerializer,
+    StudentSerializer,
+)
 from .models import Session, Class, Enrolment
 
 
@@ -79,3 +83,42 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "enrolled_class",
             "status",
         ]
+
+
+class EnrolmentCreateSerializer(serializers.ModelSerializer):
+    # session = SessionListSerializer()
+    # preferred_class = ClassListSerializer()
+    # enrolled_class = ClassListSerializer()
+    family = FamilyDetailSerializer()
+
+    class Meta:
+        model = Enrolment
+        fields = [
+            "family",
+            "session",
+            "preferred_class",
+        ]
+
+    def create(self, validated_data):
+        session = validated_data["session"]
+        preferred_class = validated_data["preferred_class"]
+
+        family_data = dict(validated_data["family"])
+        family_serializer = FamilyDetailSerializer(data=family_data)
+        family = family_serializer.save()
+
+        enrolments = Enrolment.objects.create(
+            active=True,
+            family_id=family.id,
+            session=session.id,
+            preferred_class=preferred_class.id,
+        )
+
+        return enrolments
+
+    def validate(self, attrs):
+        family_data = dict(attrs["family"])
+        family_serializer = FamilyDetailSerializer(data=family_data)
+        if not (family_serializer.is_valid()):
+            raise serializers.ValidationError("Family data is invalid")
+        return super().validate(attrs)

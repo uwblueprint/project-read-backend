@@ -3,11 +3,12 @@ from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import Session, Class
+from .models import Session, Class, Enrolment
 from .serializers import (
     SessionListSerializer,
     SessionDetailSerializer,
     ClassDetailSerializer,
+    EnrolmentCreateSerializer
 )
 
 
@@ -36,5 +37,17 @@ class ClassViewSet(
     serializer_class = ClassDetailSerializer
     http_method_names = [
         "get",
+    ]
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class EnrolmentViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+):
+    queryset = Enrolment.objects.all()
+    serializer_class = EnrolmentCreateSerializer
+    http_method_names = [
+        "post",
     ]
     permission_classes = [permissions.IsAuthenticated]

@@ -125,9 +125,11 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
     def validate(self, attrs):
+        print(attrs)
         if not all(
             StudentSerializer(data=student).is_valid() for student in attrs["students"]
         ):
+            print("failed")
             raise serializers.ValidationError("Student data is invalid")
         return super().validate(attrs)
 
