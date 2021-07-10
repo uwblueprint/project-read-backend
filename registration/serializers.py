@@ -146,17 +146,29 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         )
         instance.notes = validated_data.get("notes", instance.notes)
 
-        for student, student_data in zip(students, students_data):
-            student.first_name = student_data.get("first_name", student.first_name)
-            student.last_name = student_data.get("last_name", student.last_name)
-            student.date_of_birth = student_data.get(
-                "date_of_birth", student.date_of_birth
-            )
-            student.information = student_data.get("information", student.information)
+        student_objs = Student.objects.filter(id__in=[student.id for student in students])
+        student_data_objs = Student.objects.filter(id__in=[student["id"] for student in students_data])
+
+        if(len(student_objs) > len(student_data_objs)):
+            student_to_delete = student_objs.difference(student_data_objs)
+            student_to_delete.delete()
+
+        if(len(student_objs) < len(student_data_objs)):
+            student_to_create = student_objs.difference(student_data_objs)
+            student_to_create.create()
+            
+
+        intersection_of_students = student_objs.intersection(student_data_objs)
+        for student, intersection_of_students in zip(students, intersection_of_students):
+            student.first_name = intersection_of_students.first_name
+            student.last_name = intersection_of_students.last_name
+            student.date_of_birth = intersection_of_students.date_of_birth
+            student.information = intersection_of_students.information
             student.save()
 
         instance.save()
         return instance
+    
 
     def to_internal_value(self, data):
         parent = data.pop("parent", {})
