@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from registration.models import Family
+from registration.models import Family, Student
 from registration.serializers import (
     FamilyDetailSerializer,
     FamilySerializer,
-    StudentSerializer,
 )
 from .models import Session, Class, Enrolment
+from .validators import (
+    validate_class_in_session,
+)
 
 
 class SessionListSerializer(serializers.HyperlinkedModelSerializer):
@@ -86,10 +88,11 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentCreateSerializer(serializers.ModelSerializer):
-    # session = SessionListSerializer()
-    # preferred_class = ClassListSerializer()
-    # enrolled_class = ClassListSerializer()
     family = FamilyDetailSerializer()
+    preferred_class = serializers.PrimaryKeyRelatedField(
+        allow_null=True, queryset=Class.objects.all()
+    )
+    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
 
     class Meta:
         model = Enrolment
@@ -100,25 +103,26 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        session = validated_data["session"]
-        preferred_class = validated_data["preferred_class"]
-
-        family_data = dict(validated_data["family"])
-        family_serializer = FamilyDetailSerializer(data=family_data)
-        family = family_serializer.save()
+        family = FamilyDetailSerializer.create(self, validated_data["family"])
+        students = Student.objects.filter(family=family)
 
         enrolments = Enrolment.objects.create(
             active=True,
-            family_id=family.id,
-            session=session.id,
-            preferred_class=preferred_class.id,
+            family=family,
+            students=[student.id for student in students],
+            session=validated_data["session"],
+            preferred_class=validated_data["preferred_class"],
         )
 
         return enrolments
 
     def validate(self, attrs):
-        family_data = dict(attrs["family"])
-        family_serializer = FamilyDetailSerializer(data=family_data)
-        if not (family_serializer.is_valid()):
-            raise serializers.ValidationError("Family data is invalid")
-        return super().validate(attrs)
+        try:
+            if attrs["preferred_class"]:
+                validate_class_in_session(attrs["preferred_class"], attrs["session"])
+            return attrs
+        except:
+            raise serializers.ValidationError(
+                detail="preferred class does not exist in session",
+                code="invalid_preferred_class",
+            )
