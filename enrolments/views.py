@@ -8,7 +8,7 @@ from .serializers import (
     SessionListSerializer,
     SessionDetailSerializer,
     ClassDetailSerializer,
-    EnrolmentCreateSerializer
+    EnrolmentCreateSerializer,
 )
 
 
