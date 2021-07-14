@@ -4,6 +4,7 @@ from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
 from .validators import validate_student_information_role
+from enrolments.models import Enrolment
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -35,6 +36,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
     children = StudentSerializer(many=True)
+    current_enrolment = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -47,19 +49,25 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "preferred_comms",
             "num_children",
             "children",
-            "is_enrolled",
-            "current_class",
-            "status",
+            "current_enrolment",
         ]
 
     def get_num_children(self, obj):
         return obj.children.count()
+
+    def get_current_enrolment(self, obj):
+        from enrolments.serializers import EnrolmentSerializer
+
+        if obj.current_enrolment is None:
+            return None
+        return EnrolmentSerializer(obj.current_enrolment).data
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
+    current_enrolment = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -76,10 +84,15 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "children",
             "guests",
             "notes",
-            "is_enrolled",
-            "current_class",
-            "status",
+            "current_enrolment",
         ]
+
+    def get_current_enrolment(self, obj):
+        from enrolments.serializers import EnrolmentSerializer
+
+        if obj.current_enrolment is None:
+            return None
+        return EnrolmentSerializer(obj.current_enrolment).data
 
     def create(self, validated_data):
         students = validated_data.pop("students")

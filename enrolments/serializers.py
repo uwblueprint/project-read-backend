@@ -63,3 +63,19 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             ).data
             for enrolment in e_set
         ]
+
+
+class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
+    session = SessionListSerializer()
+    preferred_class = ClassListSerializer()
+    enrolled_class = ClassListSerializer()
+
+    class Meta:
+        model = Enrolment
+        fields = [
+            "id",
+            "session",
+            "preferred_class",
+            "enrolled_class",
+            "status",
+        ]
