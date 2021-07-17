@@ -17,7 +17,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
         fields = [
-            "id",
+            "id", # need to figure out what to do if no id is given (this is typical with new students)
             "first_name",
             "last_name",
             "role",
@@ -126,8 +126,8 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return family
 
     def update(self, instance, validated_data):
-        students_data = validated_data.pop("students")
-        students = (
+        students_data = validated_data.pop("students") 
+        students = ( 
             [instance.parent]
             + list(instance.children.all())
             + list(instance.guests.all())
@@ -146,25 +146,25 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         )
         instance.notes = validated_data.get("notes", instance.notes)
 
-        student_objs = Student.objects.filter(id__in=[student.id for student in students])
-        student_data_objs = Student.objects.filter(id__in=[student["id"] for student in students_data])
+        old_students = Student.objects.filter(id__in=[student.id for student in students]) 
+        new_students = Student.objects.filter(id__in=[student["id"] for student in students_data])
+ 
+        students_to_delete = old_students.difference(new_students) 
+        for student in students_to_delete:
+            Student.objects.filter(id=student.id).delete()
 
-        if(len(student_objs) > len(student_data_objs)):
-            student_to_delete = student_objs.difference(student_data_objs)
-            student_to_delete.delete()
-
-        if(len(student_objs) < len(student_data_objs)):
-            student_to_create = student_objs.difference(student_data_objs)
-            student_to_create.create()
-            
-
-        intersection_of_students = student_objs.intersection(student_data_objs)
-        for student, intersection_of_students in zip(students, intersection_of_students):
-            student.first_name = intersection_of_students.first_name
-            student.last_name = intersection_of_students.last_name
-            student.date_of_birth = intersection_of_students.date_of_birth
-            student.information = intersection_of_students.information
-            student.save()
+        for student_data in students_data:
+            Student.objects.update_or_create( #creates a student within an existing family
+                id=student_data["id"],
+                defaults=dict(
+                    first_name=student_data["first_name"],
+                    last_name=student_data["last_name"],
+                    role=student_data["role"],
+                    family=instance,
+                    date_of_birth=student_data["date_of_birth"],
+                    information=student_data["information"],
+                )
+            )
 
         instance.save()
         return instance
