@@ -44,7 +44,13 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_families(self, obj):
         return [
-            FamilySerializer(enrolment.family, context={"request": None}).data
+            FamilySerializer(
+                enrolment.family,
+                context={
+                    "request": self.context.get("request"),
+                    "enrolment": EnrolmentSerializer(enrolment).data,
+                },
+            ).data
             for enrolment in obj.enrolments.filter(active=True)
         ]
 
@@ -62,12 +68,18 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_families(self, obj):
-        e_set = Enrolment.objects.filter(enrolled_class=obj, active=True)
+        request = self.context.get("request")
         return [
             FamilySerializer(
-                enrolment.family, read_only=True, context={"request": None}
+                enrolment.family,
+                context={
+                    "request": request,
+                    "enrolment": EnrolmentSerializer(
+                        enrolment, context={"request": request}
+                    ).data,
+                },
             ).data
-            for enrolment in e_set
+            for enrolment in obj.enrolments.filter(active=True)
         ]
 
 
@@ -88,6 +100,7 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "preferred_class",
             "enrolled_class",
             "status",
+            "students",
         ]
 
     def to_representation(self, instance):
