@@ -250,7 +250,6 @@ class EnrolmentSerializerTestCase(TestCase):
     def test_enrolment_update(self):
         serializer = EnrolmentSerializer(data=self.update_request)
         self.assertTrue(serializer.is_valid())
-        serializer.save()
 
     def test_enrolment_update__read_only_session(self):
         data = dict(self.update_request)
