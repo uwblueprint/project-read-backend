@@ -66,7 +66,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
+    session = serializers.PrimaryKeyRelatedField(read_only=True)
     preferred_class = serializers.PrimaryKeyRelatedField(
         queryset=Class.objects.all(), allow_null=True
     )
@@ -83,7 +83,6 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "enrolled_class",
             "status",
         ]
-        read_only_fields = ["session"]
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -93,16 +92,18 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
         return response
 
     def validate(self, attrs):
-        class_ids = set()
-        if not attrs["preferred_class"] == None:
-            class_ids.add(attrs["preferred_class"].id)
-        if not attrs["enrolled_class"] == None:
-            class_ids.add(attrs["enrolled_class"].id)
         if (
-            len(class_ids)
-            != Class.objects.filter(
-                id__in=list(class_ids), session=attrs["session"].id
-            ).count()
+            attrs["preferred_class"] is not None
+            and attrs["preferred_class"].session != self.instance.session
         ):
-            raise serializers.ValidationError("Classes do not exist in Session")
+            raise serializers.ValidationError(
+                "Perferred class does not exist in Session"
+            )
+        if (
+            attrs["enrolled_class"] is not None
+            and attrs["enrolled_class"].session != self.instance.session
+        ):
+            raise serializers.ValidationError(
+                "Enrolled class does not exist in Session"
+            )
         return super().validate(attrs)

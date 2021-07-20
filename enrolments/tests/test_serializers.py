@@ -248,17 +248,19 @@ class EnrolmentSerializerTestCase(TestCase):
         )
 
     def test_enrolment_update(self):
-        serializer = EnrolmentSerializer(data=self.update_request)
+        serializer = EnrolmentSerializer(self.enrolment, data=self.update_request)
         self.assertTrue(serializer.is_valid())
 
     def test_enrolment_update__read_only_session(self):
         data = dict(self.update_request)
         data["session"] = self.other_session.id
-        serializer = EnrolmentSerializer(data=data)
-        self.assertFalse(serializer.is_valid())
+        serializer = EnrolmentSerializer(self.enrolment, data=data)
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+        self.assertEqual(self.enrolment.session, self.session)
 
     def test_enrolment_update__invalid_class(self):
         data = dict(self.update_request)
         data["preferred_class"] = self.class_not_in_session.id
-        serializer = EnrolmentSerializer(data=data)
+        serializer = EnrolmentSerializer(self.enrolment, data=data)
         self.assertFalse(serializer.is_valid())
