@@ -47,20 +47,14 @@ class EnrolmentsTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         request = {
             "id": self.enrolment.id,
-            "session": {
-                "id": self.session.id,
-                "season": self.session.season,
-                "year": self.session.year,
-            },
-            "preferred_class": {"id": self.class2.id, "name": self.class2.name},
-            "enrolled_class": {"id": self.class2.id, "name": self.class2.name},
+            "session": self.session.id,
+            "preferred_class": self.class2.id,
+            "enrolled_class": self.class2.id,
             "status": Enrolment.CLASS_ALLOCATED,
         }
         response = self.client.put(url, request, format="json")
-        payload = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(request, payload)
 
     def test_method_not_allowed(self):
         self.client.force_authenticate(self.user)

@@ -1,4 +1,5 @@
-from rest_framework import serializers
+from django.db.models import query
+from rest_framework import response, serializers
 from rest_framework.fields import SerializerMethodField
 from registration.serializers import FamilySerializer
 from .models import Session, Class, Enrolment
@@ -65,9 +66,13 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = SessionListSerializer(read_only=True)
-    preferred_class = ClassListSerializer()
-    enrolled_class = ClassListSerializer()
+    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
+    preferred_class = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(), allow_null=True
+    )
+    enrolled_class = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(), allow_null=True
+    )
 
     class Meta:
         model = Enrolment
@@ -78,29 +83,25 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "enrolled_class",
             "status",
         ]
+        read_only_fields = ["session"]
 
-    def update(self, instance, validated_data):
-        instance.preferred_class = Class.objects.get(
-            id=validated_data.pop("preferred_class_id"), session=instance.session
-        )
-        instance.enrolled_class = Class.objects.get(
-            id=validated_data.pop("enrolled_class_id"), session=instance.session
-        )
-        instance.status = validated_data.get("status", instance.status)
-        instance.save()
-        return instance
-
-    def to_internal_value(self, data):
-        data["preferred_class_id"] = data.pop("preferred_class", {})["id"]
-        data["enrolled_class_id"] = data.pop("enrolled_class", {})["id"]
-        return data
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["session"] = SessionListSerializer(instance.session).data
+        response["preferred_class"] = ClassListSerializer(instance.preferred_class).data
+        response["enrolled_class"] = ClassListSerializer(instance.enrolled_class).data
+        return response
 
     def validate(self, attrs):
-        class_ids = {attrs["preferred_class_id"], attrs["enrolled_class_id"]}
+        class_ids = set()
+        if not attrs["preferred_class"] == None:
+            class_ids.add(attrs["preferred_class"].id)
+        if not attrs["enrolled_class"] == None:
+            class_ids.add(attrs["enrolled_class"].id)
         if (
             len(class_ids)
             != Class.objects.filter(
-                id__in=list(class_ids), session=attrs["session"]["id"]
+                id__in=list(class_ids), session=attrs["session"].id
             ).count()
         ):
             raise serializers.ValidationError("Classes do not exist in Session")

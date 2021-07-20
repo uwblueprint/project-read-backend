@@ -219,13 +219,9 @@ class EnrolmentSerializerTestCase(TestCase):
         )
         self.update_request = {
             "id": self.enrolment.id,
-            "session": {
-                "id": self.session.id,
-                "season": self.session.season,
-                "year": self.session.year,
-            },
-            "preferred_class": {"id": self.class2.id, "name": self.class2.name},
-            "enrolled_class": {"id": self.class1.id, "name": self.class1.name},
+            "session": self.session.id,
+            "preferred_class": self.class2.id,
+            "enrolled_class": self.class1.id,
             "status": Enrolment.CLASS_ALLOCATED,
         }
 
@@ -254,22 +250,16 @@ class EnrolmentSerializerTestCase(TestCase):
     def test_enrolment_update(self):
         serializer = EnrolmentSerializer(data=self.update_request)
         self.assertTrue(serializer.is_valid())
-        updated_enrolment = EnrolmentSerializer.update(
-            self, self.enrolment, self.update_request
-        )
-        self.assertEqual(self.enrolment, updated_enrolment)
+        serializer.save()
 
-    def test_enrolment_update_read_only_session(self):
+    def test_enrolment_update__read_only_session(self):
         data = dict(self.update_request)
-        data["session"]["year"] += 1
+        data["session"] = self.other_session.id
         serializer = EnrolmentSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
-        updated_enrolment = EnrolmentSerializer.update(self, self.enrolment, data)
-        self.assertEqual(self.enrolment, updated_enrolment)
+        self.assertFalse(serializer.is_valid())
 
     def test_enrolment_update__invalid_class(self):
         data = dict(self.update_request)
-        data["preferred_class"]["id"] = self.class_not_in_session.id
-        data["preferred_class"]["name"] = self.class_not_in_session.name
+        data["preferred_class"] = self.class_not_in_session.id
         serializer = EnrolmentSerializer(data=data)
         self.assertFalse(serializer.is_valid())
