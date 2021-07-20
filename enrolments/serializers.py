@@ -1,5 +1,4 @@
-from django.db.models import query
-from rest_framework import response, serializers
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from registration.serializers import FamilySerializer
 from .models import Session, Class, Enrolment
