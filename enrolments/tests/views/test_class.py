@@ -56,7 +56,7 @@ class ClassesTestCase(APITestCase):
         url = reverse("class-detail", args=[self.class1.id])
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
-        context = {'request': Request(APIRequestFactory().get('/'))}
+        context = {"request": Request(APIRequestFactory().get("/"))}
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
