@@ -228,3 +228,37 @@ class EnrolmentSerializerTestCase(TestCase):
             },
             EnrolmentSerializer(self.enrolment).data,
         )
+
+
+class EnrolmentCreateSerializerTestCase(TestCase):
+    def setUp(self):
+        self.family_data = {
+            "email": "weasleys@theorder.com",
+            "cell_number": "123456789",
+            "address": "12 Grimmauld Place",
+            "preferred_comms": "Owl Post",
+        }
+        self.parent_data = {
+            "first_name": "Molly",
+            "last_name": "Weasley",
+            "information": {f"{self.parent_field.id}": "yes"},
+        }
+        self.children_data = [
+            {
+                "first_name": "Ron",
+                "last_name": "Weasley",
+                "information": {f"{self.child_field.id}": "male"},
+            },
+            {
+                "first_name": "Ginny",
+                "last_name": "Weasley",
+                "information": {f"{self.child_field.id}": "female"},
+            },
+        ]
+        self.guests_data = [
+            {
+                "first_name": "Harry",
+                "last_name": "Potter",
+                "information": {f"{self.guest_field.id}": "friend"},
+            }
+        ]
