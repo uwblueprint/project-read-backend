@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from registration.models import Family, Student
+from registration.models import Student
 from registration.serializers import (
     FamilyDetailSerializer,
     FamilySerializer,
@@ -72,9 +72,13 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = SessionListSerializer()
-    preferred_class = ClassListSerializer()
-    enrolled_class = ClassListSerializer()
+    session = serializers.PrimaryKeyRelatedField(read_only=True)
+    preferred_class = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(), allow_null=True
+    )
+    enrolled_class = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(), allow_null=True
+    )
 
     class Meta:
         model = Enrolment
@@ -86,6 +90,30 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "status",
         ]
 
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["session"] = SessionListSerializer(instance.session).data
+        response["preferred_class"] = ClassListSerializer(instance.preferred_class).data
+        response["enrolled_class"] = ClassListSerializer(instance.enrolled_class).data
+        return response
+
+    def validate(self, attrs):
+        if (
+            attrs["preferred_class"] is not None
+            and attrs["preferred_class"].session != self.instance.session
+        ):
+            raise serializers.ValidationError(
+                "Perferred class does not exist in Session"
+            )
+        if (
+            attrs["enrolled_class"] is not None
+            and attrs["enrolled_class"].session != self.instance.session
+        ):
+            raise serializers.ValidationError(
+                "Enrolled class does not exist in Session"
+            )
+        return super().validate(attrs)
+
 
 class EnrolmentCreateSerializer(serializers.ModelSerializer):
     family = FamilyDetailSerializer()
@@ -96,11 +124,7 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Enrolment
-        fields = [
-            "family",
-            "session",
-            "preferred_class",
-        ]
+        fields = ["family", "session", "preferred_class", "status"]
 
     def create(self, validated_data):
         family = FamilyDetailSerializer.create(self, validated_data["family"])
@@ -112,6 +136,7 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
             students=[student.id for student in students],
             session=validated_data["session"],
             preferred_class=validated_data["preferred_class"],
+            status=validated_data["status"],
         )
 
         return enrolments
