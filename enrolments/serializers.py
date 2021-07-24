@@ -128,7 +128,7 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         family = FamilyDetailSerializer.create(self, validated_data["family"])
-        students = Student.objects.filter(family=family)
+        students = family.students.all()
 
         enrolments = Enrolment.objects.create(
             active=True,
