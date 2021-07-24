@@ -127,7 +127,7 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
         fields = ["family", "session", "preferred_class", "status"]
 
     def create(self, validated_data):
-        family = FamilyDetailSerializer.create(self, validated_data["family"])
+        family = FamilyDetailSerializer.create(None, validated_data["family"])
         students = family.students.all()
 
         enrolments = Enrolment.objects.create(
