@@ -3,11 +3,13 @@ import os
 from faker import Faker
 
 from registration.models import Family, Student, Field
+from accounts.models import User
 
 fake = Faker()
 
 # Sample options
 preferred_comms = {"Phone", "Email"}
+interaction_types = {"Phone call", "Email"}
 
 
 def create_test_fields():
@@ -20,7 +22,18 @@ def create_test_fields():
     return Field.objects.bulk_create([Field(**field) for field in fields_data])
 
 
-def create_test_family(last_name):
+def create_test_family(last_name, staff_user=None):
+    num_interactions = fake.pyint(min_value=0, max_value=3)
+    family_interactions = []
+    if staff_user is not None:
+        for _ in range(0, num_interactions):
+            interaction = {
+                "type": fake.random_element(elements=interaction_types),
+                "date": fake.date(),
+                "user_id": staff_user.id,
+            }
+            family_interactions.append(interaction)
+
     return Family.objects.create(
         email=f"{last_name.lower()}@test.com",
         cell_number=fake.phone_number(),
@@ -30,6 +43,7 @@ def create_test_family(last_name):
         address=fake.address(),
         preferred_comms=fake.random_element(elements=preferred_comms),
         notes=fake.text(max_nb_chars=60),
+        interactions=family_interactions,
     )
 
 
@@ -116,12 +130,10 @@ def create_test_guests(
 
 
 def create_test_family_with_students(
-    num_children,
-    num_guests,
-    with_fields=False,
+    num_children, num_guests, with_fields=False, staff_user=None
 ):
     last_name = fake.unique.last_name()
-    family = create_test_family(last_name=last_name)
+    family = create_test_family(last_name=last_name, staff_user=staff_user)
     create_test_parent(
         family=family,
         last_name=last_name,

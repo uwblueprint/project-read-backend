@@ -40,3 +40,26 @@ def validate_student(student):
 def validate_mc_options(field):
     if not all(isinstance(option, str) for option in field.options):
         raise ValidationError("One of the provided options is not a string")
+
+
+def validate_client_interaction(interaction):
+    from enrolments.validators import validate_schema
+
+    INTERACTION_SCHEMA = {
+        "type": "str",
+        "date": "str",
+        "user_id": "int",
+    }
+    validate_schema(interaction, INTERACTION_SCHEMA)
+    User = apps.get_model("accounts", "User")
+    try:
+        User.objects.get(id=interaction["user_id"])
+    except User.DoesNotExist as dne_error:
+        raise dne_error
+    except:
+        raise ValidationError("Invalid interaction JSON")
+
+
+def validate_interactions(interactions):
+    for interaction in interactions.values():
+        validate_client_interaction(interaction)

@@ -85,7 +85,9 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "guests",
             "notes",
             "current_enrolment",
+            "interactions",
         ]
+        read_only_fields = ["interactions"]
 
     def get_current_enrolment(self, obj):
         from enrolments.serializers import EnrolmentSerializer
