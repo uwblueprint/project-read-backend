@@ -45,8 +45,7 @@ class FamilySerializerTestCase(TestCase):
         )
 
         self.current_session = Session.objects.create(
-            season="Spring",
-            year=2021,
+            name="Spring 2021",
             start_date=date(2021, 5, 15),
         )
         self.current_class = Class.objects.create(
@@ -62,8 +61,7 @@ class FamilySerializerTestCase(TestCase):
         )
 
         self.past_session = Session.objects.create(
-            season="Fall",
-            year=2019,
+            name="Fall 2019",
             start_date=date(2019, 1, 23),
         )
         self.past_class = Class.objects.create(
