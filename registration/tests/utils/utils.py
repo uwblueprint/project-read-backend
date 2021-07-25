@@ -31,7 +31,6 @@ def create_test_family(last_name, staff_user=None):
                 "type": fake.random_element(elements=interaction_types),
                 "date": fake.date(),
                 "user_id": staff_user.id,
-                "user_email": staff_user.email,
             }
             family_interactions.append(interaction)
 

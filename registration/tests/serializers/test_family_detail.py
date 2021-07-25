@@ -23,7 +23,6 @@ class FamilyDetailSerializerTestCase(TestCase):
                     "type": "Phone Call",
                     "date": "2012-04-04",
                     "user_id": self.user.id,
-                    "user_email": self.user.email,
                 }
             ],
         )

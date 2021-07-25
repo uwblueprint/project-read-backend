@@ -169,22 +169,17 @@ class ValidatorsTestCase(TestCase):
             "type": "Phone Call",
             "date": "2012-04-04",
             "user_id": self.test_user.id,
-            "user_email": self.test_user.email,
         }
         interaction_invalid_schema = {
             "date": "2012-04-04",
             "user_id": self.test_user.id,
-            "user_email": self.test_user.email,
         }
         interaction_invalid_user = {
             "type": "Phone Call",
             "date": "2012-04-04",
             "user_id": self.test_user.id + 1,
-            "user_email": self.test_user.email,
         }
-        self.assertEqual(
-            validators.validate_client_interaction(interaction_valid), None
-        )
+        self.assertIsNone(validators.validate_client_interaction(interaction_valid))
         self.assertFalse(
             validators.validate_client_interaction(interaction_invalid_schema)
         )

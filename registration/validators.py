@@ -49,7 +49,6 @@ def validate_client_interaction(interaction):
         "type": "str",
         "date": "str",
         "user_id": "int",
-        "user_email": "str",
     }
     validate_schema(interaction, INTERACTION_SCHEMA)
     User = apps.get_model("accounts", "User")
