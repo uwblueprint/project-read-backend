@@ -9,8 +9,7 @@ class SessionListSerializer(serializers.HyperlinkedModelSerializer):
         model = Session
         fields = [
             "id",
-            "season",
-            "year",
+            "name",
         ]
 
 
@@ -28,8 +27,7 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
         model = Session
         fields = [
             "id",
-            "season",
-            "year",
+            "name",
             "families",
             "fields",
             "classes",

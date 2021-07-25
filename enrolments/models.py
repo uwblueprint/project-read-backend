@@ -9,24 +9,14 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class Session(models.Model):
-    SPRING = "Spring"
-    SUMMER = "Summer"
-    FALL = "Fall"
-    SEASON_CHOICES = [
-        (SPRING, "Spring"),
-        (SUMMER, "Summer"),
-        (FALL, "Fall"),
-    ]
-
-    season = models.CharField(max_length=6, choices=SEASON_CHOICES)
-    year = models.PositiveSmallIntegerField()
+    name = models.CharField(max_length=128, default="")
     start_date = models.DateField(null=True)
     fields = ArrayField(
         models.IntegerField(), default=list, validators=[validate_fields]
     )
 
     def __str__(self):
-        return f"{self.season} {self.year}"
+        return self.name
 
 
 class Class(models.Model):

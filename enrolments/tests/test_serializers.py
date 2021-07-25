@@ -19,8 +19,7 @@ context = {"request": None}
 class SessionDetailSerializerTestCase(TestCase):
     def setUp(self):
         self.session = Session.objects.create(
-            season=Session.SPRING,
-            year=2020,
+            name="Spring 2020",
             fields=[1, 2, 3],
         )
         self.session_class = create_test_classes(self.session, 1)[0]
@@ -50,8 +49,7 @@ class SessionDetailSerializerTestCase(TestCase):
         self.assertEqual(
             {
                 "id": self.session.id,
-                "season": self.session.season,
-                "year": self.session.year,
+                "name": self.session.name,
                 "families": [
                     FamilySerializer(self.family, context=context).data,
                     FamilySerializer(self.other_family, context=context).data,
@@ -86,13 +84,9 @@ class ClassDetailSerializerTestCase(TestCase):
             address="3 Fam St",
             preferred_comms="email",
         )
-        self.session1 = Session.objects.create(
-            season="Fall",
-            year="2019",
-        )
+        self.session1 = Session.objects.create(name="Fall 2019")
         self.session2 = Session.objects.create(
-            season="Spring",
-            year="2021",
+            name="Spring 2021",
         )
         self.student1 = Student.objects.create(
             first_name="Student1 FirstName",
@@ -182,14 +176,12 @@ class EnrolmentSerializerTestCase(TestCase):
             preferred_comms="Dolphin Whistle",
         )
         self.session = Session.objects.create(
-            season="Spring",
-            year=2021,
+            name="Spring 201",
             start_date=date(2021, 5, 15),
         )
         self.other_session = Session.objects.create(
-            season="Fall",
-            year=2021,
-            start_date=date(2021, 5, 15),
+            name="Fall 2021",
+            start_date=date(2021, 9, 15),
         )
         self.class1 = Class.objects.create(
             name="Tuesday & Saturday",
@@ -231,8 +223,7 @@ class EnrolmentSerializerTestCase(TestCase):
                 "id": self.enrolment.id,
                 "session": {
                     "id": self.session.id,
-                    "season": self.session.season,
-                    "year": self.session.year,
+                    "name": self.session.name,
                 },
                 "preferred_class": {
                     "id": self.class1.id,

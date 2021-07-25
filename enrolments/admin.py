@@ -5,22 +5,13 @@ from .models import Class, Session, Enrolment
 class SessionAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "season",
+        "name",
         "start_date",
-        "year",
     )
-    ordering = (
-        "id",
-        "year",
-    )
+    ordering = ("id",)
     search_fields = (
-        "season",
-        "year",
+        "name",
         "start_date",
-    )
-    list_filter = (
-        "season",
-        "year",
     )
 
 
