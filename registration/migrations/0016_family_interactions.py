@@ -7,13 +7,15 @@ import registration.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0015_auto_20210716_1611'),
+        ("registration", "0015_auto_20210716_1611"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='family',
-            name='interactions',
-            field=models.JSONField(default=list, validators=[registration.validators.validate_interactions]),
+            model_name="family",
+            name="interactions",
+            field=models.JSONField(
+                default=list, validators=[registration.validators.validate_interactions]
+            ),
         ),
     ]
