@@ -16,7 +16,7 @@ class EnrolmentsTestCase(APITestCase):
             address="1 Fam St",
             preferred_comms="email",
         )
-        self.session = Session.objects.create(season=Session.SPRING, year=2021)
+        self.session = Session.objects.create(name="Spring 2021")
         self.class1 = Class.objects.create(
             name="Tuesday & Saturday",
             session_id=self.session.id,

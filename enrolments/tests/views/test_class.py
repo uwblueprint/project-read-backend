@@ -12,8 +12,8 @@ from enrolments.serializers import ClassDetailSerializer
 class ClassesTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
-        self.session1 = Session.objects.create(season=Session.SPRING, year=2021)
-        self.session2 = Session.objects.create(season=Session.FALL, year=2020)
+        self.session1 = Session.objects.create()
+        self.session2 = Session.objects.create()
         self.family1 = Family.objects.create(
             email="fam1@test.com",
             cell_number="123456789",

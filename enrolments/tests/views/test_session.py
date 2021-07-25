@@ -12,13 +12,13 @@ class SessionTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
         self.session = Session.objects.create(
-            season=Session.SUMMER, year=2021, start_date=date(2021, 1, 1)
+            name="Summer 2021", start_date=date(2021, 1, 1)
         )
         self.older_session = Session.objects.create(
-            season=Session.SPRING, year=2021, start_date=date(2020, 1, 1)
+            name="Spring 2021", start_date=date(2020, 1, 1)
         )
         self.session_no_start_date = Session.objects.create(
-            season=Session.SUMMER, year=2021, start_date=None
+            name="Summer 2021", start_date=None
         )
 
     def test_get_all_sessions(self):
