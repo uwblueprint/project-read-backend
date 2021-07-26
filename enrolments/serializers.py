@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from registration.serializers import FamilySerializer
+from registration.models import Student
+from registration.serializers import (
+    FamilyDetailSerializer,
+    FamilySerializer,
+)
 from .models import Session, Class, Enrolment
+from .validators import (
+    validate_class_in_session,
+)
 
 
 class SessionListSerializer(serializers.HyperlinkedModelSerializer):
@@ -106,3 +113,46 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
                 "Enrolled class does not exist in Session"
             )
         return super().validate(attrs)
+
+
+class EnrolmentCreateSerializer(serializers.ModelSerializer):
+    family = FamilyDetailSerializer()
+    preferred_class = serializers.PrimaryKeyRelatedField(
+        allow_null=True, queryset=Class.objects.all()
+    )
+    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
+
+    class Meta:
+        model = Enrolment
+        fields = [
+            "family",
+            "session",
+            "preferred_class",
+            "status",
+        ]
+
+    def create(self, validated_data):
+        family = FamilyDetailSerializer.create(None, validated_data["family"])
+        students = family.students.all()
+
+        enrolments = Enrolment.objects.create(
+            active=True,
+            family=family,
+            students=[student.id for student in students],
+            session=validated_data["session"],
+            preferred_class=validated_data["preferred_class"],
+            status=validated_data["status"],
+        )
+
+        return enrolments
+
+    def validate(self, attrs):
+        try:
+            if attrs["preferred_class"]:
+                validate_class_in_session(attrs["preferred_class"], attrs["session"])
+            return attrs
+        except:
+            raise serializers.ValidationError(
+                detail="preferred class does not exist in session",
+                code="invalid_preferred_class",
+            )

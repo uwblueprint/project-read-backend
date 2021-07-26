@@ -89,6 +89,7 @@ class Enrolment(models.Model):
     preferred_class = models.ForeignKey(
         "enrolments.Class",
         null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
     enrolled_class = models.ForeignKey(

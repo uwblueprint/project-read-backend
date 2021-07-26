@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import EnrolmentViewSet, SessionViewSet, ClassViewSet
+from .views import SessionViewSet, ClassViewSet, EnrolmentViewSet
 
 router = DefaultRouter()
 router.register(r"sessions", SessionViewSet)

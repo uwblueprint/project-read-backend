@@ -38,9 +38,54 @@ class EnrolmentsTestCase(APITestCase):
             status=Enrolment.REGISTERED,
         )
 
-    def test_enrolment_list_url_fail(self):
-        with self.assertRaises(NoReverseMatch):
-            reverse("enrolment-list")
+    def test_create_enrolment(self):
+        family_data = {
+            "email": "brittanylau@uwblueprint.com",
+            "home_number": "string",
+            "cell_number": "string",
+            "work_number": "string",
+            "preferred_number": "Home",
+            "address": "10909 Yonge St Unit 10",
+            "preferred_comms": "Home",
+            "parent": {
+                "first_name": "Brittany",
+                "last_name": "Buckets",
+                "role": "Parent",
+                "date_of_birth": None,
+                "information": {},
+            },
+            "children": [
+                {
+                    "first_name": "Daniel",
+                    "last_name": "Chen",
+                    "role": "Child",
+                    "date_of_birth": None,
+                    "information": {},
+                }
+            ],
+            "guests": [
+                {
+                    "first_name": "Lebron",
+                    "last_name": "James",
+                    "role": "Guest",
+                    "date_of_birth": None,
+                    "information": {},
+                }
+            ],
+            "notes": "string",
+        }
+
+        url = reverse("enrolment-list")
+        self.client.force_authenticate(self.user)
+        request = {
+            "family": family_data,
+            "session": self.session.id,
+            "preferred_class": self.class2.id,
+            "status": Enrolment.CLASS_ALLOCATED,
+        }
+        response = self.client.post(url, request, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_enrolment(self):
         url = reverse("enrolment-detail", args=[self.enrolment.id])

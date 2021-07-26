@@ -9,7 +9,7 @@ from enrolments.serializers import (
     SessionDetailSerializer,
     EnrolmentSerializer,
 )
-from registration.serializers import FamilySerializer, StudentSerializer
+from registration.serializers import FamilySerializer
 from enrolments.tests.utils.utils import create_test_classes
 from datetime import date
 
