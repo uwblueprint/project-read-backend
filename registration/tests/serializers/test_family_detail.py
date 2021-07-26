@@ -1,6 +1,7 @@
 from django.test.testcases import TestCase
 
 from registration.models import Family, Student
+from accounts.models import User
 from registration.serializers import FamilyDetailSerializer, StudentSerializer
 
 context = {"request": None}
@@ -8,12 +9,22 @@ context = {"request": None}
 
 class FamilyDetailSerializerTestCase(TestCase):
     def setUp(self):
+        self.user = User.objects.create(
+            email="user@test.com",
+        )
         self.family = Family.objects.create(
             email="closets@pritchett.com",
             cell_number="123456789",
             preferred_number="Cell",
             address="10 Modern Lane",
             preferred_comms="Phone",
+            interactions=[
+                {
+                    "type": "Phone Call",
+                    "date": "2012-04-04",
+                    "user_id": self.user.id,
+                }
+            ],
         )
         self.parent = Student.objects.create(
             first_name="Claire",

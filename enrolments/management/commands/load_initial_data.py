@@ -6,6 +6,7 @@ from enrolments.models import Session, Class, Enrolment
 from registration.models import Family, Student, Field
 import enrolments.tests.utils.utils as enrolment_utils
 import registration.tests.utils.utils as registration_utils
+import accounts.tests.utils.utils as account_utils
 
 fake = Faker()
 
@@ -58,12 +59,13 @@ class Command(BaseCommand):
                 Student.objects.all().delete()
 
                 registration_utils.create_test_fields()
-
+                staff_user = account_utils.create_staff_user()
                 # Create at least 1 family with guests
                 registration_utils.create_test_family_with_students(
                     with_fields=True,
                     num_children=fake.pyint(min_value=1, max_value=3),
                     num_guests=1,
+                    staff_user=staff_user,
                 )
 
                 # Create n-1 families
@@ -72,6 +74,7 @@ class Command(BaseCommand):
                         with_fields=True,
                         num_children=fake.pyint(min_value=1, max_value=3),
                         num_guests=fake.pyint(max_value=1),
+                        staff_user=staff_user,
                     )
 
                 sessions = enrolment_utils.create_test_sessions(
