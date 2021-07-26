@@ -109,6 +109,8 @@ class EnrolmentCreateSerializerTestCase(TestCase):
 
         self.assertEqual(enrolment.family, family)
         self.assertEqual(enrolment.preferred_class, self.class_in_session)
+        self.assertEqual(enrolment.session, self.session)
+        self.assertEqual(enrolment.status, Enrolment.REGISTERED)
         mock_create.assert_called_once_with(None, self.family_payload)
 
     @patch("enrolments.serializers.validate_class_in_session")
@@ -116,7 +118,7 @@ class EnrolmentCreateSerializerTestCase(TestCase):
         self.assertTrue(
             EnrolmentCreateSerializer(data=self.enrolment_payload).is_valid()
         )
-        mock_validate.assert_called_once()
+        mock_validate.assert_called_once_with(self.class_in_session, self.session)
 
     @patch(
         "enrolments.serializers.validate_class_in_session",
@@ -126,4 +128,4 @@ class EnrolmentCreateSerializerTestCase(TestCase):
         self.assertFalse(
             EnrolmentCreateSerializer(data=self.enrolment_payload).is_valid()
         )
-        mock_validate.assert_called_once()
+        mock_validate.assert_called_once_with(self.class_in_session, self.session)

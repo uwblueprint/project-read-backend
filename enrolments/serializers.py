@@ -124,7 +124,12 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Enrolment
-        fields = ["family", "session", "preferred_class", "status"]
+        fields = [
+            "family",
+            "session",
+            "preferred_class",
+            "status",
+        ]
 
     def create(self, validated_data):
         family = FamilyDetailSerializer.create(None, validated_data["family"])
@@ -136,6 +141,7 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
             students=[student.id for student in students],
             session=validated_data["session"],
             preferred_class=validated_data["preferred_class"],
+            status=validated_data["status"],
         )
 
         return enrolments
