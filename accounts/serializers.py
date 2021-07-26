@@ -10,11 +10,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "first_name",
             "last_name",
-            "is_staff",
-            "is_active",
-            "email",
-            "last_login",
-            "date_joined",
         ]
 
 
