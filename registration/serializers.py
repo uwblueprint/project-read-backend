@@ -17,7 +17,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
         fields = [
-            "id", # need to figure out what to do if no id is given (this is typical with new students)
+            "id",  # need to figure out what to do if no id is given (this is typical with new students)
             "first_name",
             "last_name",
             "role",
@@ -25,7 +25,6 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
             "family",
             "information",
         ]
-        # read_only_fields = ["role", "family"]
 
     def validate(self, attrs):
         validate_student_information_role(
@@ -126,8 +125,8 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return family
 
     def update(self, instance, validated_data):
-        students_data = validated_data.pop("students") 
-        students = ( 
+        students_data = validated_data.pop("students")
+        students = (
             [instance.parent]
             + list(instance.children.all())
             + list(instance.guests.all())
@@ -146,17 +145,28 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         )
         instance.notes = validated_data.get("notes", instance.notes)
 
-        old_students = Student.objects.filter(id__in=[student.id for student in students]) 
-        new_students = Student.objects.filter(id__in=[student["id"] for student in students_data])
- 
-        students_to_delete = old_students.difference(new_students) 
+        old_students = Student.objects.filter(
+            id__in=[student.id for student in students]
+        )
+        new_students = Student.objects.filter(
+            id__in=[student["id"] for student in students_data]
+        )
+
+        students_to_delete = old_students.difference(new_students)
         for student in students_to_delete:
             Student.objects.filter(id=student.id).delete()
 
         for student_data in students_data:
-            Student.objects.update_or_create( #creates a student within an existing family
-                id=student_data["id"],
-                defaults=dict(
+            student = Student.objects.filter(id=student_data["id"])
+            if student.exists():
+                student.update(
+                    first_name=student_data["first_name"],
+                    last_name=student_data["last_name"],
+                    date_of_birth=student_data["date_of_birth"],
+                    information=student_data["information"],
+                )
+            else:
+                Student.objects.create(
                     first_name=student_data["first_name"],
                     last_name=student_data["last_name"],
                     role=student_data["role"],
@@ -164,11 +174,9 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
                     date_of_birth=student_data["date_of_birth"],
                     information=student_data["information"],
                 )
-            )
 
         instance.save()
         return instance
-    
 
     def to_internal_value(self, data):
         parent = data.pop("parent", {})

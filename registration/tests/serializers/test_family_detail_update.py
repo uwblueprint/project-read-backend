@@ -1,9 +1,7 @@
 from django.test.testcases import TestCase
-from unittest.mock import patch
 
-from registration.models import Family, Student, Field
+from registration.models import Family, Field, Student
 from registration.serializers import FamilyDetailSerializer
-from rest_framework.serializers import ValidationError
 
 
 class FamilyDetailSerializerTestCase(TestCase):
@@ -33,26 +31,43 @@ class FamilyDetailSerializerTestCase(TestCase):
             order=1,
         )
 
-        self.family_data = {
-            "email": "weasleys@theorder.com",
-            "cell_number": "123456789",
-            "address": "12 Grimmauld Place",
-            "preferred_comms": "Owl Post",
-        }
         self.parent_data = {
             "first_name": "Molly",
             "last_name": "Weasley",
+            "role": Student.PARENT,
+            "date_of_birth": "2020-03-05",
             "information": {f"{self.parent_field.id}": "yes"},
         }
+        self.parent = Student.objects.create(**self.parent_data)
+        self.family_data = {
+            "email": "weasleys@theorder.com",
+            "home_number": "123456789",
+            "cell_number": "144.618.8659x1124",
+            "work_number": "793.373.9334",
+            "preferred_number": "Work",
+            "address": "12 Grimmauld Place",
+            "preferred_comms": "Owl Post",
+            "parent": self.parent,
+            "notes": "Development perhaps successful they set.",
+        }
+        self.family = Family.objects.create(**self.family_data)
+        self.parent.family = self.family
+
         self.children_data = [
             {
                 "first_name": "Ron",
                 "last_name": "Weasley",
+                "family": self.family,
+                "role": Student.CHILD,
+                "date_of_birth": "2020-03-05",
                 "information": {f"{self.child_field.id}": "male"},
             },
             {
                 "first_name": "Ginny",
                 "last_name": "Weasley",
+                "family": self.family,
+                "role": Student.CHILD,
+                "date_of_birth": "2020-03-05",
                 "information": {f"{self.child_field.id}": "female"},
             },
         ]
@@ -60,102 +75,100 @@ class FamilyDetailSerializerTestCase(TestCase):
             {
                 "first_name": "Harry",
                 "last_name": "Potter",
+                "family": self.family,
+                "role": Student.GUEST,
+                "date_of_birth": "2020-03-05",
                 "information": {f"{self.guest_field.id}": "friend"},
             }
         ]
+        Student.objects.bulk_create(
+            Student(**data) for data in self.children_data + self.guests_data
+        )
+        child1 = Student.objects.create(**self.children_data[0])
+        child2 = Student.objects.create(**self.children_data[1])
+        guest = Student.objects.create(**self.guests_data[0])
+        self.children_data[0]["id"] = child1.id
+        self.children_data[1]["id"] = child2.id
+        self.guests_data[0]["id"] = guest.id
+        self.parent_data["id"] = self.parent.id
 
-    # TEST: create students, update students, delete students, just updating family data, 
-    # read only, updating parent, updating top values, can't delete parent
-
-    # DONT TEST: validator, to_internal_value, weirdly formatted data
+        self.family_data["children"] = self.children_data
+        self.family_data["guests"] = self.guests_data
+        self.family_data["parent"] = self.parent_data
 
     def test_family_detail_serializer_update(self):
         data = dict(self.family_data)
-        data["parent"] = self.parent_data
-        data["email"] = 
-        data["home_number"] = 
-        data["preferred_number"] = "Home"
+        data["email"] = "new_email"
+        data["home_number"] = "new_home_number"
+        data["preferred_comms"] = "Phone"
 
-        serializer = FamilyDetailSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
-        family = serializer.update()
-
-        self.assertEqual(family.parent.first_name, self.parent_data["first_name"])
-        self.assertEqual(family.parent.last_name, self.parent_data["last_name"])
-        self.assertEqual(family.parent.information, self.parent_data["information"])
-
-    def test_family_detail_serializer_update_children(self):
-        num_families = Family.objects.all().count()
-        num_students = Student.objects.all().count()
-
-        data = dict(self.family_data)
-        data["parent"] = self.parent_data
-        data["children"] = self.children_data
-        data["guests"] = self.guests_data
-
-        serializer = FamilyDetailSerializer(data=data)
+        serializer = FamilyDetailSerializer(instance=self.family, data=data)
         self.assertTrue(serializer.is_valid())
         family = serializer.save()
 
-        self.assertEqual(Family.objects.all().count(), num_families + 1)
-        self.assertEqual(Student.objects.all().count(), num_students + 4)
+        self.assertEqual(family.email, data["email"])
+        self.assertEqual(family.home_number, data["home_number"])
+        self.assertEqual(family.preferred_comms, data["preferred_comms"])
 
-        self.assertEqual(family.parent.first_name, self.parent_data["first_name"])
-        self.assertEqual(family.parent.last_name, self.parent_data["last_name"])
-        self.assertEqual(family.parent.information, self.parent_data["information"])
+    def test_family_detail_serializer_update_children(self):
+        data = dict(self.family_data)
+        data["children"][0]["first_name"] = "Pablo"
+        data["children"][1]["first_name"] = "Boblo"
 
-        self.assertEqual(family.children.count(), 2)
+        serializer = FamilyDetailSerializer(instance=self.family, data=data)
+        self.assertTrue(serializer.is_valid())
+        family = serializer.save()
 
-        child1 = family.children.get(first_name=self.children_data[0]["first_name"])
-        self.assertEqual(child1.last_name, self.children_data[0]["last_name"])
-        self.assertEqual(child1.information, self.children_data[0]["information"])
-
-        child2 = family.children.get(first_name=self.children_data[1]["first_name"])
-        self.assertEqual(child2.last_name, self.children_data[1]["last_name"])
-        self.assertEqual(child2.information, self.children_data[1]["information"])
-
-        self.assertEqual(family.guests.count(), 1)
-        guest = family.guests.first()
-        self.assertEqual(guest.first_name, self.guests_data[0]["first_name"])
-        self.assertEqual(guest.last_name, self.guests_data[0]["last_name"])
-        self.assertEqual(guest.information, self.guests_data[0]["information"])
+        self.assertEqual(
+            family.children[0].first_name, self.children_data[0]["first_name"]
+        )
+        self.assertEqual(
+            family.children[1].first_name, self.children_data[1]["first_name"]
+        )
 
     def test_family_detail_serializer_create_children(self):
+        data = dict(self.family_data)
+        new_child = {
+            "id": None,
+            "first_name": "Pableaux",
+            "last_name": "Petersaune",
+            "role": "Child",
+            "date_of_birth": "2020-02-06",
+            "family": self.family,
+            "information": {},
+        }
+        data["children"].append(new_child)
+
+        serializer = FamilyDetailSerializer(instance=self.family, data=data)
+        self.assertTrue(serializer.is_valid())
+        family = serializer.save()
+
+        self.assertEqual(family.children[2].first_name, new_child["first_name"])
 
     def test_family_detail_serializer_delete_children(self):
-
-    def test_family_detail_serializer_update_parent(self):
-
-    def test_family_detail_serializer_read_only_update(self): #should fail
-        #try to update role or family 
-        #assert that *something* is returned 
-        serializer = FamilyDetailSerializer(data=data)
-        self.assertRaises(ValidationError, serializer.update())
-
-
-
-
-
-    def test_family_detail_serializer_validate__no_parent(self):
         data = dict(self.family_data)
-        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
+        data["children"].pop(1)
 
-    @patch("registration.serializers.StudentSerializer.is_valid")
-    def test_family_detail_serializer_validate(self, mock_validate):
+        serializer = FamilyDetailSerializer(instance=self.family, data=data)
+        self.assertTrue(serializer.is_valid())
+        family = serializer.save()
+
+        self.assertEqual(family.children.count(), 1)
+        self.assertEqual(
+            family.children[0].first_name, self.family_data["children"][0]["first_name"]
+        )
+
+    def test_family_detail_serializer_read_only_update(self):  # should fail
         data = dict(self.family_data)
-        data["parent"] = self.parent_data
-        data["children"] = self.children_data
-        data["guests"] = self.guests_data
+        old_child_role = data["children"][0]["role"]
+        old_child_family = data["children"][0]["family"]
+        data["children"][0]["role"] = "Guest"
+        data["children"][0]["family"] = None
+        # try to update role or family
 
-        self.assertTrue(FamilyDetailSerializer(data=data).is_valid())
-        self.assertEqual(mock_validate.call_count, 4)
+        serializer = FamilyDetailSerializer(instance=self.family, data=data)
+        self.assertTrue(serializer.is_valid())
+        family = serializer.save()
 
-    @patch("registration.serializers.StudentSerializer.is_valid", return_value=False)
-    def test_family_detail_serializer_validate__invalid(self, mock_validate):
-        data = dict(self.family_data)
-        data["parent"] = self.parent_data
-        data["children"] = self.children_data
-        data["guests"] = self.guests_data
-
-        self.assertFalse(FamilyDetailSerializer(data=data).is_valid())
-        mock_validate.assert_called_once()
+        self.assertEqual(family.children[0].role, old_child_role)
+        self.assertEqual(family.children[0].family, old_child_family)
