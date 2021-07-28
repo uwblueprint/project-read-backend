@@ -3,8 +3,6 @@ from datetime import date
 
 from registration.models import Family, Student
 from enrolments.models import Enrolment, Session, Class
-from enrolments.tests.utils import utils
-from accounts.models import User
 from registration.serializers import (
     FamilySerializer,
     StudentSerializer,

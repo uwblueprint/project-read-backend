@@ -2,7 +2,6 @@ from django.urls import NoReverseMatch, reverse
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.test import APITestCase, APIRequestFactory
-import json
 
 from accounts.models import User
 from enrolments.models import Class, Session, Enrolment
