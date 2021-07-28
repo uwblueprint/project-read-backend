@@ -5,6 +5,8 @@ from rest_framework.fields import SerializerMethodField
 from .models import Family, Student, Field
 from .validators import validate_student_information_role
 from enrolments.models import Enrolment
+from accounts.models import User
+from accounts.serializers import UserSerializer
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -73,6 +75,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
     current_enrolment = SerializerMethodField()
+    interactions = serializers.SerializerMethodField()
 
     class Meta:
         model = Family
@@ -100,6 +103,13 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         if obj.current_enrolment is None:
             return None
         return EnrolmentSerializer(obj.current_enrolment).data
+
+    def get_interactions(self, obj):
+        interactions = obj.interactions
+        for interaction in interactions:
+            user = User.objects.get(id=interaction.pop("user_id"))
+            interaction["user"] = UserSerializer(user).data
+        return interactions
 
     def create(self, validated_data):
         students = validated_data.pop("students")

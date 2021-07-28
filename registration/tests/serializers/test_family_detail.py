@@ -1,5 +1,6 @@
 from django.test.testcases import TestCase
 
+from accounts.serializers import UserSerializer
 from registration.models import Family, Student
 from accounts.models import User
 from registration.serializers import FamilyDetailSerializer, StudentSerializer
@@ -11,6 +12,8 @@ class FamilyDetailSerializerTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(
             email="user@test.com",
+            first_name="Stella",
+            last_name="Pritchett",
         )
         self.family = Family.objects.create(
             email="closets@pritchett.com",
@@ -63,4 +66,17 @@ class FamilyDetailSerializerTestCase(TestCase):
         data = FamilyDetailSerializer(self.family, context=context).data
         self.assertEqual(
             data["guests"], [StudentSerializer(self.guest, context=context).data]
+        )
+
+    def test_family_detail_serializer_interactions(self):
+        data = FamilyDetailSerializer(self.family, context=context).data
+        self.assertEqual(
+            data["interactions"],
+            [
+                {
+                    "type": "Phone Call",
+                    "date": "2012-04-04",
+                    "user": UserSerializer(self.user).data,
+                }
+            ],
         )

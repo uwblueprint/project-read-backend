@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from faker import Faker
 
+from accounts.models import User
 from enrolments.models import Session, Class, Enrolment
 from registration.models import Family, Student, Field
 import enrolments.tests.utils.utils as enrolment_utils
@@ -57,6 +58,7 @@ class Command(BaseCommand):
                 Field.objects.all().delete()
                 Family.objects.all().delete()
                 Student.objects.all().delete()
+                User.objects.filter(email="user@test.com").delete()
 
                 registration_utils.create_test_fields()
                 staff_user = account_utils.create_staff_user()
