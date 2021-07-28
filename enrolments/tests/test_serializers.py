@@ -53,8 +53,18 @@ class SessionDetailSerializerTestCase(TestCase):
                 "season": self.session.season,
                 "year": self.session.year,
                 "families": [
-                    FamilySerializer(self.family, context=context).data,
-                    FamilySerializer(self.other_family, context=context).data,
+                    FamilySerializer(
+                        self.family,
+                        context={
+                            "enrolment": EnrolmentSerializer(self.enrolment).data,
+                        },
+                    ).data,
+                    FamilySerializer(
+                        self.other_family,
+                        context={
+                            "enrolment": EnrolmentSerializer(self.other_enrolment).data
+                        },
+                    ).data,
                 ],
                 "fields": self.session.fields,
                 "classes": [
@@ -143,21 +153,33 @@ class ClassDetailSerializerTestCase(TestCase):
             enrolled_class=self.class1,
         )
 
-    def test_serializer1(self):
+    def test_class_detail_serializer(self):
         self.assertEqual(
             {
                 "id": self.class1.id,
                 "name": self.class1.name,
                 "attendance": self.class1.attendance,
                 "families": [
-                    FamilySerializer(self.family1, context={"request": None}).data,
-                    FamilySerializer(self.family2, context={"request": None}).data,
+                    FamilySerializer(
+                        self.family1,
+                        context={
+                            "request": None,
+                            "enrolment": EnrolmentSerializer(self.enrolment1).data,
+                        },
+                    ).data,
+                    FamilySerializer(
+                        self.family2,
+                        context={
+                            "request": None,
+                            "enrolment": EnrolmentSerializer(self.enrolment2).data,
+                        },
+                    ).data,
                 ],
             },
             ClassDetailSerializer(self.class1, context={"request": None}).data,
         )
 
-    def test_empty_class(self):
+    def test_class_detail_serializer__empty_class(self):
         self.assertEqual(
             {
                 "id": self.empty_class.id,
@@ -243,6 +265,7 @@ class EnrolmentSerializerTestCase(TestCase):
                     "name": self.class2.name,
                 },
                 "status": self.enrolment.status,
+                "students": [],
             },
             EnrolmentSerializer(self.enrolment).data,
         )

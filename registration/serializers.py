@@ -36,7 +36,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
     children = StudentSerializer(many=True)
-    current_enrolment = SerializerMethodField()
+    enrolment = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -49,18 +49,23 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "preferred_comms",
             "num_children",
             "children",
-            "current_enrolment",
+            "enrolment",
         ]
 
     def get_num_children(self, obj):
         return obj.children.count()
 
-    def get_current_enrolment(self, obj):
-        from enrolments.serializers import EnrolmentSerializer
+    def get_enrolment(self, obj):
+        enrolment = self.context.get("enrolment")
+        if enrolment is not None:
+            return enrolment
 
-        if obj.current_enrolment is None:
-            return None
-        return EnrolmentSerializer(obj.current_enrolment).data
+        if obj.current_enrolment is not None:
+            from enrolments.serializers import EnrolmentSerializer
+
+            return EnrolmentSerializer(obj.current_enrolment).data
+
+        return None
 
 
 class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):

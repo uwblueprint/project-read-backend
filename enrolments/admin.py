@@ -42,15 +42,27 @@ class EnrolmentAdmin(admin.ModelAdmin):
         "family",
         "session",
         "status",
-        "created_at",
-        "updated_at",
         "preferred_class",
         "enrolled_class",
+        "created_at",
+        "updated_at",
     )
 
     ordering = ("-id",)
 
-    search_fields = ("family__id", "family__email", "enrolled_class__name")
+    search_fields = (
+        "family__id",
+        "family__email",
+        "family__parent__first_name",
+        "family__parent__last_name",
+        "enrolled_class__name",
+        "preferred_class__name",
+    )
+
+    list_filter = (
+        "session",
+        "status",
+    )
 
 
 admin.site.register(Session, SessionAdmin)
