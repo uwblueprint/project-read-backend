@@ -6,21 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('enrolments', '0016_auto_20210713_2155'),
+        ("enrolments", "0016_auto_20210713_2155"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='session',
-            name='season',
+            model_name="session",
+            name="season",
         ),
         migrations.RemoveField(
-            model_name='session',
-            name='year',
+            model_name="session",
+            name="year",
         ),
         migrations.AddField(
-            model_name='session',
-            name='name',
-            field=models.CharField(default='', max_length=128),
+            model_name="session",
+            name="name",
+            field=models.CharField(default="", max_length=128),
         ),
     ]
