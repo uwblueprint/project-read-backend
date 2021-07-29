@@ -3,7 +3,6 @@ from .validators import (
     validate_attendance,
     validate_enrolment,
     validate_fields,
-    validate_students_in_enrolment,
 )
 from django.contrib.postgres.fields import ArrayField
 
@@ -34,8 +33,11 @@ class Class(models.Model):
         null=True,
         blank=True,
     )
-
-    attendance = models.JSONField(validators=[validate_attendance])
+    attendance = models.JSONField(
+        default=list,
+        blank=True,
+        validators=[validate_attendance],
+    )
 
     class Meta:
         verbose_name_plural = "classes"
@@ -68,7 +70,6 @@ class Enrolment(models.Model):
     students = ArrayField(
         models.PositiveIntegerField(),
         default=list,
-        validators=[validate_students_in_enrolment],
     )
     session = models.ForeignKey(
         "enrolments.Session",

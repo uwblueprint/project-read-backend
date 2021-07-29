@@ -59,6 +59,9 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 status=fake.random_element(
                     elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
                 ),
+                students=[family.parent.id]
+                + list(family.children.all().values_list("id", flat=True))
+                + list(family.guests.all().values_list("id", flat=True)),
             )
         )
 

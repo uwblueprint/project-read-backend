@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from registration.models import Student
@@ -8,22 +9,29 @@ from registration.serializers import (
 from .models import Session, Class, Enrolment
 from .validators import (
     validate_class_in_session,
+    validate_student_ids_in_family,
 )
 
 
-class SessionListSerializer(serializers.HyperlinkedModelSerializer):
+class ClassListSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Session
+        model = Class
         fields = [
             "id",
             "name",
         ]
 
 
-class ClassListSerializer(serializers.HyperlinkedModelSerializer):
+class SessionListSerializer(serializers.HyperlinkedModelSerializer):
+    classes = ClassListSerializer(many=True)
+
     class Meta:
-        model = Class
-        fields = ["id", "name"]
+        model = Session
+        fields = [
+            "id",
+            "name",
+            "classes",
+        ]
 
 
 class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -109,20 +117,13 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
         return response
 
     def validate(self, attrs):
-        if (
-            attrs["preferred_class"] is not None
-            and attrs["preferred_class"].session != self.instance.session
-        ):
-            raise serializers.ValidationError(
-                "Perferred class does not exist in Session"
-            )
-        if (
-            attrs["enrolled_class"] is not None
-            and attrs["enrolled_class"].session != self.instance.session
-        ):
-            raise serializers.ValidationError(
-                "Enrolled class does not exist in Session"
-            )
+        try:
+            validate_student_ids_in_family(attrs["students"], self.instance.family)
+            validate_class_in_session(attrs["preferred_class"], self.instance.session)
+            validate_class_in_session(attrs["enrolled_class"], self.instance.session)
+        except ValidationError:
+            raise serializers.ValidationError(ValidationError)
+
         return super().validate(attrs)
 
 
@@ -161,9 +162,10 @@ class EnrolmentCreateSerializer(serializers.ModelSerializer):
         try:
             if attrs["preferred_class"]:
                 validate_class_in_session(attrs["preferred_class"], attrs["session"])
-            return attrs
         except:
             raise serializers.ValidationError(
                 detail="preferred class does not exist in session",
                 code="invalid_preferred_class",
             )
+
+        return super().validate(attrs)
