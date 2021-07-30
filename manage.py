@@ -6,7 +6,10 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "projectread.settings")
+    deployment_env = os.environ.get("DEPLOYMENT_ENV")
+    os.environ.setdefault(
+        "DJANGO_SETTINGS_MODULE", f"projectread.settings.{deployment_env}"
+    )
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
