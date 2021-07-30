@@ -88,6 +88,7 @@ class Enrolment(models.Model):
         on_delete=models.PROTECT,
         related_name="enrolments",
         null=True,
+        blank=True,
     )
     status = models.CharField(
         max_length=16, choices=ENROLMENT_STATUSES, default=SIGNED_UP

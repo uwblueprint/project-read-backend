@@ -258,6 +258,21 @@ class EnrolmentSerializerTestCase(TestCase):
             EnrolmentSerializer(self.enrolment).data,
         )
 
+    def test_enrolment_serializer__no_classes(self):
+        self.enrolment.preferred_class = None
+        self.enrolment.enrolled_class = None
+        self.assertEqual(
+            {
+                "id": self.enrolment.id,
+                "session": SessionListSerializer(self.session).data,
+                "preferred_class": None,
+                "enrolled_class": None,
+                "status": self.enrolment.status,
+                "students": [],
+            },
+            EnrolmentSerializer(self.enrolment).data,
+        )
+
     def test_enrolment_update(self):
         serializer = EnrolmentSerializer(self.enrolment, data=self.update_request)
         self.assertTrue(serializer.is_valid())

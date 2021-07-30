@@ -112,8 +112,14 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response["session"] = SessionListSerializer(instance.session).data
-        response["preferred_class"] = ClassListSerializer(instance.preferred_class).data
-        response["enrolled_class"] = ClassListSerializer(instance.enrolled_class).data
+        if response["preferred_class"] is not None:
+            response["preferred_class"] = ClassListSerializer(
+                instance.preferred_class
+            ).data
+        if response["enrolled_class"] is not None:
+            response["enrolled_class"] = ClassListSerializer(
+                instance.enrolled_class
+            ).data
         return response
 
     def validate(self, attrs):
