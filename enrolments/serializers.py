@@ -65,7 +65,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "attendance",
             "families",
-        ] 
+        ]
 
     def get_families(self, obj):
         request = self.context.get("request")
