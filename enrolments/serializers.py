@@ -65,7 +65,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "attendance",
             "families",
-        ]
+        ] 
 
     def get_families(self, obj):
         request = self.context.get("request")
@@ -81,6 +81,12 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             ).data
             for enrolment in obj.enrolments.filter(active=True)
         ]
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get("name", instance.name)
+        instance.attendance = validated_data.get("attendance", instance.attendance)
+        instance.save()
+        return instance
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):

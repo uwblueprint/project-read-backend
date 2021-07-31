@@ -63,12 +63,54 @@ class ClassesTestCase(APITestCase):
             ClassDetailSerializer(self.class1, context=context).data,
         )
 
+    def test_update_class(self):
+        url = reverse("class-detail", args=[self.class1.id])
+        self.client.force_authenticate(self.user)
+        request = {
+            "id": self.class1.id,
+            "name": self.class1.name,
+            "attendance": self.class1.attendance,
+            "families": self.family1,
+            # "families": [{
+            #     "id": self.family1.id,
+            #     "parent": {},
+            #     "email": self.family1.email,
+            #     "phone_number": self.family1.cell_number,
+            #     "address": self.family1.address,
+            #     "preferred_comms": self.family1.preferred_comms,
+            #     "num_children": 1,
+            #     "children": [
+            #         {
+            #             "id": self.student1.id,
+            #             "first_name": self.student1.first_name,
+            #             "last_name": self.student1.last_name,
+            #             "role": self.student1.role,
+            #             # "date_of_birth": "2020-10-30",
+            #             # "family": self.family1,
+            #             "information": self.student1.role,
+            #         },
+            #     ],
+            #     "enrolment": {
+            #         "id": self.enrolment1.id,
+            #         "session": {
+            #             "id": 3,
+            #             "season": "Fall",
+            #             "year": 2020
+            #         },
+            #         "preferred_class": self.enrolment1.preferred_class,
+            #         "enrolled_class": self.enrolment1.enrolled_class,
+            #         "status": "No show",
+            #         "students": []
+            #     }
+            # }],
+        }
+        response = self.client.put(url, request, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_method_not_allowed(self):
         self.client.force_authenticate(self.user)
         url = reverse("class-detail", args=[self.class1.id])
-
-        response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         response = self.client.patch(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
