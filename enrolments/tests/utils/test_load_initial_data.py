@@ -43,7 +43,7 @@ class LoadInitialDataTestCase(TestCase):
         num_sessions = 5
         num_classes_per_session = 3
         num_classes = num_sessions * num_classes_per_session
-        num_fields = 11
+        num_fields = 13
 
         call_command(
             "load_initial_data",

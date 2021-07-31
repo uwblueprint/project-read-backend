@@ -7,7 +7,7 @@ from registration.models import Student, Field
 from registration.serializers import FieldSerializer, FieldListSerializer
 
 
-class StudentSerializerTestCase(TestCase):
+class FieldListTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
         self.parent_field = Field.objects.create(
@@ -42,6 +42,14 @@ class StudentSerializerTestCase(TestCase):
             is_default=True,
             order=1,
         )
+        self.session_field = Field.objects.create(
+            role=Field.SESSION,
+            name="Time Lived in Canada",
+            question="How long have you been in Canada?",
+            question_type=Field.TEXT,
+            is_default=True,
+            order=1,
+        )
 
     def test_field_list_serializer(self):
         serializer = FieldListSerializer(child=FieldSerializer(), data=Field.objects)
@@ -56,6 +64,7 @@ class StudentSerializerTestCase(TestCase):
                     ],
                     "child_fields": [FieldSerializer(self.child_field).data],
                     "guest_fields": [FieldSerializer(self.guest_field).data],
+                    "session_fields": [FieldSerializer(self.session_field).data],
                 }
             ],
         )
