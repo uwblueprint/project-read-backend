@@ -9,7 +9,7 @@ from enrolments.validators import (
     validate_enrolment_in_session,
     validate_enrolment,
     validate_fields,
-    validate_students_in_enrolment,
+    validate_student_ids_in_family,
 )
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
@@ -135,7 +135,7 @@ class EnrolmentValidatorTestCase(TestCase):
         self.assertRaises(ValidationError, validate_enrolment, enrolment)
         mock_validate.assert_called_once_with(self.class_in_session, self.session)
 
-    def test_validate_students_in_enrolment(self):
+    def test_student_ids_in_family(self):
         parent = Student.objects.create(
             first_name="Daddy",
             last_name="McDonald",
@@ -160,26 +160,13 @@ class EnrolmentValidatorTestCase(TestCase):
             role=Student.CHILD,
             family=other_family,
         )
-        enrolment = Enrolment.objects.create(
-            active=True,
-            family=self.family,
-            session=self.session,
-            preferred_class=self.class_in_session,
-            enrolled_class=self.class_in_session,
-            students=[child.id],
-        )
-        enrolment_extra_student = Enrolment.objects.create(
-            active=True,
-            family=self.family,
-            session=self.session,
-            preferred_class=self.class_in_session,
-            enrolled_class=self.class_in_session,
-            students=[child.id, other_child.id],
-        )
 
-        self.assertIsNone(validate_students_in_enrolment(enrolment))
+        self.assertIsNone(validate_student_ids_in_family([child.id], self.family))
         self.assertRaises(
-            ValidationError, validate_students_in_enrolment, enrolment_extra_student
+            ValidationError,
+            validate_student_ids_in_family,
+            [child.id, other_child.id],
+            self.family,
         )
 
 

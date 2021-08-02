@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 base_field=models.PositiveIntegerField(),
                 default=list,
                 size=None,
-                validators=[enrolments.validators.validate_students_in_enrolment],
+                validators=[enrolments.validators.validate_student_ids_in_family],
             ),
         ),
     ]
