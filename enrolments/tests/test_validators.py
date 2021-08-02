@@ -24,7 +24,7 @@ class EnrolmentValidatorTestCase(TestCase):
             address="1 Fam Ave",
             preferred_comms="email",
         )
-        self.session = Session.objects.create(season=Session.FALL, year="2019")
+        self.session = Session.objects.create()
         self.class_in_session = Class.objects.create(
             name="Class in session",
             session=self.session,
@@ -39,7 +39,7 @@ class EnrolmentValidatorTestCase(TestCase):
             facilitator=self.user,
             attendance={},
         )
-        session_other = Session.objects.create(season=Session.SPRING, year="2020")
+        session_other = Session.objects.create()
         self.assertIsNone(
             validate_class_in_session(self.class_in_session, self.session)
         )
@@ -54,7 +54,7 @@ class EnrolmentValidatorTestCase(TestCase):
         )
 
     def test_validate_enrolment_in_session(self):
-        session1 = Session.objects.create(season=Session.SPRING, year="2019")
+        session1 = Session.objects.create()
         session2 = self.session
         class1_in_session1 = Class.objects.create(
             name="Class 1 in Session 1",
@@ -222,7 +222,7 @@ class AttendanceValidatorTestCase(TestCase):
         self.field_ids = list(Field.objects.values_list("id", flat=True))
         self.student_ids = list(Student.objects.values_list("id", flat=True))
         self.session = Session.objects.create(
-            season=Session.SPRING, year=2021, fields=self.field_ids
+            fields=self.field_ids,
         )
 
     def test_attendance_date_format(self):
