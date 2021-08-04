@@ -3,30 +3,19 @@ from .validators import (
     validate_attendance,
     validate_enrolment,
     validate_fields,
-    validate_students_in_enrolment,
 )
 from django.contrib.postgres.fields import ArrayField
 
 
 class Session(models.Model):
-    SPRING = "Spring"
-    SUMMER = "Summer"
-    FALL = "Fall"
-    SEASON_CHOICES = [
-        (SPRING, "Spring"),
-        (SUMMER, "Summer"),
-        (FALL, "Fall"),
-    ]
-
-    season = models.CharField(max_length=6, choices=SEASON_CHOICES)
-    year = models.PositiveSmallIntegerField()
+    name = models.CharField(max_length=128, default="")
     start_date = models.DateField(null=True)
     fields = ArrayField(
         models.IntegerField(), default=list, validators=[validate_fields]
     )
 
     def __str__(self):
-        return f"{self.season} {self.year}"
+        return self.name
 
 
 class Class(models.Model):
@@ -44,8 +33,11 @@ class Class(models.Model):
         null=True,
         blank=True,
     )
-
-    attendance = models.JSONField(validators=[validate_attendance])
+    attendance = models.JSONField(
+        default=list,
+        blank=True,
+        validators=[validate_attendance],
+    )
 
     class Meta:
         verbose_name_plural = "classes"
@@ -78,7 +70,6 @@ class Enrolment(models.Model):
     students = ArrayField(
         models.PositiveIntegerField(),
         default=list,
-        validators=[validate_students_in_enrolment],
     )
     session = models.ForeignKey(
         "enrolments.Session",
@@ -97,6 +88,7 @@ class Enrolment(models.Model):
         on_delete=models.PROTECT,
         related_name="enrolments",
         null=True,
+        blank=True,
     )
     status = models.CharField(
         max_length=16, choices=ENROLMENT_STATUSES, default=SIGNED_UP

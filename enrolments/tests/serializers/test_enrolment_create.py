@@ -36,8 +36,7 @@ class EnrolmentCreateSerializerTestCase(TestCase):
             order=1,
         )
         self.session = Session.objects.create(
-            season="Spring",
-            year=2021,
+            name="Spring 2021",
             start_date=date(2021, 5, 15),
         )
         self.class_in_session = Class.objects.create(

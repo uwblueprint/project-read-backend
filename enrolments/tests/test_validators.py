@@ -9,7 +9,7 @@ from enrolments.validators import (
     validate_enrolment_in_session,
     validate_enrolment,
     validate_fields,
-    validate_students_in_enrolment,
+    validate_student_ids_in_family,
 )
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
@@ -24,7 +24,7 @@ class EnrolmentValidatorTestCase(TestCase):
             address="1 Fam Ave",
             preferred_comms="email",
         )
-        self.session = Session.objects.create(season=Session.FALL, year="2019")
+        self.session = Session.objects.create()
         self.class_in_session = Class.objects.create(
             name="Class in session",
             session=self.session,
@@ -39,7 +39,7 @@ class EnrolmentValidatorTestCase(TestCase):
             facilitator=self.user,
             attendance={},
         )
-        session_other = Session.objects.create(season=Session.SPRING, year="2020")
+        session_other = Session.objects.create()
         self.assertIsNone(
             validate_class_in_session(self.class_in_session, self.session)
         )
@@ -54,7 +54,7 @@ class EnrolmentValidatorTestCase(TestCase):
         )
 
     def test_validate_enrolment_in_session(self):
-        session1 = Session.objects.create(season=Session.SPRING, year="2019")
+        session1 = Session.objects.create()
         session2 = self.session
         class1_in_session1 = Class.objects.create(
             name="Class 1 in Session 1",
@@ -135,7 +135,7 @@ class EnrolmentValidatorTestCase(TestCase):
         self.assertRaises(ValidationError, validate_enrolment, enrolment)
         mock_validate.assert_called_once_with(self.class_in_session, self.session)
 
-    def test_validate_students_in_enrolment(self):
+    def test_student_ids_in_family(self):
         parent = Student.objects.create(
             first_name="Daddy",
             last_name="McDonald",
@@ -160,26 +160,13 @@ class EnrolmentValidatorTestCase(TestCase):
             role=Student.CHILD,
             family=other_family,
         )
-        enrolment = Enrolment.objects.create(
-            active=True,
-            family=self.family,
-            session=self.session,
-            preferred_class=self.class_in_session,
-            enrolled_class=self.class_in_session,
-            students=[child.id],
-        )
-        enrolment_extra_student = Enrolment.objects.create(
-            active=True,
-            family=self.family,
-            session=self.session,
-            preferred_class=self.class_in_session,
-            enrolled_class=self.class_in_session,
-            students=[child.id, other_child.id],
-        )
 
-        self.assertIsNone(validate_students_in_enrolment(enrolment))
+        self.assertIsNone(validate_student_ids_in_family([child.id], self.family))
         self.assertRaises(
-            ValidationError, validate_students_in_enrolment, enrolment_extra_student
+            ValidationError,
+            validate_student_ids_in_family,
+            [child.id, other_child.id],
+            self.family,
         )
 
 
@@ -222,7 +209,7 @@ class AttendanceValidatorTestCase(TestCase):
         self.field_ids = list(Field.objects.values_list("id", flat=True))
         self.student_ids = list(Student.objects.values_list("id", flat=True))
         self.session = Session.objects.create(
-            season=Session.SPRING, year=2021, fields=self.field_ids
+            fields=self.field_ids,
         )
 
     def test_attendance_date_format(self):
