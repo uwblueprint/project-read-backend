@@ -20,13 +20,13 @@ def validate_student_information_role(information, role):
     Field = apps.get_model("registration", "Field")
     try:
         if role == Field.PARENT:
-            acceptable_roles = [role, Field.SESSION]
+            valid_roles = [role, Field.SESSION]
         else:
-            acceptable_roles = [role]
+            valid_roles = [role]
         if (
             len(information)
             != Field.objects.filter(
-                id__in=information.keys(), role__in=acceptable_roles
+                id__in=information.keys(), role__in=valid_roles
             ).count()
         ):
             raise ValidationError(

@@ -85,6 +85,7 @@ class FieldListTestCase(TestCase):
                     ],
                     "child_fields": [FieldSerializer(self.child_field).data],
                     "guest_fields": [FieldSerializer(self.guest_field).data],
+                    "session_fields": [FieldSerializer(self.session_field).data],
                 }
             ],
         )
