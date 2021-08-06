@@ -39,7 +39,7 @@ class Class(models.Model):
         validators=[validate_attendance],
     )
     colour = models.CharField(
-        max_length=6, 
+        max_length=6,
         default="FFFFFF",
         blank=True,
     )

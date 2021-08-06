@@ -40,6 +40,17 @@ def create_test_classes(session, num_classes):
                 name=f"{fake.day_of_week()} & {fake.day_of_week()}",
                 session=session,
                 attendance={},
+                colour=fake.random_element(
+                    elements=[
+                        "f8bbd0",
+                        "e1bee7",
+                        "bbdefb",
+                        "b2ebf2",
+                        "dcedc8",
+                        "fff9c4",
+                        "ffecb3",
+                    ]
+                ),
             )
         )
 
