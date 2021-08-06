@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0016_family_interactions'),
+        ("registration", "0016_family_interactions"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='field',
-            name='role',
-            field=models.CharField(choices=[('Parent', 'Parent'), ('Child', 'Child'), ('Guest', 'Guest'), ('Session', 'Session')], max_length=7),
+            model_name="field",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("Parent", "Parent"),
+                    ("Child", "Child"),
+                    ("Guest", "Guest"),
+                    ("Session", "Session"),
+                ],
+                max_length=7,
+            ),
         ),
     ]

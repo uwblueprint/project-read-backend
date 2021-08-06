@@ -73,7 +73,7 @@ class ValidatorsTestCase(TestCase):
         student = {
             "role": Student.PARENT,
             "information": {
-                f"{self.parent_field.id}": "value",            
+                f"{self.parent_field.id}": "value",
             },
         }
         self.assertIsNone(
@@ -87,14 +87,14 @@ class ValidatorsTestCase(TestCase):
             list(mock_validate.call_args.args[0]),
             list(student["information"].values()),
         )
-    
+
     @patch("registration.validators.validate_information_responses")
     def test_validate_student_information_role__session_field(self, mock_validate):
         student = {
             "role": Student.PARENT,
             "information": {
                 f"{self.parent_field.id}": "value",
-                f"{self.session_field.id}": "value",           
+                f"{self.session_field.id}": "value",
             },
         }
         self.assertIsNone(
