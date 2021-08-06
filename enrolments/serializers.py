@@ -19,6 +19,7 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "name",
+            "colour",
         ]
 
 
