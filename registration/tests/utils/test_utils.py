@@ -13,7 +13,7 @@ class RegistrationUtilsTestCase(TestCase):
     def test_create_test_fields(self):
         Field.objects.all().delete()
         utils.create_test_fields()
-        self.assertEqual(Field.objects.all().count(), 11)
+        self.assertEqual(Field.objects.all().count(), 13)
 
     def test_create_test_family(self):
         utils.create_test_family(last_name=self.last_name)
