@@ -33,11 +33,13 @@ class SessionViewSet(
 class ClassViewSet(
     viewsets.GenericViewSet,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
 ):
     queryset = Class.objects.all()
     serializer_class = ClassDetailSerializer
     http_method_names = [
         "get",
+        "put",
     ]
     permission_classes = [permissions.IsAuthenticated]
 

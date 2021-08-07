@@ -31,7 +31,7 @@ class ClassesTestCase(APITestCase):
             name="Test Class 1",
             session_id=self.session1.id,
             facilitator_id=self.user.id,
-            attendance=[{"date": "2020-01-01", "attendees": [1]}],
+            attendance=[{"date": "2020-01-01", "attendees": [self.student1.id]}],
         )
         self.empty_class = Class.objects.create(
             name="Test Empty Class",
@@ -63,12 +63,21 @@ class ClassesTestCase(APITestCase):
             ClassDetailSerializer(self.class1, context=context).data,
         )
 
+    def test_update_class(self):
+        url = reverse("class-detail", args=[self.class1.id])
+        self.client.force_authenticate(self.user)
+        request = {
+            "id": self.class1.id,
+            "name": self.class1.name,
+            "attendance": self.class1.attendance,
+        }
+        response = self.client.put(url, request, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_method_not_allowed(self):
         self.client.force_authenticate(self.user)
         url = reverse("class-detail", args=[self.class1.id])
-
-        response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         response = self.client.patch(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
