@@ -38,6 +38,11 @@ class Class(models.Model):
         blank=True,
         validators=[validate_attendance],
     )
+    colour = models.CharField(
+        max_length=6,
+        default="FFFFFF",
+        blank=True,
+    )
 
     class Meta:
         verbose_name_plural = "classes"
