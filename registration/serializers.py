@@ -77,7 +77,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
     current_enrolment = SerializerMethodField()
-
+    enrolments = SerializerMethodField()
     class Meta:
         model = Family
         fields = [
@@ -94,6 +94,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "guests",
             "notes",
             "current_enrolment",
+            "enrolments",
             "interactions",
         ]
         read_only_fields = ["interactions"]
@@ -104,6 +105,13 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         if obj.current_enrolment is None:
             return None
         return EnrolmentSerializer(obj.current_enrolment).data
+    
+    def get_enrolments(self, obj):
+        from enrolments.serializers import EnrolmentSerializer
+        enrolments = Enrolment.objects.filter(family = obj) 
+
+        enrolment_list = [EnrolmentSerializer(enrolment).data for enrolment in enrolments]
+        return enrolment_list
 
     def create(self, validated_data):
         students = validated_data.pop("students")
