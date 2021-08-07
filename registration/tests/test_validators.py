@@ -40,6 +40,14 @@ class ValidatorsTestCase(TestCase):
             is_default=True,
             order=1,
         )
+        self.session_field = Field.objects.create(
+            role=Field.SESSION,
+            name="Ontario Works",
+            question="Ontario Works?",
+            question_type=Field.MULTIPLE_CHOICE,
+            is_default=True,
+            order=1,
+        )
         self.test_user = User.objects.create(
             email="user@test.com",
         )
@@ -66,6 +74,27 @@ class ValidatorsTestCase(TestCase):
             "role": Student.PARENT,
             "information": {
                 f"{self.parent_field.id}": "value",
+            },
+        }
+        self.assertIsNone(
+            validators.validate_student_information_role(
+                student["information"],
+                student["role"],
+            )
+        )
+        mock_validate.assert_called_once()
+        self.assertListEqual(
+            list(mock_validate.call_args.args[0]),
+            list(student["information"].values()),
+        )
+
+    @patch("registration.validators.validate_information_responses")
+    def test_validate_student_information_role__session_field(self, mock_validate):
+        student = {
+            "role": Student.PARENT,
+            "information": {
+                f"{self.parent_field.id}": "value",
+                f"{self.session_field.id}": "value",
             },
         }
         self.assertIsNone(

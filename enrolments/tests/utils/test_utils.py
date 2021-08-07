@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from enrolments.models import Session, Class, Enrolment
 from .utils import create_test_sessions, create_test_classes, create_test_enrolments
-from registration.tests.utils.utils import create_test_family
+from registration.tests.utils.utils import create_test_family_with_students
 
 
 class EnrolmentUtilsTestCase(TestCase):
@@ -48,7 +48,9 @@ class EnrolmentUtilsTestCase(TestCase):
 
         families = []
         for i in range(num_families):
-            families.append(create_test_family("Test"))
+            families.append(
+                create_test_family_with_students(num_children=1, num_guests=1)
+            )
         create_test_enrolments(session, enrolled_class, families)
 
         self.assertEqual(

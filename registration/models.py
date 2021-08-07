@@ -122,15 +122,17 @@ class Field(models.Model):
     PARENT = "Parent"
     CHILD = "Child"
     GUEST = "Guest"
+    SESSION = "Session"
     TEXT = "Text"
     MULTIPLE_CHOICE = "Multiple Choice"
     ROLE_CHOICES = [
         (PARENT, "Parent"),
         (CHILD, "Child"),
         (GUEST, "Guest"),
+        (SESSION, "Session"),
     ]
     QUESTION_CHOICES = [(TEXT, "Text"), (MULTIPLE_CHOICE, "Multiple Choice")]
-    role = models.CharField(max_length=6, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=7, choices=ROLE_CHOICES)
     name = models.CharField(max_length=512)
     question = models.CharField(max_length=512)
     question_type = models.CharField(max_length=15, choices=QUESTION_CHOICES)

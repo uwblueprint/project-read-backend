@@ -4,19 +4,27 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from enrolments.models import Enrolment, Session, Class
-from registration.models import Family
+from registration.models import Family, Student
 
 
 class EnrolmentsTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
+        parent = Student.objects.create(
+            first_name="Jessica",
+            last_name="Day",
+            role="Parent",
+        )
         self.family = Family.objects.create(
             email="fam1@test.com",
             cell_number="123456789",
             address="1 Fam St",
             preferred_comms="email",
+            parent=parent,
         )
-        self.session = Session.objects.create(season=Session.SPRING, year=2021)
+        parent.family = self.family
+        parent.save()
+        self.session = Session.objects.create(name="Spring 2021")
         self.class1 = Class.objects.create(
             name="Tuesday & Saturday",
             session_id=self.session.id,
@@ -96,6 +104,7 @@ class EnrolmentsTestCase(APITestCase):
             "preferred_class": self.class2.id,
             "enrolled_class": self.class2.id,
             "status": Enrolment.CLASS_ALLOCATED,
+            "students": [self.family.parent.id],
         }
         response = self.client.put(url, request, format="json")
 
