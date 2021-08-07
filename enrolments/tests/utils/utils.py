@@ -10,11 +10,11 @@ Faker.seed(0)
 def create_test_sessions(num_sessions, with_fields=False):
     sessions = []
     for i in range(num_sessions):
+        start_date = fake.date_this_decade()
         sessions.append(
             Session(
-                start_date=fake.date_this_decade(),
-                season=Session.SEASON_CHOICES[i % len(Session.SEASON_CHOICES)][1],
-                year=2020 - i // len(Session.SEASON_CHOICES),
+                start_date=start_date,
+                name=f"{start_date.strftime('%B')} {start_date.year}",
                 fields=(
                     fake.random_elements(
                         elements=(
@@ -59,6 +59,7 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 status=fake.random_element(
                     elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
                 ),
+                students=list(family.students.all().values_list("id", flat=True)),
             )
         )
 

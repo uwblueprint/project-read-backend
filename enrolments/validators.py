@@ -4,16 +4,10 @@ from registration.models import Student, Field
 from django.apps import apps
 
 
-def validate_students_in_enrolment(enrolment):
-    Student = apps.get_model("registration", "Student")
-    if (
-        len(enrolment.students)
-        != Student.objects.filter(
-            id__in=enrolment.students, family=enrolment.family
-        ).count()
-    ):
+def validate_student_ids_in_family(student_ids, family):
+    if len(student_ids) != family.students.filter(id__in=student_ids).count():
         raise ValidationError(
-            f"Enroled student IDs do not completely match with students under this family"
+            f"Enrolled student IDs do not completely match with students under this family"
         )
 
 
@@ -39,6 +33,7 @@ def validate_enrolment(enrolment):
     validate_class_in_session(enrolment.preferred_class, enrolment.session)
     validate_class_in_session(enrolment.enrolled_class, enrolment.session)
     validate_enrolment_in_session(enrolment.session, enrolment.family)
+    validate_student_ids_in_family(enrolment.students, enrolment.family)
 
 
 def validate_attendance(class_obj):
