@@ -124,6 +124,47 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
         return family
 
+    def update(self, instance, validated_data):
+        validated_data.pop("current_enrolment")
+        students_data = validated_data.pop("students")
+        students = (
+            [instance.parent]
+            + list(instance.children.all())
+            + list(instance.guests.all())
+        )
+
+        existing_students = Student.objects.filter(
+            id__in=[student.id for student in students]
+        )
+
+        students_to_delete = existing_students.difference(
+            Student.objects.filter(id__in=[student["id"] for student in students_data])
+        )
+        # TODO: change deletion of students to soft delete
+        for student in students_to_delete:
+            Student.objects.filter(id=student.id).delete()
+
+        for student_data in students_data:
+            student = Student.objects.filter(id=student_data["id"])
+            if student.exists():
+                student.update(
+                    first_name=student_data["first_name"],
+                    last_name=student_data["last_name"],
+                    date_of_birth=student_data["date_of_birth"],
+                    information=student_data["information"],
+                )
+            else:
+                Student.objects.create(
+                    first_name=student_data["first_name"],
+                    last_name=student_data["last_name"],
+                    role=student_data["role"],
+                    family=instance,
+                    date_of_birth=student_data["date_of_birth"],
+                    information=student_data["information"],
+                )
+
+        return super().update(instance, validated_data)
+
     def to_internal_value(self, data):
         parent = data.pop("parent", {})
         if not len(parent):
