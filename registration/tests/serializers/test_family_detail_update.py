@@ -110,7 +110,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertEqual(family.home_number, data["home_number"])
         self.assertEqual(family.preferred_comms, data["preferred_comms"])
 
-    def test_family_detail_serializer_update_child(self):
+    def test_family_detail_serializer_update__update_children(self):
         data = dict(self.family_data)
         new_name = "Pablo"
         data["children"][0]["first_name"] = new_name
@@ -170,7 +170,7 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertEqual(family.children.count(), 1)
         self.assertEqual(family.children.first(), self.child)
 
-    def test_family_detail_serializer_update_read_only(self):  # should fail
+    def test_family_detail_serializer_update__read_only(self):  # should fail
         data = dict(self.family_data)
         old_child_role = data["children"][0]["role"]
         old_child_family = data["children"][0]["family"]

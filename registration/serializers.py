@@ -125,7 +125,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return family
 
     def update(self, instance, validated_data):
-        validated_data.pop("current_enrolment")  # Return value needed for future ticket
+        validated_data.pop("current_enrolment")
         students_data = validated_data.pop("students")
         students = (
             [instance.parent]
