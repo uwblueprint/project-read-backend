@@ -21,13 +21,7 @@ class FamilyDetailSerializerTestCase(TestCase):
             preferred_number="Cell",
             address="10 Modern Lane",
             preferred_comms="Phone",
-            interactions=[
-                {
-                    "type": "Phone Call",
-                    "date": "2012-04-04",
-                    "user_id": self.user.id,
-                }
-            ],
+            interactions=[],
         )
         self.parent = Student.objects.create(
             first_name="Claire",
@@ -68,15 +62,3 @@ class FamilyDetailSerializerTestCase(TestCase):
             data["guests"], [StudentSerializer(self.guest, context=context).data]
         )
 
-    def test_family_detail_serializer_interactions(self):
-        data = FamilyDetailSerializer(self.family, context=context).data
-        self.assertEqual(
-            data["interactions"],
-            [
-                {
-                    "type": "Phone Call",
-                    "date": "2012-04-04",
-                    "user": UserSerializer(self.user).data,
-                }
-            ],
-        )
