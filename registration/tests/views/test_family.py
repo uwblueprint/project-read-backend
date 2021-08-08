@@ -81,6 +81,32 @@ class FamilyTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_put_family(self):
+        url = reverse("family-detail", args=[self.family.id])
+        self.client.force_authenticate(self.user)
+        request = {
+            "id": self.family.id,
+            "email": self.family.email,
+            "cell_number": self.family.cell_number,
+            "parent": {
+                "id": self.parent.id,
+                "first_name": self.parent.first_name,
+                "last_name": self.parent.last_name,
+                "date_of_birth": "1970-01-01",
+                "information": {},
+            },
+            "children": [],
+            "guests": [],
+            "current_enrolment": None,
+        }
+        self.parent.family = self.family
+        self.family.parent = self.parent
+        self.parent.save()
+        self.family.save()
+        response = self.client.put(url, request, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_search_familes_no_params(self):
         url = reverse("family-list") + "search/"
         self.client.force_authenticate(self.user)

@@ -81,9 +81,7 @@ class FamilyDetailSerializerTestCase(TestCase):
                 "information": {f"{self.guest_field.id}": "friend"},
             }
         ]
-        Student.objects.bulk_create(
-            Student(**data) for data in self.children_data + self.guests_data
-        )
+
         child1 = Student.objects.create(**self.children_data[0])
         child2 = Student.objects.create(**self.children_data[1])
         guest = Student.objects.create(**self.guests_data[0])
@@ -91,10 +89,12 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.children_data[1]["id"] = child2.id
         self.guests_data[0]["id"] = guest.id
         self.parent_data["id"] = self.parent.id
+        self.child = child1
 
         self.family_data["children"] = self.children_data
         self.family_data["guests"] = self.guests_data
         self.family_data["parent"] = self.parent_data
+        self.family_data["current_enrolment"] = None
 
     def test_family_detail_serializer_update(self):
         data = dict(self.family_data)
@@ -110,23 +110,28 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertEqual(family.home_number, data["home_number"])
         self.assertEqual(family.preferred_comms, data["preferred_comms"])
 
-    def test_family_detail_serializer_update_children(self):
+    def test_family_detail_serializer_update_child(self):
         data = dict(self.family_data)
-        data["children"][0]["first_name"] = "Pablo"
-        data["children"][1]["first_name"] = "Boblo"
+        new_name = "Pablo"
+        data["children"][0]["first_name"] = new_name
 
         serializer = FamilyDetailSerializer(instance=self.family, data=data)
         self.assertTrue(serializer.is_valid())
         family = serializer.save()
 
+        self.assertEqual(family.children.first().first_name, new_name)
         self.assertEqual(
-            family.children[0].first_name, self.children_data[0]["first_name"]
+            family.children.first().last_name, self.children_data[0]["last_name"]
         )
         self.assertEqual(
-            family.children[1].first_name, self.children_data[1]["first_name"]
+            family.children.first().date_of_birth.strftime(format="%Y-%m-%d"),
+            self.children_data[0]["date_of_birth"],
+        )
+        self.assertEqual(
+            family.children.first().information, self.children_data[0]["information"]
         )
 
-    def test_family_detail_serializer_create_children(self):
+    def test_family_detail_serializer_update__create_children(self):
         data = dict(self.family_data)
         new_child = {
             "id": None,
@@ -141,30 +146,30 @@ class FamilyDetailSerializerTestCase(TestCase):
 
         serializer = FamilyDetailSerializer(instance=self.family, data=data)
         self.assertTrue(serializer.is_valid())
+        self.assertEqual(self.family.children.count(), 2)
         family = serializer.save()
+        self.assertEqual(family.children.count(), 3)
 
         self.assertEqual(family.children[2].first_name, new_child["first_name"])
 
-    def test_family_detail_serializer_delete_children(self):
+    def test_family_detail_serializer_update__delete_children(self):
         data = dict(self.family_data)
         data["children"].pop(1)
 
         serializer = FamilyDetailSerializer(instance=self.family, data=data)
         self.assertTrue(serializer.is_valid())
+        self.assertEqual(self.family.children.count(), 2)
         family = serializer.save()
 
         self.assertEqual(family.children.count(), 1)
-        self.assertEqual(
-            family.children[0].first_name, self.family_data["children"][0]["first_name"]
-        )
+        self.assertEqual(family.children.first(), self.child)
 
-    def test_family_detail_serializer_read_only_update(self):  # should fail
+    def test_family_detail_serializer_update_read_only(self):  # should fail
         data = dict(self.family_data)
         old_child_role = data["children"][0]["role"]
         old_child_family = data["children"][0]["family"]
         data["children"][0]["role"] = "Guest"
         data["children"][0]["family"] = None
-        # try to update role or family
 
         serializer = FamilyDetailSerializer(instance=self.family, data=data)
         self.assertTrue(serializer.is_valid())

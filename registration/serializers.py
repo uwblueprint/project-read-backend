@@ -17,7 +17,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
         fields = [
-            "id",  # need to figure out what to do if no id is given (this is typical with new students)
+            "id",
             "first_name",
             "last_name",
             "role",
@@ -125,6 +125,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return family
 
     def update(self, instance, validated_data):
+        validated_data.pop("current_enrolment")  # Return value needed for future ticket
         students_data = validated_data.pop("students")
         students = (
             [instance.parent]
@@ -132,27 +133,14 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             + list(instance.guests.all())
         )
 
-        instance.email = validated_data.get("email", instance.email)
-        instance.home_number = validated_data.get("home_number", instance.home_number)
-        instance.cell_number = validated_data.get("cell_number", instance.cell_number)
-        instance.work_number = validated_data.get("work_number", instance.work_number)
-        instance.preferred_number = validated_data.get(
-            "preferred_number", instance.preferred_number
-        )
-        instance.address = validated_data.get("address", instance.address)
-        instance.preferred_comms = validated_data.get(
-            "preferred_comms", instance.preferred_comms
-        )
-        instance.notes = validated_data.get("notes", instance.notes)
-
-        old_students = Student.objects.filter(
+        existing_students = Student.objects.filter(
             id__in=[student.id for student in students]
         )
-        new_students = Student.objects.filter(
-            id__in=[student["id"] for student in students_data]
-        )
 
-        students_to_delete = old_students.difference(new_students)
+        students_to_delete = existing_students.difference(
+            Student.objects.filter(id__in=[student["id"] for student in students_data])
+        )
+        # TODO: change deletion of students to soft delete
         for student in students_to_delete:
             Student.objects.filter(id=student.id).delete()
 
@@ -175,8 +163,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
                     information=student_data["information"],
                 )
 
-        instance.save()
-        return instance
+        return super().update(instance, validated_data)
 
     def to_internal_value(self, data):
         parent = data.pop("parent", {})
