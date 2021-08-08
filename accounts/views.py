@@ -33,6 +33,4 @@ class UserViewSet(
         url_name="me",
     )
     def me(self, request):
-        return Response(
-            UserSerializer(request.user).data
-        )
+        return Response(UserSerializer(request.user).data)

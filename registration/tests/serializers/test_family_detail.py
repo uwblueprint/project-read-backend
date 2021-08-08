@@ -61,4 +61,3 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertEqual(
             data["guests"], [StudentSerializer(self.guest, context=context).data]
         )
-
