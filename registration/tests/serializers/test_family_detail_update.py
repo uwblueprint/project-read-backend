@@ -151,6 +151,12 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.assertEqual(family.children.count(), 3)
 
         self.assertEqual(family.children[2].first_name, new_child["first_name"])
+        self.assertEqual(family.children[2].last_name, new_child["last_name"])
+        self.assertEqual(
+            family.children[2].date_of_birth.strftime(format="%Y-%m-%d"),
+            new_child["date_of_birth"],
+        )
+        self.assertEqual(family.children[2].information, new_child["information"])
 
     def test_family_detail_serializer_update__delete_children(self):
         data = dict(self.family_data)
