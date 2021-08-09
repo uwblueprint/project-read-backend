@@ -9,9 +9,9 @@ services:
       - POSTGRES_PASSWORD=postgres
   web:
     build: .
-    environment:
-      - DEPLOYMENT_ENV=local
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --settings=projectread.settings.${DEPLOYMENT_ENV}"
+    env_file:
+      - projectread/settings/.env
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --settings=projectread.settings.local"
     volumes:
       - .:/code/
     ports:
