@@ -39,7 +39,13 @@ def create_test_classes(session, num_classes):
             Class(
                 name=f"{fake.day_of_week()} & {fake.day_of_week()}",
                 session=session,
-                attendance={},
+                attendance=[
+                    {
+                        "date": str(fake.date_this_decade()),
+                        "attendees": [],
+                    }
+                    for _ in range(32)
+                ],
                 colour=fake.random_element(
                     elements=[
                         "f8bbd0",
@@ -60,6 +66,7 @@ def create_test_classes(session, num_classes):
 def create_test_enrolments(session, enrolled_class, families, active=True):
     enrolments = []
     for family in families:
+        students = list(family.students.all().values_list("id", flat=True))
         enrolments.append(
             Enrolment(
                 family=family,
@@ -70,8 +77,14 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 status=fake.random_element(
                     elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
                 ),
-                students=list(family.students.all().values_list("id", flat=True)),
+                students=students,
             )
         )
+        for record in enrolled_class.attendance:
+            record["attendees"].extend(
+                fake.random_elements(elements=students, unique=True)
+            )
+
+    enrolled_class.save()
 
     Enrolment.objects.bulk_create(enrolments)
