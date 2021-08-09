@@ -96,7 +96,7 @@ class FamilySerializerTestCase(TestCase):
                     StudentSerializer(self.child1, context=context).data,
                     StudentSerializer(self.child2, context=context).data,
                 ],
-                "guests": [ StudentSerializer(self.guest, context=context).data ],
+                "guests": [StudentSerializer(self.guest, context=context).data],
                 "enrolment": EnrolmentSerializer(
                     self.current_enrolment, context=context
                 ).data,
