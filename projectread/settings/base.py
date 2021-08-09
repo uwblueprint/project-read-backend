@@ -30,16 +30,6 @@ SECRET_KEY = env.str("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.str("DJANGO_DEBUG") == "True"
 
-ALLOWED_HOSTS = [] if DEBUG else ["project-read-backend.herokuapp.com"]
-
-CORS_ALLOWED_ORIGINS = [
-    "https://getsetlearn.herokuapp.com",
-    "https://getsetlearn.netlify.app",
-]
-
-if DEBUG:
-    CORS_ALLOWED_ORIGINS += ["http://localhost:3000"]
-
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"https://(deploy-preview-[\d]+--)?getsetlearn\.netlify\.app$"
 ]
