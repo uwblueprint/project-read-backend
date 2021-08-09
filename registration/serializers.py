@@ -155,7 +155,9 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
                     information=student_data["information"],
                 )
 
-        return super().update(instance, validated_data)
+        super().update(instance, validated_data)
+        instance.refresh_from_db()
+        return instance
 
     def to_internal_value(self, data):
         parent = data.pop("parent", {})
