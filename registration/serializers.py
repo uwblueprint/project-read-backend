@@ -38,6 +38,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
     children = StudentSerializer(many=True)
+    guests = StudentSerializer(many=True)
     enrolment = SerializerMethodField()
 
     class Meta:
@@ -51,6 +52,7 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             "preferred_comms",
             "num_children",
             "children",
+            "guests",
             "enrolment",
         ]
 

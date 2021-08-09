@@ -43,6 +43,12 @@ class FamilySerializerTestCase(TestCase):
             role=Student.CHILD,
             family=self.family,
         )
+        self.guest = Student.objects.create(
+            first_name="Greggy",
+            last_name="Peggy",
+            role=Student.GUEST,
+            family=self.family,
+        )
 
         self.current_session = Session.objects.create(
             name="Spring 2021",
@@ -90,6 +96,7 @@ class FamilySerializerTestCase(TestCase):
                     StudentSerializer(self.child1, context=context).data,
                     StudentSerializer(self.child2, context=context).data,
                 ],
+                "guests": [ StudentSerializer(self.guest, context=context).data ],
                 "enrolment": EnrolmentSerializer(
                     self.current_enrolment, context=context
                 ).data,
