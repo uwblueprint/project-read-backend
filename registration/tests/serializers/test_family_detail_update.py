@@ -133,7 +133,7 @@ class FamilyDetailSerializerTestCase(TestCase):
 
     def test_family_detail_serializer_update__create_children(self):
         data = dict(self.family_data)
-        new_child = {
+        new_child_data = {
             "id": None,
             "first_name": "Pableaux",
             "last_name": "Petersaune",
@@ -142,7 +142,7 @@ class FamilyDetailSerializerTestCase(TestCase):
             "family": self.family,
             "information": {},
         }
-        data["children"].append(new_child)
+        data["children"].append(new_child_data)
 
         serializer = FamilyDetailSerializer(instance=self.family, data=data)
         self.assertTrue(serializer.is_valid())
@@ -150,13 +150,14 @@ class FamilyDetailSerializerTestCase(TestCase):
         family = serializer.save()
         self.assertEqual(family.children.count(), 3)
 
-        self.assertEqual(family.children[2].first_name, new_child["first_name"])
-        self.assertEqual(family.children[2].last_name, new_child["last_name"])
+        new_child = family.children.order_by("-created_at").first()
+        self.assertEqual(new_child.first_name, new_child_data["first_name"])
+        self.assertEqual(new_child.last_name, new_child_data["last_name"])
         self.assertEqual(
-            family.children[2].date_of_birth.strftime(format="%Y-%m-%d"),
-            new_child["date_of_birth"],
+            new_child.date_of_birth.strftime(format="%Y-%m-%d"),
+            new_child_data["date_of_birth"],
         )
-        self.assertEqual(family.children[2].information, new_child["information"])
+        self.assertEqual(new_child.information, new_child_data["information"])
 
     def test_family_detail_serializer_update__delete_children(self):
         data = dict(self.family_data)
