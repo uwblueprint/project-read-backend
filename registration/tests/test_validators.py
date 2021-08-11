@@ -187,11 +187,10 @@ class ValidatorsTestCase(TestCase):
     def test_validate_mc_options(self):
         test_field = self.child_field
         self.assertIsNone(
-            validators.validate_mc_options(test_field),
-            f"Test field options: {test_field.options}",
+            validators.validate_mc_options(test_field.options)
         )
         test_field.options.append(1)
-        self.assertRaises(ValidationError, validators.validate_mc_options, test_field)
+        self.assertRaises(ValidationError, validators.validate_mc_options, test_field.options)
 
     def test_validate_client_interaction(self):
         interaction_valid = {
