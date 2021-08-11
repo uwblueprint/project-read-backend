@@ -1,4 +1,7 @@
 from rest_framework import mixins, permissions, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from .models import User
 from .serializers import UserSerializer, UserCreateSerializer
 
@@ -6,7 +9,6 @@ from .serializers import UserSerializer, UserCreateSerializer
 class UserViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
 ):
     queryset = User.objects.all()
@@ -22,3 +24,13 @@ class UserViewSet(
         if self.action == "create":
             return UserCreateSerializer
         return UserSerializer
+
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=[permissions.IsAuthenticated],
+        url_path="me",
+        url_name="me",
+    )
+    def me(self, request):
+        return Response(UserSerializer(request.user).data)
