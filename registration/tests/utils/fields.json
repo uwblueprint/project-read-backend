@@ -3,7 +3,7 @@
     "id": 1,
     "role": "Parent",
     "name": "Gender",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": true,
     "options": ["Man", "Woman", "Non-binary", "Other"],
     "order": 1
@@ -21,7 +21,7 @@
     "id": 3,
     "role": "Parent",
     "name": "Dietary Restrictions",
-    "question_type": "Multiple Choice",
+    "question_type": "Multiple Select",
     "is_default": false,
     "options": [
       "Peanuts",
@@ -38,7 +38,7 @@
     "id": 4,
     "role": "Parent",
     "name": "Technology Access",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": true,
     "options": ["Laptop", "Tablet", "Desktop"],
     "order": 4
@@ -47,7 +47,7 @@
     "id": 5,
     "role": "Parent",
     "name": "Internet Access",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": true,
     "options": ["Yes", "No"],
     "order": 5
@@ -56,7 +56,7 @@
     "id": 6,
     "role": "Parent",
     "name": "GSL Returner",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": true,
     "options": ["Yes", "No"],
     "order": 6
@@ -65,7 +65,7 @@
     "id": 7,
     "role": "Parent",
     "name": "Education Level",
-    "question_type": "Multiple Choice",
+    "question_type": "Multiple Select",
     "is_default": false,
     "options": ["High School", "Trade School", "College/University", "Masters"],
     "order": 7
@@ -74,7 +74,7 @@
     "id": 8,
     "role": "Child",
     "name": "Gender",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": true,
     "options": ["Man", "Woman", "Non-binary", "Other"],
     "order": 1
@@ -83,7 +83,7 @@
     "id": 9,
     "role": "Child",
     "name": "Allergies",
-    "question_type": "Text",
+    "question_type": "Multiple Select",
     "is_default": true,
     "options": [
       "Peanuts",
@@ -100,7 +100,7 @@
     "id": 10,
     "role": "Guest",
     "name": "Relation to Family",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": true,
     "options": [
       "Grandmother",
@@ -136,7 +136,7 @@
     "id": 13,
     "role": "Session",
     "name": "Ontario Works",
-    "question_type": "Multiple Choice",
+    "question_type": "Select",
     "is_default": false,
     "options": ["Yes", "No"],
     "order": 2

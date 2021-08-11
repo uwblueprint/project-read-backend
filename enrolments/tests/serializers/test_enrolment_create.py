@@ -23,7 +23,7 @@ class EnrolmentCreateSerializerTestCase(TestCase):
             role=Field.CHILD,
             name="Gender",
             question="What is their gender?",
-            question_type=Field.MULTIPLE_CHOICE,
+            question_type=Field.SELECT,
             is_default=True,
             order=1,
         )
@@ -31,7 +31,7 @@ class EnrolmentCreateSerializerTestCase(TestCase):
             role=Field.GUEST,
             name="Relationship",
             question="What's their relationship to your family?",
-            question_type=Field.MULTIPLE_CHOICE,
+            question_type=Field.SELECT,
             is_default=True,
             order=1,
         )

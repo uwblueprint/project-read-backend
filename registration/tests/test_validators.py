@@ -27,7 +27,7 @@ class ValidatorsTestCase(TestCase):
             role=Field.CHILD,
             name="Allergies",
             question="Do they have any allergies?",
-            question_type=Field.MULTIPLE_CHOICE,
+            question_type=Field.SELECT,
             is_default=True,
             options=["Yes", "No"],
             order=1,
@@ -36,7 +36,7 @@ class ValidatorsTestCase(TestCase):
             role=Field.GUEST,
             name="Relationship",
             question="What's their relationship to your family?",
-            question_type=Field.MULTIPLE_CHOICE,
+            question_type=Field.SELECT,
             is_default=True,
             order=1,
         )
@@ -44,7 +44,7 @@ class ValidatorsTestCase(TestCase):
             role=Field.SESSION,
             name="Ontario Works",
             question="Ontario Works?",
-            question_type=Field.MULTIPLE_CHOICE,
+            question_type=Field.SELECT,
             is_default=True,
             order=1,
         )

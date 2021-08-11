@@ -53,12 +53,12 @@ class FieldAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
-        "question",
         "role",
+        "question_type",
         "is_default",
     )
     ordering = ("id", "order", "name")
-    search_fields = ("name", "question")
+    search_fields = ("name",)
     list_filter = (
         "role",
         "question_type",
