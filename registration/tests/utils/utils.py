@@ -59,13 +59,13 @@ def create_test_parent(
             "1": fake.random_element(elements=Field.objects.get(id=1).options),
             "3": "\n".join(
                 fake.random_elements(
-                    elements=Field.objects.get(id=3).options, 
+                    elements=Field.objects.get(id=3).options,
                     unique=True,
                 )
             ),
             "4": "\n".join(
                 fake.random_elements(
-                    elements=Field.objects.get(id=4).options, 
+                    elements=Field.objects.get(id=4).options,
                     unique=True,
                 )
             ),
