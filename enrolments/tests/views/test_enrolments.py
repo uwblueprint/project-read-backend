@@ -47,49 +47,15 @@ class EnrolmentsTestCase(APITestCase):
         )
 
     def test_create_enrolment(self):
-        family_data = {
-            "email": "brittanylau@uwblueprint.com",
-            "home_number": "string",
-            "cell_number": "string",
-            "work_number": "string",
-            "preferred_number": "Home",
-            "address": "10909 Yonge St Unit 10",
-            "preferred_comms": "Home",
-            "parent": {
-                "first_name": "Brittany",
-                "last_name": "Buckets",
-                "role": "Parent",
-                "date_of_birth": None,
-                "information": {},
-            },
-            "children": [
-                {
-                    "first_name": "Daniel",
-                    "last_name": "Chen",
-                    "role": "Child",
-                    "date_of_birth": None,
-                    "information": {},
-                }
-            ],
-            "guests": [
-                {
-                    "first_name": "Lebron",
-                    "last_name": "James",
-                    "role": "Guest",
-                    "date_of_birth": None,
-                    "information": {},
-                }
-            ],
-            "notes": "string",
-        }
-
         url = reverse("enrolment-list")
         self.client.force_authenticate(self.user)
         request = {
-            "family": family_data,
+            "family": self.family.id,
             "session": self.session.id,
             "preferred_class": self.class2.id,
+            "enrolled_class": self.class1.id,
             "status": Enrolment.CLASS_ALLOCATED,
+            "students": [self.family.parent.id],
         }
         response = self.client.post(url, request, format="json")
 
@@ -100,6 +66,7 @@ class EnrolmentsTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         request = {
             "id": self.enrolment.id,
+            "family": self.family.id,
             "session": self.session.id,
             "preferred_class": self.class2.id,
             "enrolled_class": self.class2.id,

@@ -8,7 +8,6 @@ from .serializers import (
     SessionListSerializer,
     SessionDetailSerializer,
     ClassDetailSerializer,
-    EnrolmentCreateSerializer,
     EnrolmentSerializer,
 )
 
@@ -55,6 +54,4 @@ class EnrolmentViewSet(
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return EnrolmentCreateSerializer
         return EnrolmentSerializer

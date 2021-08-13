@@ -68,7 +68,7 @@ class Enrolment(models.Model):
         (DROP_OUT, "Drop out"),
         (WAITLISTED, "Waitlisted"),
     ]
-    active = models.BooleanField()
+    active = models.BooleanField(default=True)
     family = models.ForeignKey(
         "registration.Family", on_delete=models.PROTECT, related_name="enrolments"
     )
