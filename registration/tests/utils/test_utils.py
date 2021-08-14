@@ -37,7 +37,7 @@ class RegistrationUtilsTestCase(TestCase):
         self.assertEqual(parent.family, family)
         self.assertEqual(family.parent, parent)
 
-        field_ids = [1, 4, 5, 6, 7]
+        field_ids = [1, 3, 4, 5, 6, 7]
         self.assertEqual(len(parent.information), len(field_ids))
         self.assertTrue(
             set([str(field_id) for field_id in field_ids]).issubset(parent.information)

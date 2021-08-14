@@ -123,18 +123,25 @@ class Field(models.Model):
     CHILD = "Child"
     GUEST = "Guest"
     SESSION = "Session"
-    TEXT = "Text"
-    MULTIPLE_CHOICE = "Multiple Choice"
     ROLE_CHOICES = [
         (PARENT, "Parent"),
         (CHILD, "Child"),
         (GUEST, "Guest"),
         (SESSION, "Session"),
     ]
-    QUESTION_CHOICES = [(TEXT, "Text"), (MULTIPLE_CHOICE, "Multiple Choice")]
+
+    TEXT = "Text"
+    SELECT = "Select"
+    MULTIPLE_SELECT = "Multiple Select"
+    QUESTION_CHOICES = [
+        (TEXT, "Text"),
+        (SELECT, "Select"),
+        (MULTIPLE_SELECT, "Multiple Select"),
+    ]
+
     role = models.CharField(max_length=7, choices=ROLE_CHOICES)
     name = models.CharField(max_length=512)
-    question = models.CharField(max_length=512)
+    question = models.CharField(max_length=512, blank=True)
     question_type = models.CharField(max_length=15, choices=QUESTION_CHOICES)
     is_default = models.BooleanField()
     options = ArrayField(

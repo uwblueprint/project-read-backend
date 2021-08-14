@@ -56,8 +56,19 @@ def create_test_parent(
         first_name=fake.first_name(),
         role=Student.PARENT,
         information={
-            "1": fake.date(),
-            "4": fake.random_element(elements=Field.objects.get(id=4).options),
+            "1": fake.random_element(elements=Field.objects.get(id=1).options),
+            "3": "\n".join(
+                fake.random_elements(
+                    elements=Field.objects.get(id=3).options,
+                    unique=True,
+                )
+            ),
+            "4": "\n".join(
+                fake.random_elements(
+                    elements=Field.objects.get(id=4).options,
+                    unique=True,
+                )
+            ),
             "5": fake.random_element(elements=Field.objects.get(id=5).options),
             "6": fake.random_element(elements=Field.objects.get(id=6).options),
             "7": fake.random_element(elements=Field.objects.get(id=7).options),
