@@ -1,6 +1,7 @@
 from rest_framework import mixins, permissions, viewsets, status
+from rest_framework.views import APIView
 
-from .models import Family, Field
+from .models import Family, Field, Student
 from .serializers import (
     FamilySerializer,
     FamilyDetailSerializer,
@@ -9,6 +10,7 @@ from .serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework_csv import renderers as r
 
 
 class FamilyViewSet(
@@ -66,3 +68,27 @@ class FieldViewSet(
         "get",
     ]
     permission_classes = [permissions.IsAuthenticated]
+
+
+class ExportFamiliesView(APIView):
+    queryset = Family.objects.all()
+    renderer_classes = [r.CSVRenderer]
+
+    def get(self, request, format=None):
+        return Response(list(Family.objects.values()))
+
+
+class ExportStudentsView(APIView):
+    queryset = Student.objects.all()
+    renderer_classes = [r.CSVRenderer]
+
+    def get(self, request, format=None):
+        return Response(list(Student.objects.values()))
+
+
+class ExportFieldsView(APIView):
+    queryset = Field.objects.all()
+    renderer_classes = [r.CSVRenderer]
+
+    def get(self, request, format=None):
+        return Response(list(Field.objects.values()))
