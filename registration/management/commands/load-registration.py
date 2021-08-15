@@ -3,6 +3,7 @@ import argparse
 import json
 import pandas as pd
 from registration.models import Family, Field, Student
+from enrolments.models import Session, Enrolment, Class
 
 PARENT_DEFAULT_FIELDS = {"first_name", "last_name"}
 CHILD_DEFAULT_FIELDS = {"first_name", "last_name"}
@@ -12,7 +13,10 @@ FAMILY_DEFAULT_FIELDS = {
     "cell_number",
     "work_number",
     "address",
+    "notes",
 }
+
+GUEST_RELATION_FIELD_NAME = "Relation to family"
 
 
 class Command(BaseCommand):
@@ -21,8 +25,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("csv", type=argparse.FileType("r"))
         parser.add_argument("fields_map", type=argparse.FileType("r"))
+        parser.add_argument("session_name", type=str)
+        parser.add_argument("attendance_csvs", nargs="+", type=argparse.FileType("r"))
 
     def handle(self, *args, **options):
+        session = Session.objects.create(name=options["session_name"])
         df = pd.read_csv(options["csv"])
         records = df.to_dict(orient="records")
         default_fields_map = json.load(options["fields_map"])
@@ -57,7 +64,7 @@ class Command(BaseCommand):
         )
 
         for record in records:
-            parent, family = self.create_parent_family(record, default_fields_map)
+            parent, family = self.create_parent_family(record, default_fields_map, options["session_name"])
             self.assign_dynamic_fields(
                 record, parent, parent_dynamic_fields, parent_dynamic_field_ids
             )
@@ -65,10 +72,132 @@ class Command(BaseCommand):
                 record, family, default_fields_map, child_dynamic_field_ids
             )
 
+        guest_relation_field, created = Field.objects.get_or_create(
+            role=Student.GUEST,
+            name=GUEST_RELATION_FIELD_NAME,
+            question=GUEST_RELATION_FIELD_NAME,
+            question_type=Field.TEXT,
+            is_default=True,
+            order=0,
+        )
+        session.fields = (
+            list(parent_dynamic_field_ids.values())
+            + list(child_dynamic_field_ids.values())
+            + [guest_relation_field.id]
+        )
+        session.save()
+
+        # === PARSE ATTENDANCES ===
+        attendance_csvs = options["attendance_csvs"]
+        for i in range(len(attendance_csvs)):
+            cls = Class.objects.create(
+                name="{0} class {1}".format(options["session_name"], i + 1),
+                session=session,
+            )
+            attendance_df = pd.read_csv(attendance_csvs[i])
+            attendance = attendance_df.to_dict(orient="records")
+            attendance_obj = {
+                date: []
+                for date in attendance_df.columns.values.tolist()[3:]
+                if not date.startswith("Unnamed: ") and not date == "notes"
+            }
+            curr_family: Family = None
+            for row in attendance:
+                values = list(row.values())
+                first_name = "" if pd.isnull(values[1]) else values[1]
+                last_name = "" if pd.isnull(values[2]) else values[2]
+                type_indicator = values[0]
+                if not first_name or pd.isnull(first_name):
+                    # No parent (nor family)
+                    if type_indicator[0] == "P":
+                        curr_family = None
+                    continue
+                student: Student = None
+                # Parent
+                if type_indicator[0] == "P":
+                    try:
+                        student = Student.objects.get(
+                            first_name=first_name, last_name=last_name
+                        )
+                        if student.role != Student.PARENT:
+                            print(
+                                "Studnet {0} {1} is not a parent".format(
+                                    first_name, last_name
+                                )
+                            )
+                            continue
+                        curr_family = student.family
+                    except Student.DoesNotExist:
+                        print(
+                            "Following parent not found: {0} {1}".format(
+                                first_name, last_name
+                            )
+                        )
+                        continue
+                # Caseworker
+                elif type_indicator == "CW":
+                    if not curr_family:
+                        continue
+                    student = Student.objects.create(
+                        first_name=first_name,
+                        last_name=last_name,
+                        role=Student.GUEST,
+                        family=curr_family,
+                    )
+                    student.information = {str(guest_relation_field.id): "Caseworker"}
+                # Guest
+                elif type_indicator[0] == "G":
+                    if not curr_family:
+                        continue
+                    student = Student.objects.create(
+                        first_name=first_name,
+                        last_name=last_name,
+                        role=Student.GUEST,
+                        family=curr_family,
+                    )
+                # Child
+                elif type_indicator[0] == "C":
+                    if not curr_family:
+                        continue
+                    try:
+                        student = Student.objects.get(
+                            first_name=first_name, family=curr_family
+                        )
+                    except Student.DoesNotExist:
+                        student = Student.objects.create(
+                            first_name=first_name,
+                            last_name=last_name,
+                            family=curr_family,
+                            role=Student.CHILD,
+                        )
+
+                enrolment, created = Enrolment.objects.get_or_create(
+                    active=True,
+                    session=session,
+                    status=Enrolment.COMPLETED,
+                    family=curr_family,
+                    enrolled_class=cls
+                )
+                enrolment.students.append(student.id)
+                enrolment.save()
+
+                for idx, (key, val) in enumerate(list(row.items())[3:]):
+                    # Empty column
+                    if key.startswith("Unnamed: ") or key == "notes":
+                        continue
+                    if val and not pd.isnull(val):
+                        attendance_obj[key].append(student.id)
+            cls_attendance = [
+                {"date": date, "attendees": attendees}
+                for date, attendees in attendance_obj.items()
+            ]
+            cls.attendance = cls_attendance
+            cls.save()
+
     def create_dynamic_fields(self, fields, role):
         field_ids = {}
         for field in fields:
-            field_obj = Field.objects.create(
+            field_obj, created = Field.objects.get_or_create(
                 role=role,
                 name=field,
                 question=field,
@@ -79,23 +208,28 @@ class Command(BaseCommand):
             field_ids[field] = field_obj.pk
         return field_ids
 
-    def create_parent_family(self, record, fields_map):
+    def create_parent_family(self, record, fields_map, session_name):
         parent_args = {
             k: record[fields_map[k]]
             for k in PARENT_DEFAULT_FIELDS
             if not pd.isnull(record[fields_map[k]])
         }
         parent_args["role"] = Student.PARENT
-        parent_obj = Student.objects.create(**parent_args)
-        parent_obj.save()
+        parent_obj, created = Student.objects.update_or_create(
+            first_name=record[fields_map["first_name"]],
+            last_name=record[fields_map["last_name"]],
+            defaults=parent_args,
+        )
 
         family_args = {
             k: record[fields_map[k]]
             for k in FAMILY_DEFAULT_FIELDS
-            if not pd.isnull(record[fields_map[k]])
+            if (k in fields_map and not pd.isnull(record[fields_map[k]]))
         }
-        family_obj = Family.objects.create(**family_args)
-        family_obj.parent = parent_obj
+        family_obj, created = Family.objects.update_or_create(
+            parent=parent_obj, defaults={key: family_args[key] for key in family_args if key != "notes"}
+        )
+        family_obj.notes = "{0}{1} {2}: {3}".format(family_obj.notes, "" if not family_obj.notes else "\n", session_name, record[fields_map["notes"]])
         family_obj.save()
 
         parent_obj.family = family_obj
@@ -114,7 +248,11 @@ class Command(BaseCommand):
             }
             if all([pd.isnull(val) for val in child_args.values()]):
                 continue
-            child_obj = Student.objects.create(**child_args)
+            child_obj, created = Student.objects.update_or_create(
+                family=family,
+                first_name=record[default_fields_map["first_name"]],
+                defaults=child_args,
+            )
             child_obj.family = family
             child_obj.role = Student.CHILD
             dynamic_fields_dict = {
@@ -122,7 +260,7 @@ class Command(BaseCommand):
                 for key, value in dynamic_fields_map.items()
                 if not pd.isnull(record[value])
             }
-            child_obj.information = dynamic_fields_dict
+            child_obj.information.update(dynamic_fields_dict)
             child_obj.save()
 
     def assign_dynamic_fields(self, record, student, dynamic_fields, field_ids_map):
@@ -131,5 +269,5 @@ class Command(BaseCommand):
             for field_name in dynamic_fields
             if not pd.isnull(record[field_name])
         }
-        student.information = dynamic_fields_dict
+        student.information.update(dynamic_fields_dict)
         student.save()
