@@ -64,13 +64,13 @@ def validate_attendance(class_obj):
     for session in class_obj:
         date = session["date"]
         attendees = session["attendees"]
-        try:
-            datetime.strptime(date, "%Y-%m-%d").date()
-        except ValueError:
-            raise ValidationError(
-                date + " must be formatted as YYYY-MM-DD and must be a valid date",
-                code="invalid_date",
-            )
+        # try:
+        #     datetime.strptime(date, "%Y-%m-%d").date()
+        # except ValueError:
+        #     raise ValidationError(
+        #         date + " must be formatted as YYYY-MM-DD and must be a valid date",
+        #         code="invalid_date",
+        #     )
         if attendees and not set(
             Student.objects.filter(pk__in=attendees).values_list("id", flat=True)
         ) == set(attendees):
