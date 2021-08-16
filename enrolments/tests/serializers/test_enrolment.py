@@ -129,7 +129,6 @@ class EnrolmentSerializerTestCase(TestCase):
         data["session"] = self.other_session.id
         serializer = EnrolmentSerializer(self.enrolment, data=data)
         self.assertFalse(serializer.is_valid())
-        self.assertFalse(serializer.is_valid())
 
     @patch(
         "enrolments.serializers.validate_student_ids_in_family",
