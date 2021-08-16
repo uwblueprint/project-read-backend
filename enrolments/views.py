@@ -71,12 +71,12 @@ class ImportView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        students_csv = self.request.FILES["students_csv"]
+        students_csv = request.POST['students_csv']
         fields_map = request.POST["fields_map"]
         session_name = request.POST["session_name"]
-        attendance_csv1 = self.request.FILES.get("attendance_csv1")
-        attendance_csv2 = self.request.FILES.get("attendance_csv2")
-        # attendance_csv3 = self.request.FILES.get("attendance_csv3")
+        attendance_csv1 = request.POST["attendance_csv1"]
+        attendance_csv2 = request.POST["attendance_csv2"]
+        attendance_csv3 = request.POST["attendance_csv3"]
         # attendance_csv4 = self.request.FILES.get("attendance_csv4")
         call_command(
             "load-registration",
@@ -85,5 +85,6 @@ class ImportView(APIView):
             session_name,
             attendance_csv1,
             attendance_csv2,
+                        attendance_csv3,
         )
         return Response("data imported", status=status.HTTP_201_CREATED)

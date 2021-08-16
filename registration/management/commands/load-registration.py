@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from registration.models import Family, Field, Student
 from enrolments.models import Session, Enrolment, Class
+from io import StringIO
 
 PARENT_DEFAULT_FIELDS = {"first_name", "last_name"}
 CHILD_DEFAULT_FIELDS = {"first_name", "last_name"}
@@ -23,18 +24,18 @@ class Command(BaseCommand):
     help = "Load a csv into database"
 
     def add_arguments(self, parser):
-        parser.add_argument("csv", type=argparse.FileType("r"))
+        parser.add_argument("csv", type=str)
         parser.add_argument("fields_map", type=str)
         # parser.add_argument("fields_map", type=argparse.FileType("r"))
         parser.add_argument("session_name", type=str)
-        parser.add_argument("attendance_csv1", type=argparse.FileType("r"))
-        parser.add_argument("attendance_csv2", type=argparse.FileType("r"))
-        # parser.add_argument("attendance_csv3", type=argparse.FileType("r"))
+        parser.add_argument("attendance_csv1", type=str)
+        parser.add_argument("attendance_csv2", type=str)
+        parser.add_argument("attendance_csv3", type=str)
         # parser.add_argument("attendance_csv4", type=argparse.FileType("r"))
 
     def handle(self, *args, **options):
         session = Session.objects.create(name=options["session_name"])
-        df = pd.read_csv(options["csv"])
+        df = pd.read_csv(StringIO(options["csv"]), sep=",")
         records = df.to_dict(orient="records")
         print("WHY DOESWNT HTISH OFIHDLKF HSDLFKH LSKDHF", options["fields_map"])
         default_fields_map = json.loads(options["fields_map"])
@@ -100,7 +101,7 @@ class Command(BaseCommand):
             for x in [
                 options["attendance_csv1"],
                 options["attendance_csv2"],
-                # options["attendance_csv3"],
+                options["attendance_csv3"],
                 # options["attendance_csv4"],
             ]
             if x
@@ -110,7 +111,7 @@ class Command(BaseCommand):
                 name="{0} class {1}".format(options["session_name"], i + 1),
                 session=session,
             )
-            attendance_df = pd.read_csv(attendance_csvs[i])
+            attendance_df = pd.read_csv(StringIO(attendance_csvs[i]), sep=",")
             attendance = attendance_df.to_dict(orient="records")
             attendance_obj = {
                 date: []
@@ -123,6 +124,8 @@ class Command(BaseCommand):
                 first_name = "" if pd.isnull(values[1]) else values[1].strip()
                 last_name = "" if pd.isnull(values[2]) else values[2].strip()
                 type_indicator = values[0]
+                if pd.isnull(type_indicator):
+                    continue
                 if not first_name or pd.isnull(first_name):
                     # No parent (nor family)
                     if type_indicator[0] == "P":
