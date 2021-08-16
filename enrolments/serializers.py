@@ -1,11 +1,7 @@
-from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from registration.models import Student
-from registration.serializers import (
-    FamilyDetailSerializer,
-    FamilySerializer,
-)
+from registration.models import Family
+from registration.serializers import FamilySerializer
 from .models import Session, Class, Enrolment
 from .validators import (
     validate_class_in_session,
@@ -91,7 +87,11 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = serializers.PrimaryKeyRelatedField(read_only=True)
+    family = serializers.PrimaryKeyRelatedField(
+        allow_null=True,
+        queryset=Family.objects.all(),
+    )
+    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
     preferred_class = serializers.PrimaryKeyRelatedField(
         queryset=Class.objects.all(), allow_null=True
     )
@@ -103,9 +103,10 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
         model = Enrolment
         fields = [
             "id",
-            "session",
-            "preferred_class",
             "enrolled_class",
+            "family",
+            "preferred_class",
+            "session",
             "status",
             "students",
         ]
@@ -124,55 +125,21 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
         return response
 
     def validate(self, attrs):
-        try:
+        if self.instance is not None:
+            # updates should validate against the existing family & session
+            if attrs["family"] != self.instance.family:
+                raise serializers.ValidationError("family cannot be updated")
+            if attrs["session"] != self.instance.session:
+                raise serializers.ValidationError("session cannot be updated")
+
             validate_student_ids_in_family(attrs["students"], self.instance.family)
             validate_class_in_session(attrs["preferred_class"], self.instance.session)
             validate_class_in_session(attrs["enrolled_class"], self.instance.session)
-        except ValidationError:
-            raise serializers.ValidationError(ValidationError)
 
-        return super().validate(attrs)
-
-
-class EnrolmentCreateSerializer(serializers.ModelSerializer):
-    family = FamilyDetailSerializer()
-    preferred_class = serializers.PrimaryKeyRelatedField(
-        allow_null=True, queryset=Class.objects.all()
-    )
-    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
-
-    class Meta:
-        model = Enrolment
-        fields = [
-            "family",
-            "session",
-            "preferred_class",
-            "status",
-        ]
-
-    def create(self, validated_data):
-        family = FamilyDetailSerializer.create(None, validated_data["family"])
-        students = family.students.all()
-
-        enrolments = Enrolment.objects.create(
-            active=True,
-            family=family,
-            students=[student.id for student in students],
-            session=validated_data["session"],
-            preferred_class=validated_data["preferred_class"],
-            status=validated_data["status"],
-        )
-
-        return enrolments
-
-    def validate(self, attrs):
-        try:
-            if attrs["preferred_class"]:
-                validate_class_in_session(attrs["preferred_class"], attrs["session"])
-        except:
-            raise serializers.ValidationError(
-                detail="preferred class does not exist in session",
-                code="invalid_preferred_class",
-            )
+        else:
+            # creates should validate against the provided family & session
+            validate_student_ids_in_family(attrs["students"], attrs["family"])
+            validate_class_in_session(attrs["preferred_class"], attrs["session"])
+            validate_class_in_session(attrs["enrolled_class"], attrs["session"])
 
         return super().validate(attrs)

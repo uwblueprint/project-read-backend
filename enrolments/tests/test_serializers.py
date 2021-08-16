@@ -1,6 +1,4 @@
-from django.core.exceptions import ValidationError
 from django.test import TestCase
-from unittest.mock import call, patch
 
 from registration.models import Family, Student
 from enrolments.models import Class, Session, Enrolment
@@ -9,12 +7,10 @@ from enrolments.serializers import (
     ClassDetailSerializer,
     ClassListSerializer,
     SessionDetailSerializer,
-    SessionListSerializer,
     EnrolmentSerializer,
 )
 from registration.serializers import FamilySerializer
 from enrolments.tests.utils.utils import create_test_classes
-from datetime import date
 
 context = {"request": None}
 
@@ -185,164 +181,4 @@ class ClassDetailSerializerTestCase(TestCase):
                 "families": [],
             },
             ClassDetailSerializer(self.empty_class, context={"request": None}).data,
-        )
-
-
-class EnrolmentSerializerTestCase(TestCase):
-    def setUp(self):
-        parent = Student.objects.create(
-            first_name="Gollum", last_name="Goat", role=Student.PARENT
-        )
-        self.family = Family.objects.create(
-            parent=parent,
-            email="justkeepswimming@ocean.com",
-            cell_number="123456789",
-            address="1 Test Ave",
-            preferred_comms="Dolphin Whistle",
-        )
-        parent.family = self.family
-        parent.save()
-        self.session = Session.objects.create(
-            name="Spring 201",
-            start_date=date(2021, 5, 15),
-        )
-        self.other_session = Session.objects.create(
-            name="Fall 2021",
-            start_date=date(2021, 9, 15),
-        )
-        self.class1 = Class.objects.create(
-            name="Tuesday & Saturday",
-            session_id=self.session.id,
-            facilitator_id=None,
-            attendance=[],
-        )
-        self.class2 = Class.objects.create(
-            name="Wednesday & Thursday",
-            session_id=self.session.id,
-            facilitator_id=None,
-            attendance=[],
-        )
-        self.class_not_in_session = Class.objects.create(
-            name="Wednesday & Thursday",
-            session_id=self.other_session.id,
-            facilitator_id=None,
-            attendance=[],
-        )
-        self.enrolment = Enrolment.objects.create(
-            active=False,
-            family=self.family,
-            session=self.session,
-            preferred_class=self.class1,
-            enrolled_class=self.class2,
-            status=Enrolment.REGISTERED,
-        )
-        self.update_request = {
-            "id": self.enrolment.id,
-            "session": self.session.id,
-            "preferred_class": self.class2.id,
-            "enrolled_class": self.class1.id,
-            "status": Enrolment.CLASS_ALLOCATED,
-            "students": [self.family.parent.id],
-        }
-
-    def test_enrolment_serializer(self):
-        self.assertEqual(
-            {
-                "id": self.enrolment.id,
-                "session": SessionListSerializer(self.session).data,
-                "preferred_class": ClassListSerializer(self.class1).data,
-                "enrolled_class": ClassListSerializer(self.class2).data,
-                "status": self.enrolment.status,
-                "students": [],
-            },
-            EnrolmentSerializer(self.enrolment).data,
-        )
-
-    def test_enrolment_serializer__no_classes(self):
-        self.enrolment.preferred_class = None
-        self.enrolment.enrolled_class = None
-        self.assertEqual(
-            {
-                "id": self.enrolment.id,
-                "session": SessionListSerializer(self.session).data,
-                "preferred_class": None,
-                "enrolled_class": None,
-                "status": self.enrolment.status,
-                "students": [],
-            },
-            EnrolmentSerializer(self.enrolment).data,
-        )
-
-    def test_enrolment_update(self):
-        serializer = EnrolmentSerializer(self.enrolment, data=self.update_request)
-        self.assertTrue(serializer.is_valid())
-
-    def test_enrolment_update__read_only_session(self):
-        data = dict(self.update_request)
-        data["session"] = self.other_session.id
-        serializer = EnrolmentSerializer(self.enrolment, data=data)
-        self.assertTrue(serializer.is_valid())
-        serializer.save()
-        self.assertEqual(self.enrolment.session, self.session)
-
-    @patch("enrolments.serializers.validate_student_ids_in_family")
-    @patch("enrolments.serializers.validate_class_in_session")
-    def test_enrolment_update_validate(
-        self,
-        mock_validate_class_in_session,
-        validate_student_ids_in_family,
-    ):
-        serializer = EnrolmentSerializer(self.enrolment, data=self.update_request)
-        self.assertTrue(serializer.is_valid())
-        validate_student_ids_in_family.assert_called_once_with(
-            [self.family.parent.id],
-            self.family,
-        )
-        self.assertEqual(mock_validate_class_in_session.call_count, 2)
-        mock_validate_class_in_session.assert_has_calls(
-            [
-                call(self.class2, self.session),
-                call(self.class1, self.session),
-            ]
-        )
-
-    @patch(
-        "enrolments.serializers.validate_student_ids_in_family",
-        side_effect=ValidationError(""),
-    )
-    @patch("enrolments.serializers.validate_class_in_session")
-    def test_enrolment_update_validate__invalid_students(
-        self,
-        mock_validate_class_in_session,
-        validate_student_ids_in_family,
-    ):
-        serializer = EnrolmentSerializer(self.enrolment, data=self.update_request)
-        self.assertFalse(serializer.is_valid())
-        validate_student_ids_in_family.assert_called_once_with(
-            [self.family.parent.id],
-            self.family,
-        )
-        mock_validate_class_in_session.assert_not_called()
-
-    @patch(
-        "enrolments.serializers.validate_student_ids_in_family",
-    )
-    @patch(
-        "enrolments.serializers.validate_class_in_session",
-        side_effect=ValidationError(""),
-    )
-    def test_enrolment_update_validate__invalid_classes(
-        self,
-        mock_validate_class_in_session,
-        validate_student_ids_in_family,
-    ):
-        serializer = EnrolmentSerializer(self.enrolment, data=self.update_request)
-        self.assertFalse(serializer.is_valid())
-        validate_student_ids_in_family.assert_called_once_with(
-            [self.family.parent.id],
-            self.family,
-        )
-        mock_validate_class_in_session.assert_called_once_with(
-            self.class2,
-            self.session,
         )
