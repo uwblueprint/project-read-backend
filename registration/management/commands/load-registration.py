@@ -24,15 +24,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("csv", type=argparse.FileType("r"))
-        parser.add_argument("fields_map", type=argparse.FileType("r"))
+        parser.add_argument("fields_map", type=str)
+        # parser.add_argument("fields_map", type=argparse.FileType("r"))
         parser.add_argument("session_name", type=str)
-        parser.add_argument("attendance_csvs", nargs="+", type=argparse.FileType("r"))
+        parser.add_argument("attendance_csv1", type=argparse.FileType("r"))
+        parser.add_argument("attendance_csv2", type=argparse.FileType("r"))
+        # parser.add_argument("attendance_csv3", type=argparse.FileType("r"))
+        # parser.add_argument("attendance_csv4", type=argparse.FileType("r"))
 
     def handle(self, *args, **options):
         session = Session.objects.create(name=options["session_name"])
         df = pd.read_csv(options["csv"])
         records = df.to_dict(orient="records")
-        default_fields_map = json.load(options["fields_map"])
+        print("WHY DOESWNT HTISH OFIHDLKF HSDLFKH LSKDHF", options["fields_map"])
+        default_fields_map = json.loads(options["fields_map"])
 
         parent_default_fields = set()
         parent_dynamic_fields = set()
@@ -64,7 +69,9 @@ class Command(BaseCommand):
         )
 
         for record in records:
-            parent, family = self.create_parent_family(record, default_fields_map, options["session_name"])
+            parent, family = self.create_parent_family(
+                record, default_fields_map, options["session_name"]
+            )
             self.assign_dynamic_fields(
                 record, parent, parent_dynamic_fields, parent_dynamic_field_ids
             )
@@ -88,7 +95,16 @@ class Command(BaseCommand):
         session.save()
 
         # === PARSE ATTENDANCES ===
-        attendance_csvs = options["attendance_csvs"]
+        attendance_csvs = [
+            x
+            for x in [
+                options["attendance_csv1"],
+                options["attendance_csv2"],
+                # options["attendance_csv3"],
+                # options["attendance_csv4"],
+            ]
+            if x
+        ]
         for i in range(len(attendance_csvs)):
             cls = Class.objects.create(
                 name="{0} class {1}".format(options["session_name"], i + 1),
@@ -104,8 +120,8 @@ class Command(BaseCommand):
             curr_family: Family = None
             for row in attendance:
                 values = list(row.values())
-                first_name = "" if pd.isnull(values[1]) else values[1]
-                last_name = "" if pd.isnull(values[2]) else values[2]
+                first_name = "" if pd.isnull(values[1]) else values[1].strip()
+                last_name = "" if pd.isnull(values[2]) else values[2].strip()
                 type_indicator = values[0]
                 if not first_name or pd.isnull(first_name):
                     # No parent (nor family)
@@ -176,7 +192,7 @@ class Command(BaseCommand):
                     session=session,
                     status=Enrolment.COMPLETED,
                     family=curr_family,
-                    enrolled_class=cls
+                    enrolled_class=cls,
                 )
                 enrolment.students.append(student.id)
                 enrolment.save()
@@ -210,7 +226,7 @@ class Command(BaseCommand):
 
     def create_parent_family(self, record, fields_map, session_name):
         parent_args = {
-            k: record[fields_map[k]]
+            k: record[fields_map[k]].strip()
             for k in PARENT_DEFAULT_FIELDS
             if not pd.isnull(record[fields_map[k]])
         }
@@ -222,14 +238,20 @@ class Command(BaseCommand):
         )
 
         family_args = {
-            k: record[fields_map[k]]
+            k: record[fields_map[k]].strip()
             for k in FAMILY_DEFAULT_FIELDS
             if (k in fields_map and not pd.isnull(record[fields_map[k]]))
         }
         family_obj, created = Family.objects.update_or_create(
-            parent=parent_obj, defaults={key: family_args[key] for key in family_args if key != "notes"}
+            parent=parent_obj,
+            defaults={key: family_args[key] for key in family_args if key != "notes"},
         )
-        family_obj.notes = "{0}{1} {2}: {3}".format(family_obj.notes, "" if not family_obj.notes else "\n", session_name, record[fields_map["notes"]])
+        family_obj.notes = "{0}{1} {2}: {3}".format(
+            family_obj.notes,
+            "" if not family_obj.notes else "\n",
+            session_name,
+            record[fields_map["notes"]],
+        )
         family_obj.save()
 
         parent_obj.family = family_obj

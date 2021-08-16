@@ -1,7 +1,9 @@
 from django.db.models import F
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, permissions, viewsets, status
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.core.management import call_command
 
 from .models import Class, Enrolment, Session
 from .serializers import (
@@ -63,3 +65,25 @@ class EnrolmentViewSet(
 
     def get_serializer_class(self):
         return EnrolmentSerializer
+
+
+class ImportView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        students_csv = self.request.FILES["students_csv"]
+        fields_map = request.POST["fields_map"]
+        session_name = request.POST["session_name"]
+        attendance_csv1 = self.request.FILES.get("attendance_csv1")
+        attendance_csv2 = self.request.FILES.get("attendance_csv2")
+        # attendance_csv3 = self.request.FILES.get("attendance_csv3")
+        # attendance_csv4 = self.request.FILES.get("attendance_csv4")
+        call_command(
+            "load-registration",
+            students_csv,
+            fields_map,
+            session_name,
+            attendance_csv1,
+            attendance_csv2,
+        )
+        return Response("data imported", status=status.HTTP_201_CREATED)
