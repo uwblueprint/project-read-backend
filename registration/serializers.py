@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
-from .validators import validate_student_information_role
+from .validators import validate_student_information_role, validate_field_order
 from enrolments.serializers import EnrolmentSerializer
 
 
@@ -236,3 +236,7 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
             "order",
         ]
         list_serializer_class = FieldListSerializer
+
+    def validate(self, attrs):
+        validate_field_order(attrs["order"], attrs["role"])
+        return super().validate(attrs)

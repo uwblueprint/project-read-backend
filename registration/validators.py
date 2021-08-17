@@ -69,3 +69,9 @@ def validate_client_interaction(interaction):
 def validate_interactions(interactions):
     for interaction in interactions.values():
         validate_client_interaction(interaction)
+
+
+def validate_field_order(field_order, role):
+    Field = apps.get_model("registration", "Field")
+    if field_order != Field.objects.filter(role=role).count() + 1:
+        raise ValidationError("Invalid order value")

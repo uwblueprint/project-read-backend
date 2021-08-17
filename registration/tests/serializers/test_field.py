@@ -1,13 +1,11 @@
-from django.core.exceptions import ValidationError
 from django.test.testcases import TestCase
-from unittest.mock import patch
 
 from accounts.models import User
-from registration.models import Student, Field
+from registration.models import Field
 from registration.serializers import FieldSerializer, FieldListSerializer
 
 
-class FieldListTestCase(TestCase):
+class FieldSerializerTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
         self.parent_field = Field.objects.create(
@@ -89,3 +87,25 @@ class FieldListTestCase(TestCase):
                 }
             ],
         )
+
+    def test_field_serializer__order_validator(self):
+        field_request_invalid_order = {
+            "role": "Child",
+            "name": "Favourite Colour",
+            "question": "What is your favourite colour?",
+            "question_type": "Text",
+            "is_default": False,
+            "options": [],
+            "order": 1,
+        }
+
+        serializer = FieldSerializer(data=field_request_invalid_order)
+        self.assertFalse(serializer.is_valid())
+
+        field_request_invalid_order["order"] = 3
+        serializer = FieldSerializer(data=field_request_invalid_order)
+        self.assertFalse(serializer.is_valid())
+
+        field_request_invalid_order["order"] = 2
+        serializer = FieldSerializer(data=field_request_invalid_order)
+        self.assertTrue(serializer.is_valid())
