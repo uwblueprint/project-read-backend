@@ -7,6 +7,8 @@ class SessionAdmin(admin.ModelAdmin):
         "id",
         "name",
         "start_date",
+        "created_at",
+        "updated_at",
     )
     ordering = ("id",)
     search_fields = (
@@ -21,6 +23,8 @@ class ClassAdmin(admin.ModelAdmin):
         "session",
         "name",
         "attendance",
+        "created_at",
+        "updated_at",
     )
     ordering = ("-id",)
     search_fields = ("name",)

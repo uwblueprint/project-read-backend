@@ -13,6 +13,8 @@ class FamilyAdmin(admin.ModelAdmin):
         "work_number",
         "preferred_number",
         "address",
+        "created_at",
+        "updated_at",
     )
     ordering = ("-id",)
     search_fields = (
@@ -34,6 +36,8 @@ class StudentAdmin(admin.ModelAdmin):
         "last_name",
         "family",
         "role",
+        "created_at",
+        "updated_at",
     )
     ordering = (
         "id",
@@ -56,6 +60,8 @@ class FieldAdmin(admin.ModelAdmin):
         "role",
         "question_type",
         "is_default",
+        "created_at",
+        "updated_at",
     )
     ordering = ("id", "order", "name")
     search_fields = ("name",)
