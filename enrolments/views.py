@@ -88,6 +88,6 @@ class ImportView(APIView):
             attendance_csv2,
             attendance_csv3,
             attendance_csv4,
-            attendance_csv5,
+            # attendance_csv5,
         )
         return Response("data imported", status=status.HTTP_201_CREATED)
