@@ -13,6 +13,8 @@ class Session(models.Model):
     fields = ArrayField(
         models.IntegerField(), default=list, validators=[validate_fields]
     )
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -43,6 +45,8 @@ class Class(models.Model):
         default="FFFFFF",
         blank=True,
     )
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         verbose_name_plural = "classes"
