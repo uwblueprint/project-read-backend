@@ -166,6 +166,7 @@ class Command(BaseCommand):
                         family=curr_family,
                     )
                     student.information = {str(guest_relation_field.id): "Caseworker"}
+                    student.save()
                 # Guest
                 elif type_indicator[0] == "G":
                     if not curr_family:
