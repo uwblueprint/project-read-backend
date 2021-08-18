@@ -32,7 +32,7 @@ class Command(BaseCommand):
         parser.add_argument("attendance_csv2", type=str)
         parser.add_argument("attendance_csv3", type=str)
         parser.add_argument("attendance_csv4", type=str)
-        parser.add_argument("attendance_csv5", type=str)
+        # parser.add_argument("attendance_csv5", type=str)
 
     def handle(self, *args, **options):
         session = Session.objects.create(name=options["session_name"])
@@ -104,7 +104,7 @@ class Command(BaseCommand):
                 options["attendance_csv2"],
                 options["attendance_csv3"],
                 options["attendance_csv4"],
-                options["attendance_csv5"],
+                # options["attendance_csv5"],
             ]
             if x
         ]

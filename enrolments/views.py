@@ -78,7 +78,7 @@ class ImportView(APIView):
         attendance_csv2 = request.POST["attendance_csv2"]
         attendance_csv3 = request.POST["attendance_csv3"]
         attendance_csv4 = request.POST["attendance_csv4"]
-        attendance_csv5 = request.POST["attendance_csv5"]
+        # attendance_csv5 = request.POST["attendance_csv5"]
         call_command(
             "load-registration",
             students_csv,
