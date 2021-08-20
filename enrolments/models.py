@@ -21,6 +21,22 @@ class Session(models.Model):
 
 
 class Class(models.Model):
+    MONDAY = "Monday"
+    TUESDAY = "Tuesday"
+    WEDNESDAY = "Wednesday"
+    THURSDAY = "Thursday"
+    FRIDAY = "Friday"
+    SATURDAY = "Saturday"
+    SUNDAY = "Sunday"
+    DAYS_OF_THE_WEEK = [
+        (MONDAY, "Monday"),
+        (TUESDAY, "Tuesday"),
+        (WEDNESDAY, "Wednesday"),
+        (THURSDAY, "Thursday"),
+        (FRIDAY, "Friday"),
+        (SATURDAY, "Saturday"),
+        (SUNDAY, "Sunday"),
+    ]
     name = models.CharField(max_length=128)
     session = models.ForeignKey(
         "Session",
@@ -45,6 +61,12 @@ class Class(models.Model):
         default="FFFFFF",
         blank=True,
     )
+    days = ArrayField(
+        models.CharField(max_length=9, blank=True, choices=DAYS_OF_THE_WEEK),
+        default=list,
+        blank=True,
+    )
+    location = models.CharField(max_length=128, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 

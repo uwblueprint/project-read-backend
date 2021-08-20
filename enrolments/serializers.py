@@ -16,6 +16,7 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "colour",
+            "days",
         ]
 
 
@@ -68,6 +69,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "attendance",
             "families",
+            "days",
         ]
 
     def get_families(self, obj):
@@ -84,6 +86,44 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             ).data
             for enrolment in obj.enrolments.filter(active=True)
         ]
+
+
+class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Class
+        fields = [
+            "id",
+            "name",
+            "attendance",
+            "days",
+            "location",
+            "facilitator",
+        ]
+
+    def create(self, validated_data):
+        class_obj = Class.objects.create(**validated_data)
+        class_obj["attendance"] = ([{"date": "M&G", "attendees": []}],)
+        # class_obj = Class.objects.create(
+        #     name=validated_data["name"],
+        #     days=validated_data["days"],
+        #     attendance=[{"date": "M&G", "attendees": []}],
+        #     location=validated_data["location"],
+        #     facilitator=validated_data["facilitator"],
+        # )
+        # class_obj.save()
+        return class_obj
+
+        # students = validated_data.pop("students")
+        # with transaction.atomic():
+        #     family = Family.objects.create(**validated_data)
+        #     Student.objects.bulk_create(
+        #         Student(**student, family=family) for student in students
+        #     )
+        #     # parent is validated in to_internal_value, so there should always be a parent created
+        #     family.parent = Student.objects.get(family=family, role=Student.PARENT)
+        #     family.save()
+
+        # return family
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
