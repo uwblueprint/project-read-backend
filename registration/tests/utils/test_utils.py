@@ -28,7 +28,6 @@ class RegistrationUtilsTestCase(TestCase):
         utils.create_test_parent(
             family=family,
             last_name=self.last_name,
-            with_fields=True,
         )
         self.assertEqual(Student.objects.all().count(), 1)
 
@@ -36,11 +35,11 @@ class RegistrationUtilsTestCase(TestCase):
         self.assertEqual(parent.role, Student.PARENT)
         self.assertEqual(parent.family, family)
         self.assertEqual(family.parent, parent)
-
-        field_ids = [1, 3, 4, 5, 6, 7]
-        self.assertEqual(len(parent.information), len(field_ids))
+        self.assertGreaterEqual(len(parent.information), 1)
         self.assertTrue(
-            set([str(field_id) for field_id in field_ids]).issubset(parent.information)
+            set([int(key) for key in parent.information.keys()]).issubset(
+                Field.objects.filter(role=Student.PARENT).values_list("id", flat=True)
+            )
         )
 
     def test_create_test_children(self):
@@ -50,7 +49,6 @@ class RegistrationUtilsTestCase(TestCase):
             family=family,
             last_name=self.last_name,
             num_children=num_children,
-            with_fields=True,
         )
         self.assertEqual(Student.objects.all().count(), num_children)
         self.assertEqual(
@@ -64,12 +62,13 @@ class RegistrationUtilsTestCase(TestCase):
         )
 
         children = Student.objects.all()
-        field_ids = [8, 9]
         for child in children:
-            self.assertEqual(len(child.information), len(field_ids))
+            self.assertGreaterEqual(len(child.information), 1)
             self.assertTrue(
-                set([str(field_id) for field_id in field_ids]).issubset(
-                    child.information
+                set([int(key) for key in child.information.keys()]).issubset(
+                    Field.objects.filter(role=Student.CHILD).values_list(
+                        "id", flat=True
+                    )
                 )
             )
 
@@ -80,7 +79,6 @@ class RegistrationUtilsTestCase(TestCase):
             family=family,
             last_name=self.last_name,
             num_guests=num_guests,
-            with_fields=True,
         )
         self.assertEqual(Student.objects.all().count(), num_guests)
         self.assertEqual(
@@ -91,12 +89,13 @@ class RegistrationUtilsTestCase(TestCase):
         )
 
         guests = Student.objects.all()
-        field_ids = [10, 11]
         for guest in guests:
-            self.assertEqual(len(guest.information), len(field_ids))
+            self.assertGreaterEqual(len(guest.information), 1)
             self.assertTrue(
-                set([str(field_id) for field_id in field_ids]).issubset(
-                    guest.information
+                set([int(key) for key in guest.information.keys()]).issubset(
+                    Field.objects.filter(role=Student.GUEST).values_list(
+                        "id", flat=True
+                    )
                 )
             )
 
@@ -113,12 +112,10 @@ class RegistrationUtilsTestCase(TestCase):
     ):
         num_children = 3
         num_guests = 2
-        with_fields = True
 
         utils.create_test_family_with_students(
             num_children=num_children,
             num_guests=num_guests,
-            with_fields=True,
         )
 
         mock_family.assert_called_once()
@@ -127,17 +124,14 @@ class RegistrationUtilsTestCase(TestCase):
         mock_parent.assert_called_once_with(
             family=mock_family(),
             last_name=last_name,
-            with_fields=with_fields,
         )
         mock_children.assert_called_once_with(
             family=mock_family(),
             last_name=last_name,
             num_children=num_children,
-            with_fields=with_fields,
         )
         mock_guests.assert_called_once_with(
             family=mock_family(),
             last_name=last_name,
             num_guests=num_guests,
-            with_fields=with_fields,
         )

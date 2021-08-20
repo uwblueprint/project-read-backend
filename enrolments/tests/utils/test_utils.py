@@ -22,9 +22,9 @@ class EnrolmentUtilsTestCase(TestCase):
     def test_create_test_sessions__with_fields(self):
         field = Field.objects.create(is_default=True, order=1)
         num_sessions = 10
-        create_test_sessions(num_sessions=num_sessions, with_fields=True)
+        create_test_sessions(num_sessions=num_sessions, fields=[1])
         self.assertEqual(
-            Session.objects.filter(fields__contains=[field.id]).count(),
+            Session.objects.filter(fields__contains=[1]).count(),
             num_sessions,
         )
 

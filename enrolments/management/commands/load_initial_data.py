@@ -62,18 +62,8 @@ class Command(BaseCommand):
 
                 registration_utils.create_test_fields()
                 staff_user = account_utils.create_staff_user()
-                # Create at least 1 family with guests
-                registration_utils.create_test_family_with_students(
-                    with_fields=True,
-                    num_children=fake.pyint(min_value=1, max_value=3),
-                    num_guests=1,
-                    staff_user=staff_user,
-                )
-
-                # Create n-1 families
-                for _ in range(num_families - 1):
+                for _ in range(num_families):
                     registration_utils.create_test_family_with_students(
-                        with_fields=True,
                         num_children=fake.pyint(min_value=1, max_value=3),
                         num_guests=fake.pyint(max_value=1),
                         staff_user=staff_user,
@@ -81,10 +71,16 @@ class Command(BaseCommand):
 
                 sessions = enrolment_utils.create_test_sessions(
                     num_sessions,
-                    with_fields=True,
+                    fields=fake.random_elements(
+                        elements=(
+                            list(Field.objects.all().values_list("id", flat=True))
+                        ),
+                        length=fake.random_int(min=1, max=Field.objects.all().count()),
+                        unique=True,
+                    ),
                 )
-                classes = []
 
+                classes = []
                 for session in sessions:
                     classes.extend(
                         enrolment_utils.create_test_classes(
