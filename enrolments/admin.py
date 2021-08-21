@@ -7,6 +7,7 @@ class SessionAdmin(admin.ModelAdmin):
         "id",
         "name",
         "start_date",
+        "active",
         "created_at",
         "updated_at",
     )
