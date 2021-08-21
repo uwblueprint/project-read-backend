@@ -10,13 +10,13 @@ from enrolments.serializers import SessionListSerializer, SessionDetailSerialize
 
 class SessionTestCase(APITestCase):
     def setUp(self):
-        self.facilitator = User.objects.create(email="user@staff.com")
-        self.class1 = Class.objects.create(
-            name="Test Class Create",
-            days=[Class.MONDAY, Class.WEDNESDAY],
-            location="Waterloo",
-            facilitator=self.facilitator.id,
-        )
+        self.user = User.objects.create(email="user@staff.com")
+        # self.class1 = Class.objects.create(
+        #     name="Class Create",
+        #     days=[Class.MONDAY, Class.WEDNESDAY],
+        #     location="1999 Waterloo Way",
+        #     facilitator=self.facilitator.id,
+        # )
         self.session = Session.objects.create(
             name="Summer 2021", start_date=date(2021, 1, 1)
         )
@@ -26,16 +26,10 @@ class SessionTestCase(APITestCase):
         self.session_no_start_date = Session.objects.create(
             name="Summer 2021", start_date=None
         )
-        self.session_create = Session.objects.create(
-            name="Fall 2020",
-            start_date=date(2020, 12, 1),
-            fields=[1, 2],
-            classes=[self.class1],
-        )
 
     def test_get_all_sessions(self):
         url = reverse("session-list")
-        self.client.force_authenticate(self.facilitator)
+        self.client.force_authenticate(self.user)
         response = self.client.get(url)
         payload = response.json()
 
@@ -61,13 +55,20 @@ class SessionTestCase(APITestCase):
         self.assertEqual(payload, SessionDetailSerializer(self.session).data)
 
     def test_create_session(self):
-        url = reverse("session-detail")
+        url = reverse("session-list")
         self.client.force_authenticate(self.user)
         request = {
-            "name": self.session_create.name,
-            "start_date": self.session_create.days,
-            "fields": self.session_create.fields,
-            "classes": self.session_create.classes,
+            "name": "Fall 2020",
+            "start_date": date(2020, 12, 1),
+            "fields": [1, 2],
+            "classes": [
+                {
+                    "name": "Test Class Create",
+                    "days": [Class.MONDAY, Class.WEDNESDAY],
+                    "location": "Waterloo",
+                    "facilitator": self.user.id,
+                }
+            ],
         }
         response = self.client.post(url, request, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
