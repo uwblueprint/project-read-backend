@@ -7,6 +7,7 @@ from .validators import validate_student_information_role
 from enrolments.models import Enrolment
 from accounts.models import User
 from accounts.serializers import UserSerializer
+from enrolments.serializers import EnrolmentSerializer
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -65,8 +66,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             return enrolment
 
         if obj.current_enrolment is not None:
-            from enrolments.serializers import EnrolmentSerializer
-
             return EnrolmentSerializer(obj.current_enrolment).data
 
         return None
@@ -77,7 +76,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
     current_enrolment = SerializerMethodField()
-    enrolments = SerializerMethodField()
+    enrolments =  EnrolmentSerializer(many=True)
 
     class Meta:
         model = Family
@@ -101,21 +100,10 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ["interactions"]
 
     def get_current_enrolment(self, obj):
-        from enrolments.serializers import EnrolmentSerializer
 
         if obj.current_enrolment is None:
             return None
         return EnrolmentSerializer(obj.current_enrolment).data
-
-    def get_enrolments(self, obj):
-        from enrolments.serializers import EnrolmentSerializer
-
-        enrolments = Enrolment.objects.filter(family=obj)
-
-        enrolment_list = [
-            EnrolmentSerializer(enrolment).data for enrolment in enrolments
-        ]
-        return enrolment_list
 
     def create(self, validated_data):
         students = validated_data.pop("students")
