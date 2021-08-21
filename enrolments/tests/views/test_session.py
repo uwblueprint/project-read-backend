@@ -4,13 +4,19 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from accounts.models import User
-from enrolments.models import Session
+from enrolments.models import Class, Session
 from enrolments.serializers import SessionListSerializer, SessionDetailSerializer
 
 
 class SessionTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@staff.com")
+        self.class1 = Class.objects.create(
+            name="Test Class Create",
+            days=[Class.MONDAY, Class.WEDNESDAY],
+            location="Waterloo",
+            facilitator="self.user.id",
+        )
         self.session = Session.objects.create(
             name="Summer 2021", start_date=date(2021, 1, 1)
         )
@@ -19,6 +25,12 @@ class SessionTestCase(APITestCase):
         )
         self.session_no_start_date = Session.objects.create(
             name="Summer 2021", start_date=None
+        )
+        self.session_create = Session.objects.create(
+            name="Fall 2020",
+            start_date=date(2020, 12, 1),
+            fields=[1, 2],
+            classes=[self.class1],
         )
 
     def test_get_all_sessions(self):
@@ -47,6 +59,18 @@ class SessionTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(payload, SessionDetailSerializer(self.session).data)
+
+    def test_create_session(self):
+        url = reverse("session-detail")
+        self.client.force_authenticate(self.user)
+        request = {
+            "name": self.session_create.name,
+            "start_date": self.session_create.days,
+            "fields": self.session_create.fields,
+            "classes": self.session_create.classes,
+        }
+        response = self.client.post(url, request, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_method_not_allowed(self):
         url = reverse("session-detail", args=[self.session.id])
