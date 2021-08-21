@@ -116,66 +116,6 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
         return class_obj
 
 
-class SessionListSerializer(serializers.HyperlinkedModelSerializer):
-    classes = ClassListSerializer(many=True)
-
-    class Meta:
-        model = Session
-        fields = [
-            "id",
-            "name",
-            "classes",
-        ]
-
-
-class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
-    classes = ClassListSerializer(many=True)
-    families = SerializerMethodField()
-
-    class Meta:
-        model = Session
-        fields = [
-            "id",
-            "name",
-            "families",
-            "fields",
-            "classes",
-        ]
-
-    def get_families(self, obj):
-        return [
-            FamilySerializer(
-                enrolment.family,
-                context={
-                    "request": self.context.get("request"),
-                    "enrolment": EnrolmentSerializer(enrolment).data,
-                },
-            ).data
-            for enrolment in obj.enrolments.filter(active=True)
-        ]
-
-
-class SessionCreateSerializer(serializers.ModelSerializer):
-    classes = ClassCreateSerializer(many=True)
-
-    class Meta:
-        model = Session
-        fields = [
-            "name",
-            "start_date",
-            "fields",
-            "classes",
-        ]
-
-    def create(self, validated_data):
-        classes = validated_data.pop("classes")
-        session = Session.objects.create(**validated_data)
-        for class_obj in classes:
-            Class.objects.create(session=session, **class_obj, attendance=[{"date": "M&G", "attendees": []}])
-
-        return session
-
-
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
     family = serializers.PrimaryKeyRelatedField(
         allow_null=True,
