@@ -33,12 +33,6 @@ class ClassesTestCase(APITestCase):
             facilitator_id=self.user.id,
             attendance=[{"date": "2020-01-01", "attendees": [self.student1.id]}],
         )
-        self.class_create = Class.objects.create(
-            name="Test Class Create",
-            days=[Class.MONDAY, Class.WEDNESDAY],
-            location="Waterloo",
-            facilitator=self.user,
-        )
         self.enrolment1 = Enrolment.objects.create(
             active=True,
             family=self.family1,
@@ -75,10 +69,10 @@ class ClassesTestCase(APITestCase):
         url = reverse("class-list")
         self.client.force_authenticate(self.user)
         request = {
-            "name": self.class_create.name,
-            "days": self.class_create.days,
-            "location": self.class_create.location,
-            "facilitator": self.class_create.facilitator.id,
+            "name": "Test Class Create",
+            "days": [Class.MONDAY, Class.WEDNESDAY],
+            "location": "Waterloo",
+            "facilitator": self.user.id,
         }
         response = self.client.post(url, request, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
