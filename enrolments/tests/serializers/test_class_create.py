@@ -21,7 +21,10 @@ class ClassCreateSerializerTestCase(TestCase):
             "facilitator": self.facilitator.id,
         }
 
-    @patch("enrolments.serializers.ClassCreateSerializer.create")
-    def test_class_serializer_create(self, mock_create):
-        serializer = ClassCreateSerializer(data=self.class_payload)
+    def test_class_serializer_create(self):
+        serializer = ClassCreateSerializer(data=dict(self.class_payload))
         self.assertTrue(serializer.is_valid())
+        class_obj = serializer.save()
+
+        self.assertEqual(class_obj.attendance, [{"date": "M&G", "attendees": []}])
+

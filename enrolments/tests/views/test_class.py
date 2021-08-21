@@ -53,9 +53,6 @@ class ClassesTestCase(APITestCase):
             enrolled_class=self.class1,
         )
 
-    def test_class_list_url_fail(self):
-        with self.assertRaises(NoReverseMatch):
-            reverse("class-detail")
 
     def test_get_class(self):
         url = reverse("class-detail", args=[self.class1.id])
@@ -85,10 +82,10 @@ class ClassesTestCase(APITestCase):
         url = reverse("class-list")
         self.client.force_authenticate(self.user)
         request = {
-            "name": self.empty_class.name,
-            "days": self.empty_class.days,
-            "location": self.empty_class.location,
-            "facilitator": self.empty_class.facilitator.id,
+            "name": self.class_create.name,
+            "days": self.class_create.days,
+            "location": self.class_create.location,
+            "facilitator": self.class_create.facilitator.id,
         }
         response = self.client.post(url, request, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
