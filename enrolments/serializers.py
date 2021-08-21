@@ -22,7 +22,7 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
 
 class SessionListSerializer(serializers.HyperlinkedModelSerializer):
     classes = ClassListSerializer(many=True)
-    
+
     class Meta:
         model = Session
         fields = [

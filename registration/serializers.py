@@ -76,7 +76,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
     current_enrolment = SerializerMethodField()
-    enrolments =  EnrolmentSerializer(many=True)
+    enrolments = EnrolmentSerializer(many=True)
 
     class Meta:
         model = Family
