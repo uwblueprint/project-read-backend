@@ -39,12 +39,6 @@ class ClassesTestCase(APITestCase):
             location="Waterloo",
             facilitator=self.user,
         )
-        self.empty_class = Class.objects.create(
-            name="Test Empty Class",
-            session_id=self.session2.id,
-            facilitator_id=self.user.id,
-            attendance=[{"date": "2020-01-01", "attendees": []}],
-        )
         self.enrolment1 = Enrolment.objects.create(
             active=True,
             family=self.family1,
@@ -52,7 +46,6 @@ class ClassesTestCase(APITestCase):
             preferred_class=self.class1,
             enrolled_class=self.class1,
         )
-
 
     def test_get_class(self):
         url = reverse("class-detail", args=[self.class1.id])
