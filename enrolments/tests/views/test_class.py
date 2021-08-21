@@ -49,7 +49,7 @@ class ClassesTestCase(APITestCase):
 
     def test_class_list_url_fail(self):
         with self.assertRaises(NoReverseMatch):
-            reverse("class-list")
+            reverse("class-detail")
 
     def test_get_class(self):
         url = reverse("class-detail", args=[self.class1.id])

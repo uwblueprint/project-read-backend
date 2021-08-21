@@ -20,7 +20,7 @@ class ClassCreateSerializerTestCase(TestCase):
             "name": self.name,
             "days": self.days,
             "location": self.location,
-            "facilitator": self.facilitator,
+            "facilitator": self.facilitator.id,
         }
 
     @patch("enrolments.serializers.ClassCreateSerializer.create")
