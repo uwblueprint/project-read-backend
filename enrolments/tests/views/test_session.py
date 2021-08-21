@@ -10,12 +10,12 @@ from enrolments.serializers import SessionListSerializer, SessionDetailSerialize
 
 class SessionTestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create(email="user@staff.com")
+        self.facilitator = User.objects.create(email="user@staff.com")
         self.class1 = Class.objects.create(
             name="Test Class Create",
             days=[Class.MONDAY, Class.WEDNESDAY],
             location="Waterloo",
-            facilitator="self.user.id",
+            facilitator=self.facilitator.id,
         )
         self.session = Session.objects.create(
             name="Summer 2021", start_date=date(2021, 1, 1)
@@ -35,7 +35,7 @@ class SessionTestCase(APITestCase):
 
     def test_get_all_sessions(self):
         url = reverse("session-list")
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.facilitator)
         response = self.client.get(url)
         payload = response.json()
 
