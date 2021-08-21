@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from registration.models import Family
 from registration.serializers import FamilySerializer
+from accounts.models import User
 from .models import Session, Class, Enrolment
 from .validators import (
     validate_class_in_session,
@@ -89,8 +90,8 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
-    facilitator = serializers.HyperlinkedRelatedField(
-        view_name="user-list", read_only=True
+    facilitator = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), allow_null=True
     )
 
     class Meta:
