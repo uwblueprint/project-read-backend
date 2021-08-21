@@ -171,7 +171,7 @@ class SessionCreateSerializer(serializers.ModelSerializer):
         classes = validated_data.pop("classes")
         session = Session.objects.create(**validated_data)
         for class_obj in classes:
-            Class.objects.create(session=session, **class_obj)
+            Class.objects.create(session=session, **class_obj, attendance=[{"date": "M&G", "attendees": []}])
 
         return session
 
