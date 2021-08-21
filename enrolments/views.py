@@ -7,6 +7,7 @@ from .models import Class, Enrolment, Session
 from .serializers import (
     SessionListSerializer,
     SessionDetailSerializer,
+    SessionCreateSerializer,
     ClassDetailSerializer,
     ClassCreateSerializer,
     EnrolmentSerializer,
@@ -17,16 +18,20 @@ class SessionViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
 ):
     queryset = Session.objects.all().order_by(F("start_date").desc(nulls_last=True))
     http_method_names = [
         "get",
+        "post",
     ]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "retrieve":
             return SessionDetailSerializer
+        elif self.action == "create":
+            return SessionCreateSerializer
         return SessionListSerializer
 
 
