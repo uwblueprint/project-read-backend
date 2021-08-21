@@ -89,12 +89,15 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
+    facilitator = serializers.HyperlinkedRelatedField(
+        view_name="user-list", read_only=True
+    )
+
     class Meta:
         model = Class
         fields = [
             "id",
             "name",
-            "attendance",
             "days",
             "location",
             "facilitator",
@@ -104,15 +107,7 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
         class_obj = Class.objects.create(
             **validated_data, attendance=[{"date": "M&G", "attendees": []}]
         )
-        # class_obj["attendance"] = ([{"date": "M&G", "attendees": []}],)
-        # class_obj = Class.objects.create(
-        #     name=validated_data["name"],
-        #     days=validated_data["days"],
-        #     attendance=[{"date": "M&G", "attendees": []}],
-        #     location=validated_data["location"],
-        #     facilitator=validated_data["facilitator"],
-        # )
-        # class_obj.save()
+        class_obj.save()
         return class_obj
 
 

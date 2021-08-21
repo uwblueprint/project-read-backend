@@ -6,8 +6,6 @@ from accounts.models import User
 from enrolments.models import Class
 from enrolments.serializers import ClassCreateSerializer
 
-# from datetime import date
-
 
 class ClassCreateSerializerTestCase(TestCase):
     def setUp(self):
