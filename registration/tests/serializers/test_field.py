@@ -90,7 +90,7 @@ class FieldSerializerTestCase(TestCase):
 
     def test_field_serializer__order_validator(self):
         field_request_invalid_order = {
-            "role": "Child",
+            "role": Field.PARENT,
             "name": "Favourite Colour",
             "question": "What is your favourite colour?",
             "question_type": "Text",
@@ -102,10 +102,10 @@ class FieldSerializerTestCase(TestCase):
         serializer = FieldSerializer(data=field_request_invalid_order)
         self.assertFalse(serializer.is_valid())
 
-        field_request_invalid_order["order"] = 3
+        field_request_invalid_order["order"] = 2
         serializer = FieldSerializer(data=field_request_invalid_order)
         self.assertFalse(serializer.is_valid())
 
-        field_request_invalid_order["order"] = 2
+        field_request_invalid_order["order"] = 3
         serializer = FieldSerializer(data=field_request_invalid_order)
         self.assertTrue(serializer.is_valid())

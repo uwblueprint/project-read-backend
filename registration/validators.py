@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.core.exceptions import ValidationError
+from django.db.models import Max
 
 
 def validate_family_parent(student_id):
@@ -73,5 +74,8 @@ def validate_interactions(interactions):
 
 def validate_field_order(field_order, role):
     Field = apps.get_model("registration", "Field")
-    if field_order != Field.objects.filter(role=role).count() + 1:
+    if (
+        not field_order
+        > Field.objects.filter(role=role).aggregate(Max("order"))["order__max"]
+    ):
         raise ValidationError("Invalid order value")
