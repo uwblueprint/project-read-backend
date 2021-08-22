@@ -1,4 +1,6 @@
+import re
 from django.db import models, transaction
+from django.http import request
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -238,5 +240,7 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
         list_serializer_class = FieldListSerializer
 
     def validate(self, attrs):
-        validate_field_order(attrs["order"], attrs["role"])
+        request = self.context.get("request")
+        if request.method == "POST":
+            validate_field_order(attrs["order"], attrs["role"])
         return super().validate(attrs)
