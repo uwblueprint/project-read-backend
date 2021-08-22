@@ -33,12 +33,6 @@ class ClassesTestCase(APITestCase):
             facilitator_id=self.user.id,
             attendance=[{"date": "2020-01-01", "attendees": [self.student1.id]}],
         )
-        self.empty_class = Class.objects.create(
-            name="Test Empty Class",
-            session_id=self.session2.id,
-            facilitator_id=self.user.id,
-            attendance=[{"date": "2020-01-01", "attendees": []}],
-        )
         self.enrolment1 = Enrolment.objects.create(
             active=True,
             family=self.family1,
@@ -46,10 +40,6 @@ class ClassesTestCase(APITestCase):
             preferred_class=self.class1,
             enrolled_class=self.class1,
         )
-
-    def test_class_list_url_fail(self):
-        with self.assertRaises(NoReverseMatch):
-            reverse("class-list")
 
     def test_get_class(self):
         url = reverse("class-detail", args=[self.class1.id])
@@ -74,6 +64,18 @@ class ClassesTestCase(APITestCase):
         response = self.client.put(url, request, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_class(self):
+        url = reverse("class-list")
+        self.client.force_authenticate(self.user)
+        request = {
+            "name": "Test Class Create",
+            "days": [Class.MONDAY, Class.WEDNESDAY],
+            "location": "Waterloo",
+            "facilitator": self.user.id,
+        }
+        response = self.client.post(url, request, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_method_not_allowed(self):
         self.client.force_authenticate(self.user)

@@ -57,6 +57,18 @@ def create_test_classes(session, num_classes):
                         "ffecb3",
                     ]
                 ),
+                days=fake.random_elements(
+                    elements=[
+                        Class.MONDAY,
+                        Class.TUESDAY,
+                        Class.WEDNESDAY,
+                        Class.THURSDAY,
+                        Class.FRIDAY,
+                        Class.SATURDAY,
+                        Class.SUNDAY,
+                    ],
+                    unique=True,
+                ),
             )
         )
 
