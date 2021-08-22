@@ -51,12 +51,23 @@ class FieldTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(payload, serializer.data)
 
-    def test_method_not_allowed(self):
+    def test_post_fields(self):
         url = reverse("field-list")
         self.client.force_authenticate(self.user)
-
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.post(
+            url,
+            {
+                "role": "Child",
+                "name": "Favourite Colour",
+                "question": "What is your favourite colour",
+                "question_type": "Text",
+                "is_default": False,
+                "options": [],
+                "order": Field.objects.filter(role="Child").count() + 1,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_unauthorized(self):
         url = reverse("field-list")
