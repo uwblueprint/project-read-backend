@@ -75,7 +75,7 @@ def validate_interactions(interactions):
 def validate_field_order(field_order, role):
     Field = apps.get_model("registration", "Field")
     if (
-        not field_order
-        > Field.objects.filter(role=role).aggregate(Max("order"))["order__max"]
+        field_order
+        != Field.objects.filter(role=role).aggregate(Max("order"))["order__max"] + 1
     ):
         raise ValidationError("Invalid order value")

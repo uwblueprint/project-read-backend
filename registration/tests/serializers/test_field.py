@@ -102,7 +102,7 @@ class FieldSerializerTestCase(TestCase):
         serializer = FieldSerializer(data=field_request_invalid_order)
         self.assertFalse(serializer.is_valid())
 
-        field_request_invalid_order["order"] = 2
+        field_request_invalid_order["order"] = 4
         serializer = FieldSerializer(data=field_request_invalid_order)
         self.assertFalse(serializer.is_valid())
 
