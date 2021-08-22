@@ -1,4 +1,6 @@
 from django.test.testcases import TestCase
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
 
 from accounts.models import User
 from registration.models import Field
@@ -98,14 +100,14 @@ class FieldSerializerTestCase(TestCase):
             "options": [],
             "order": 1,
         }
-
-        serializer = FieldSerializer(data=field_request_invalid_order)
+        context = {"request": Request(APIRequestFactory().post("/fields/"))}
+        serializer = FieldSerializer(data=field_request_invalid_order, context=context)
         self.assertFalse(serializer.is_valid())
 
         field_request_invalid_order["order"] = 4
-        serializer = FieldSerializer(data=field_request_invalid_order)
+        serializer = FieldSerializer(data=field_request_invalid_order, context=context)
         self.assertFalse(serializer.is_valid())
 
         field_request_invalid_order["order"] = 3
-        serializer = FieldSerializer(data=field_request_invalid_order)
+        serializer = FieldSerializer(data=field_request_invalid_order, context=context)
         self.assertTrue(serializer.is_valid())
