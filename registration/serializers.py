@@ -4,9 +4,6 @@ from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
 from .validators import validate_student_information_role
-from enrolments.models import Enrolment
-from accounts.models import User
-from accounts.serializers import UserSerializer
 from enrolments.serializers import EnrolmentSerializer
 
 
@@ -100,7 +97,6 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ["interactions"]
 
     def get_current_enrolment(self, obj):
-
         if obj.current_enrolment is None:
             return None
         return EnrolmentSerializer(obj.current_enrolment).data
