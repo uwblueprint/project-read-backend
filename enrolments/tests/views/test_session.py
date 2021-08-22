@@ -29,12 +29,12 @@ class SessionTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # sessions should be ordered by descending start date, with nulls last
+        # sessions should be ordered by ascending start date, with nulls last
         self.assertEqual(
             payload,
             [
-                SessionListSerializer(self.session).data,
                 SessionListSerializer(self.older_session).data,
+                SessionListSerializer(self.session).data,
                 SessionListSerializer(self.session_no_start_date).data,
             ],
         )
