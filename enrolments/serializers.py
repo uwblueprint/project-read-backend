@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from registration.models import Family
 from registration.serializers import FamilySerializer
+from accounts.models import User
 from .models import Session, Class, Enrolment
 from .validators import (
     validate_class_in_session,
@@ -16,6 +17,7 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "colour",
+            "days",
         ]
 
 
@@ -68,6 +70,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "attendance",
             "families",
+            "days",
         ]
 
     def get_families(self, obj):
@@ -84,6 +87,29 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
             ).data
             for enrolment in obj.enrolments.filter(active=True)
         ]
+
+
+class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
+    facilitator = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), allow_null=True
+    )
+
+    class Meta:
+        model = Class
+        fields = [
+            "id",
+            "name",
+            "days",
+            "location",
+            "facilitator",
+        ]
+
+    def create(self, validated_data):
+        class_obj = Class.objects.create(
+            **validated_data, attendance=[{"date": "M&G", "attendees": []}]
+        )
+        class_obj.save()
+        return class_obj
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):

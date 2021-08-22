@@ -117,12 +117,14 @@ class ClassDetailSerializerTestCase(TestCase):
             session_id=self.session1.id,
             facilitator_id=self.facilitator.id,
             attendance=[{"date": "2020-01-01", "attendees": [1, 2]}],
+            days=[Class.MONDAY, Class.THURSDAY],
         )
         self.empty_class = Class.objects.create(
             name="Test Empty Class",
             session_id=self.session2.id,
             facilitator_id=self.facilitator.id,
             attendance=[{"date": "2020-01-01", "attendees": []}],
+            days=[Class.FRIDAY],
         )
         self.enrolment1 = Enrolment.objects.create(
             active=True,
@@ -168,6 +170,7 @@ class ClassDetailSerializerTestCase(TestCase):
                         },
                     ).data,
                 ],
+                "days": self.class1.days,
             },
             ClassDetailSerializer(self.class1, context={"request": None}).data,
         )
@@ -179,6 +182,7 @@ class ClassDetailSerializerTestCase(TestCase):
                 "name": self.empty_class.name,
                 "attendance": self.empty_class.attendance,
                 "families": [],
+                "days": self.empty_class.days,
             },
             ClassDetailSerializer(self.empty_class, context={"request": None}).data,
         )
