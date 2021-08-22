@@ -28,6 +28,7 @@ class SessionListSerializerTestCase(TestCase):
                     ClassListSerializer(self.session_class).data,
                     ClassListSerializer(self.other_session_class).data,
                 ],
+                "active": self.session.active,
             },
             SessionListSerializer(self.session, context=context).data,
         )

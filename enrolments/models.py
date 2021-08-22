@@ -10,6 +10,8 @@ from django.contrib.postgres.fields import ArrayField
 class Session(models.Model):
     name = models.CharField(max_length=128, default="")
     start_date = models.DateField(null=True)
+    active = models.BooleanField(default=False)
+
     fields = ArrayField(
         models.IntegerField(), default=list, validators=[validate_fields]
     )

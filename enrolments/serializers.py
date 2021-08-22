@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from registration.models import Family
-from registration.serializers import FamilySerializer
 from accounts.models import User
 from .models import Session, Class, Enrolment
 from .validators import (
@@ -30,6 +29,7 @@ class SessionListSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "classes",
+            "active",
         ]
 
 
@@ -48,6 +48,8 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_families(self, obj):
+        from registration.serializers import FamilySerializer
+
         return [
             FamilySerializer(
                 enrolment.family,
@@ -74,6 +76,8 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_families(self, obj):
+        from registration.serializers import FamilySerializer
+
         request = self.context.get("request")
         return [
             FamilySerializer(
