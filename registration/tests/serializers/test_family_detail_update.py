@@ -94,7 +94,6 @@ class FamilyDetailSerializerTestCase(TestCase):
         self.family_data["children"] = self.children_data
         self.family_data["guests"] = self.guests_data
         self.family_data["parent"] = self.parent_data
-        self.family_data["current_enrolment"] = None
         self.family_data["enrolments"] = []
 
     def test_family_detail_serializer_update(self):

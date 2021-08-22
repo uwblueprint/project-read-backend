@@ -18,7 +18,7 @@ class SessionViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
 ):
-    queryset = Session.objects.all().order_by(F("start_date").desc(nulls_last=True))
+    queryset = Session.objects.all().order_by(F("start_date").asc(nulls_last=True))
     http_method_names = [
         "get",
     ]
