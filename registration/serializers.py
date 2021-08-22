@@ -1,6 +1,4 @@
-import re
 from django.db import models, transaction
-from django.http import request
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
