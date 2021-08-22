@@ -50,6 +50,15 @@ class FieldSerializerTestCase(TestCase):
             is_default=True,
             order=1,
         )
+        self.field_request = {
+            "role": Field.PARENT,
+            "name": "Favourite Colour",
+            "question": "What is your favourite colour?",
+            "question_type": Field.TEXT,
+            "is_default": False,
+            "options": [],
+            "order": 3,
+        }
 
     def test_field_list_serializer(self):
         serializer = FieldListSerializer(child=FieldSerializer(), data=Field.objects)
@@ -91,23 +100,31 @@ class FieldSerializerTestCase(TestCase):
         )
 
     def test_field_serializer__order_validator(self):
-        field_request_invalid_order = {
-            "role": Field.PARENT,
-            "name": "Favourite Colour",
-            "question": "What is your favourite colour?",
-            "question_type": "Text",
-            "is_default": False,
-            "options": [],
-            "order": 1,
-        }
+        field_request_invalid_order = self.field_request
         context = {"request": Request(APIRequestFactory().post("/fields/"))}
         serializer = FieldSerializer(data=field_request_invalid_order, context=context)
-        self.assertFalse(serializer.is_valid())
+        self.assertTrue(serializer.is_valid())
 
         field_request_invalid_order["order"] = 4
         serializer = FieldSerializer(data=field_request_invalid_order, context=context)
         self.assertFalse(serializer.is_valid())
 
-        field_request_invalid_order["order"] = 3
+        field_request_invalid_order["order"] = 1
         serializer = FieldSerializer(data=field_request_invalid_order, context=context)
+        self.assertFalse(serializer.is_valid())
+
+    def test_field_serializer__option_validator(self):
+        field_request_invalid_options = self.field_request
+        field_request_invalid_options["question_type"] = Field.SELECT
+
+        context = {"request": Request(APIRequestFactory().post("/fields/"))}
+        serializer = FieldSerializer(
+            data=field_request_invalid_options, context=context
+        )
+        self.assertFalse(serializer.is_valid())
+
+        field_request_invalid_options["options"] = ["Option 1"]
+        serializer = FieldSerializer(
+            data=field_request_invalid_options, context=context
+        )
         self.assertTrue(serializer.is_valid())
