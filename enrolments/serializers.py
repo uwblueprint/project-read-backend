@@ -140,7 +140,6 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "status",
             "students",
         ]
-        ordering = ["session__start_date"]
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
