@@ -94,7 +94,6 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "enrolments",
             "interactions",
         ]
-        read_only_fields = ["interactions"]
 
     def get_current_enrolment(self, obj):
         if obj.current_enrolment is None:
@@ -116,6 +115,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data.pop("current_enrolment")
+        validated_data.pop("enrolments")
         students_data = validated_data.pop("students")
         students = (
             [instance.parent]
