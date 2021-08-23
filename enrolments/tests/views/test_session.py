@@ -5,18 +5,43 @@ from rest_framework.test import APITestCase
 
 from accounts.models import User
 from enrolments.models import Class, Session
+from registration.models import Field
 from enrolments.serializers import SessionListSerializer, SessionDetailSerializer
 
 
 class SessionTestCase(APITestCase):
     def setUp(self):
+        Field.objects.bulk_create(
+            [
+                Field(
+                    role=Field.PARENT,
+                    name="Drip or drown?",
+                    question="Do you have drip?",
+                    question_type=Field.TEXT,
+                    is_default=False,
+                    order=1,
+                ),
+                Field(
+                    role=Field.CHILD,
+                    name="Swag or square?",
+                    question="Do you have swag?",
+                    question_type=Field.TEXT,
+                    is_default=True,
+                    order=2,
+                ),
+                Field(
+                    role=Field.GUEST,
+                    name="Ice or ill?",
+                    question="Do you have ice?",
+                    question_type=Field.TEXT,
+                    is_default=False,
+                    order=3,
+                ),
+            ]
+        )
+        self.field_ids = list(Field.objects.values_list("id", flat=True))
+
         self.user = User.objects.create(email="user@staff.com")
-        # self.class1 = Class.objects.create(
-        #     name="Class Create",
-        #     days=[Class.MONDAY, Class.WEDNESDAY],
-        #     location="1999 Waterloo Way",
-        #     facilitator=self.facilitator.id,
-        # )
         self.session = Session.objects.create(
             name="Summer 2021", start_date=date(2021, 1, 1)
         )
@@ -60,7 +85,7 @@ class SessionTestCase(APITestCase):
         request = {
             "name": "Fall 2020",
             "start_date": date(2020, 12, 1),
-            "fields": [1, 2],
+            "fields": self.field_ids,
             "classes": [
                 {
                     "name": "Test Class Create",
