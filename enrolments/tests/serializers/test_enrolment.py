@@ -2,10 +2,9 @@ from registration.tests.utils.utils import create_test_family, create_test_paren
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from unittest.mock import call, patch
-from datetime import date
+from datetime import timezone
 
-from registration.models import Family, Student
-from enrolments.models import Class, Session, Enrolment
+from enrolments.models import Enrolment
 from enrolments.serializers import (
     ClassListSerializer,
     SessionListSerializer,
@@ -64,6 +63,9 @@ class EnrolmentSerializerTestCase(TestCase):
                 "enrolled_class": ClassListSerializer(self.class2).data,
                 "status": self.enrolment.status,
                 "students": [],
+                "created_at": self.enrolment.created_at.replace(tzinfo=timezone.utc)
+                .astimezone(tz=None)
+                .isoformat(),
             },
             EnrolmentSerializer(self.enrolment).data,
         )
