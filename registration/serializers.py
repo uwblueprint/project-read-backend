@@ -94,7 +94,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_enrolments(self, obj):
-        enrolments = obj.enrolments.order_by('session__created_at')
+        enrolments = obj.enrolments.order_by("session__created_at")
         return EnrolmentSerializer(enrolments, many=True).data
 
     def create(self, validated_data):
