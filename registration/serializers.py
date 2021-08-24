@@ -72,8 +72,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
-    current_enrolment = SerializerMethodField()
-    enrolments = EnrolmentSerializer(many=True)
+    enrolments = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -90,15 +89,13 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "children",
             "guests",
             "notes",
-            "current_enrolment",
             "enrolments",
             "interactions",
         ]
 
-    def get_current_enrolment(self, obj):
-        if obj.current_enrolment is None:
-            return None
-        return EnrolmentSerializer(obj.current_enrolment).data
+    def get_enrolments(self, obj):
+        enrolments = obj.enrolments.order_by("session__created_at")
+        return EnrolmentSerializer(enrolments, many=True).data
 
     def create(self, validated_data):
         students = validated_data.pop("students")
@@ -114,7 +111,6 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return family
 
     def update(self, instance, validated_data):
-        validated_data.pop("current_enrolment")
         validated_data.pop("enrolments")
         students_data = validated_data.pop("students")
         students = (

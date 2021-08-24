@@ -68,13 +68,11 @@ class Family(models.Model):
 
     @property
     def current_enrolment(self):
-        most_recent_session = (
-            apps.get_model("enrolments", "Session")
-            .objects.filter(start_date__isnull=False)
-            .order_by("-start_date")
+        return (
+            self.enrolments.filter(session__active=True)
+            .order_by("-session__start_date")
             .first()
         )
-        return self.enrolments.filter(session=most_recent_session).first()
 
     def __str__(self):
         if self.parent is not None:
