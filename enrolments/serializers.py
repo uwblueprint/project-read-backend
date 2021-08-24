@@ -58,7 +58,7 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
                     "enrolment": EnrolmentSerializer(enrolment).data,
                 },
             ).data
-            for enrolment in obj.enrolments.filter(active=True)
+            for enrolment in obj.enrolments.filter(active=True).order_by("created_at")
         ]
 
 
@@ -89,7 +89,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
                     ).data,
                 },
             ).data
-            for enrolment in obj.enrolments.filter(active=True)
+            for enrolment in obj.enrolments.filter(active=True).order_by("created_at")
         ]
 
 
@@ -139,6 +139,10 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "session",
             "status",
             "students",
+            "created_at",
+        ]
+        read_only_fields = [
+            "created_at",
         ]
 
     def to_representation(self, instance):
