@@ -7,23 +7,27 @@ import registration.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('registration', '0020_auto_20210821_1823'),
+        ("registration", "0020_auto_20210821_1823"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='family',
-            name='interactions',
-            field=models.JSONField(blank=True, default=list, validators=[registration.validators.validate_interactions]),
+            model_name="family",
+            name="interactions",
+            field=models.JSONField(
+                blank=True,
+                default=list,
+                validators=[registration.validators.validate_interactions],
+            ),
         ),
         migrations.AlterField(
-            model_name='student',
-            name='first_name',
+            model_name="student",
+            name="first_name",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AlterField(
-            model_name='student',
-            name='last_name',
+            model_name="student",
+            name="last_name",
             field=models.CharField(blank=True, max_length=128, null=True),
         ),
     ]
