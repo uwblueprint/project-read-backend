@@ -93,7 +93,7 @@ class Student(models.Model):
     ]
 
     first_name = models.CharField(max_length=128, blank=True)
-    last_name = models.CharField(max_length=128, null=True, blank=True)
+    last_name = models.CharField(max_length=128, blank=True, default="")
     role = models.CharField(max_length=6, choices=ROLE_CHOICES)
     date_of_birth = models.DateField(null=True, blank=True)
     family = models.ForeignKey(
