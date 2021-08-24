@@ -36,7 +36,9 @@ class Family(models.Model):
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
     notes = models.TextField(blank=True)
-    interactions = models.JSONField(default=list, validators=[validate_interactions])
+    interactions = models.JSONField(
+        default=list, validators=[validate_interactions], blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
@@ -90,8 +92,8 @@ class Student(models.Model):
         (GUEST, "Guest"),
     ]
 
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128, null=True)
+    first_name = models.CharField(max_length=128, blank=True)
+    last_name = models.CharField(max_length=128, null=True, blank=True)
     role = models.CharField(max_length=6, choices=ROLE_CHOICES)
     date_of_birth = models.DateField(null=True, blank=True)
     family = models.ForeignKey(
