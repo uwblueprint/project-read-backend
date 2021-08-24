@@ -21,48 +21,6 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class SessionListSerializer(serializers.HyperlinkedModelSerializer):
-    classes = ClassListSerializer(many=True)
-
-    class Meta:
-        model = Session
-        fields = [
-            "id",
-            "name",
-            "classes",
-            "active",
-        ]
-
-
-class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
-    classes = ClassListSerializer(many=True)
-    families = SerializerMethodField()
-
-    class Meta:
-        model = Session
-        fields = [
-            "id",
-            "name",
-            "families",
-            "fields",
-            "classes",
-        ]
-
-    def get_families(self, obj):
-        from registration.serializers import FamilySerializer
-
-        return [
-            FamilySerializer(
-                enrolment.family,
-                context={
-                    "request": self.context.get("request"),
-                    "enrolment": EnrolmentSerializer(enrolment).data,
-                },
-            ).data
-            for enrolment in obj.enrolments.filter(active=True).order_by("created_at")
-        ]
-
-
 class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
     families = serializers.SerializerMethodField()
 
@@ -115,6 +73,69 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
         )
         class_obj.save()
         return class_obj
+
+
+class SessionListSerializer(serializers.HyperlinkedModelSerializer):
+    classes = ClassListSerializer(many=True)
+
+    class Meta:
+        model = Session
+        fields = [
+            "id",
+            "name",
+            "classes",
+            "active",
+        ]
+
+
+class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
+    classes = ClassListSerializer(many=True)
+    families = SerializerMethodField()
+
+    class Meta:
+        model = Session
+        fields = [
+            "id",
+            "name",
+            "families",
+            "fields",
+            "classes",
+        ]
+
+    def get_families(self, obj):
+        from registration.serializers import FamilySerializer
+
+        return [
+            FamilySerializer(
+                enrolment.family,
+                context={
+                    "request": self.context.get("request"),
+                    "enrolment": EnrolmentSerializer(enrolment).data,
+                },
+            ).data
+            for enrolment in obj.enrolments.filter(active=True)
+        ]
+
+
+class SessionCreateSerializer(serializers.ModelSerializer):
+    classes = ClassCreateSerializer(many=True)
+
+    class Meta:
+        model = Session
+        fields = [
+            "name",
+            "start_date",
+            "fields",
+            "classes",
+        ]
+
+    def create(self, validated_data):
+        classes = validated_data.pop("classes")
+        session = Session.objects.create(**validated_data)
+        for class_obj in classes:
+            Class.objects.create(session=session, **class_obj)
+
+        return session
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
