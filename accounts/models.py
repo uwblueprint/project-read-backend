@@ -8,6 +8,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     firebase_uid = models.CharField(max_length=128)
+    is_admin = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
