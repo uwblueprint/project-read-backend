@@ -87,6 +87,9 @@ class FieldTestCase(APITestCase):
         url = reverse("field-detail", args=[self.parent_field.id])
         self.client.force_authenticate(self.user)
 
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
         response = self.client.patch(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 

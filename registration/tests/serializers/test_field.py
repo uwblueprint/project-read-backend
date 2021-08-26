@@ -117,7 +117,7 @@ class FieldSerializerTestCase(TestCase):
         field_request_invalid_options = self.field_request
         field_request_invalid_options["question_type"] = Field.SELECT
 
-        context = {"request": Request(APIRequestFactory().post("/fields/"))}
+        context = {"request": Request(APIRequestFactory().put("/fields/"))}
         serializer = FieldSerializer(
             data=field_request_invalid_options, context=context
         )
