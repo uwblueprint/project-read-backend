@@ -196,7 +196,7 @@ class Command(BaseCommand):
                 enrolment, created = Enrolment.objects.get_or_create(
                     active=True,
                     session=session,
-                    status=Enrolment.COMPLETED,
+                    status=Enrolment.REGISTERED,
                     family=curr_family,
                     enrolled_class=cls,
                 )
@@ -252,12 +252,13 @@ class Command(BaseCommand):
             parent=parent_obj,
             defaults={key: family_args[key] for key in family_args if key != "notes"},
         )
-        family_obj.notes = "{0}{1} {2}: {3}".format(
-            family_obj.notes,
-            "" if not family_obj.notes else "\n",
-            session_name,
-            record[fields_map["notes"]],
-        )
+        if not pd.isnull(record[fields_map["notes"]]):
+            family_obj.notes = "{0}{1} {2}: {3}".format(
+                family_obj.notes,
+                "" if not family_obj.notes else "\n",
+                session_name,
+                record[fields_map["notes"]],
+            )
         family_obj.save()
 
         parent_obj.family = family_obj
