@@ -25,10 +25,10 @@ def validate_student_information_role(information, role):
         else:
             valid_roles = [role]
         if (
-            len(information)
-            != Field.objects.filter(
-                id__in=information.keys(), role__in=valid_roles
-            ).count()
+            Field.objects.filter(id__in=information.keys())
+            .exclude(role__in=valid_roles)
+            .count()
+            > 0
         ):
             raise ValidationError(
                 f"One of the provided IDs is not a valid {role} field ID"
