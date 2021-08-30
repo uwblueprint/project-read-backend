@@ -79,3 +79,11 @@ def validate_field_order(field_order, role):
         != Field.objects.filter(role=role).aggregate(Max("order"))["order__max"] + 1
     ):
         raise ValidationError("Invalid order value")
+
+
+def validate_field_options(question_type, options):
+    Field = apps.get_model("registration", "Field")
+    if question_type in [Field.SELECT, Field.MULTIPLE_SELECT] and len(options) < 1:
+        raise ValidationError(
+            "Select and multi-select fields must have at least one option"
+        )
