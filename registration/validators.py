@@ -25,10 +25,10 @@ def validate_student_information_role(information, role):
         else:
             valid_roles = [role]
         if (
-            len(information)
-            != Field.objects.filter(
-                id__in=information.keys(), role__in=valid_roles
-            ).count()
+            Field.objects.filter(id__in=information.keys())
+            .exclude(role__in=valid_roles)
+            .count()
+            > 0
         ):
             raise ValidationError(
                 f"One of the provided IDs is not a valid {role} field ID"
@@ -79,3 +79,11 @@ def validate_field_order(field_order, role):
         != Field.objects.filter(role=role).aggregate(Max("order"))["order__max"] + 1
     ):
         raise ValidationError("Invalid order value")
+
+
+def validate_field_options(question_type, options):
+    Field = apps.get_model("registration", "Field")
+    if question_type in [Field.SELECT, Field.MULTIPLE_SELECT] and len(options) < 1:
+        raise ValidationError(
+            "Select and multi-select fields must have at least one option"
+        )

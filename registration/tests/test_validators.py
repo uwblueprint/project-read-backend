@@ -110,7 +110,7 @@ class ValidatorsTestCase(TestCase):
         )
 
     @patch("registration.validators.validate_information_responses")
-    def test_validate_student_information_role__invalid_id(self, mock_validate):
+    def test_validate_student_information_role__deleted_id_ok(self, mock_validate):
         student = {
             "role": Student.PARENT,
             "information": {
@@ -118,13 +118,12 @@ class ValidatorsTestCase(TestCase):
                 "0": "",
             },
         }
-        self.assertRaises(
-            ValidationError,
-            validators.validate_student_information_role,
-            student["information"],
-            student["role"],
+        self.assertIsNone(
+            validators.validate_student_information_role(
+                student["information"],
+                student["role"],
+            )
         )
-        mock_validate.assert_not_called()
 
     @patch("registration.validators.validate_information_responses")
     def test_validate_student_information_role__invalid_role(self, mock_validate):

@@ -57,9 +57,12 @@ class FamilyViewSet(
 
 
 class FieldViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
 ):
     queryset = Field.objects.all()
     serializer_class = FieldSerializer
-    http_method_names = ["get", "post"]
+    http_method_names = ["get", "post", "put"]
     permission_classes = [permissions.IsAuthenticated]
