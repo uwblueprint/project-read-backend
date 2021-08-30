@@ -7,6 +7,7 @@ from .models import User
 class UserAdmin(BaseUserAdmin):
     list_display = (
         "email",
+        "is_admin",
         "is_staff",
         "is_active",
         "firebase_uid",
@@ -14,6 +15,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ("email",)
     search_fields = ("email",)
     list_filter = (
+        "is_admin",
         "is_staff",
         "is_active",
     )
@@ -27,6 +29,7 @@ class UserAdmin(BaseUserAdmin):
             {
                 "fields": (
                     "firebase_uid",
+                    "is_admin",
                     "is_active",
                     "is_staff",
                     "is_superuser",
