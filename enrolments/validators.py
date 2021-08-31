@@ -97,8 +97,7 @@ def validate_fields(fields_list):
         Field.objects.filter(pk__in=fields_list).values_list("id", flat=True)
     ) == set(fields_list):
         raise ValidationError(
-            "one or more of the following attendee IDs do not exist: "
-            + str(fields_list),
+            "one or more of the following field IDs do not exist: " + str(fields_list),
             code="invalid_field",
         )
 
