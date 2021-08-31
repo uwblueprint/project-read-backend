@@ -66,6 +66,36 @@ class SessionCreateSerializerTestCase(TestCase):
             ],
         }
 
-    def test_family_detail_serializer_create(self):
+    def test_session_detail_serializer_create(self):
         serializer = SessionCreateSerializer(data=self.session_payload)
         self.assertTrue(serializer.is_valid())
+
+    def test_session_detail_serializr_create__classes(self):
+        data = dict(self.session_payload)
+        serializer = SessionCreateSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        session = serializer.save()
+
+        self.assertEqual(session.name, self.session_payload["name"])
+        self.assertEqual(session.start_date, self.session_payload["start_date"])
+        self.assertEqual(session.fields, self.session_payload["fields"])
+
+        class1 = session.classes.get(name=self.session_payload["classes"][0]["name"])
+        self.assertEqual(class1.name, self.session_payload["classes"][0]["name"])
+        self.assertEqual(class1.days, self.session_payload["classes"][0]["days"])
+        self.assertEqual(
+            class1.location, self.session_payload["classes"][0]["location"]
+        )
+        self.assertEqual(
+            class1.facilitator.id, self.session_payload["classes"][0]["facilitator"]
+        )
+
+        class2 = session.classes.get(name=self.session_payload["classes"][1]["name"])
+        self.assertEqual(class2.name, self.session_payload["classes"][1]["name"])
+        self.assertEqual(class2.days, self.session_payload["classes"][1]["days"])
+        self.assertEqual(
+            class2.location, self.session_payload["classes"][1]["location"]
+        )
+        self.assertEqual(
+            class2.facilitator.id, self.session_payload["classes"][1]["facilitator"]
+        )
