@@ -3,7 +3,11 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
-from .validators import validate_student_information_role, validate_field_order
+from .validators import (
+    validate_student_information_role,
+    validate_field_order,
+    validate_field_options,
+)
 from enrolments.serializers import EnrolmentSerializer
 
 
@@ -241,4 +245,5 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
         request = self.context.get("request")
         if request.method == "POST":
             validate_field_order(attrs["order"], attrs["role"])
+        validate_field_options(attrs["question_type"], attrs["options"])
         return super().validate(attrs)
