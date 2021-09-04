@@ -89,7 +89,6 @@ class SessionTestCase(APITestCase):
             "classes": [
                 {
                     "name": "Test Class Create",
-                    # "session": self.session.id,
                     "days": [Class.MONDAY, Class.WEDNESDAY],
                     "location": "Waterloo",
                     "facilitator": self.user.id,

@@ -57,8 +57,7 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
         queryset=User.objects.all(), allow_null=True
     )
     session = serializers.PrimaryKeyRelatedField(
-        read_only=True
-        # queryset=Session.objects.all(), allow_null=True, read_only=True
+        queryset=Session.objects.all(), allow_null=True, required=False
     )
 
     class Meta:
@@ -71,7 +70,6 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
             "location",
             "facilitator",
         ]
-        # read_only_fields = ["session"]
 
     def create(self, validated_data):
         class_obj = Class.objects.create(

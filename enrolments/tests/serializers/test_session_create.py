@@ -43,11 +43,7 @@ class SessionCreateSerializerTestCase(TestCase):
 
         self.name = "Fall 2020"
         self.start_date = date(2020, 9, 5)
-        # self.fields = [1, 2, 3]
         self.facilitator = User.objects.create(email="user@staff.com")
-        self.session = Session.objects.create(
-            name="Summer 2021", start_date=date(2021, 1, 1)
-        )
 
         self.session_payload = {
             "name": self.name,
@@ -56,14 +52,12 @@ class SessionCreateSerializerTestCase(TestCase):
             "classes": [
                 {
                     "name": "Test Class 1",
-                    # "session": self.session.id,
                     "days": [Class.MONDAY, Class.WEDNESDAY],
                     "location": "129 Waterloo Ave",
                     "facilitator": self.facilitator.id,
                 },
                 {
                     "name": "Test Class 2",
-                    # "session": self.session.id,
                     "days": [Class.TUESDAY, Class.THURSDAY],
                     "location": "12 Waterloo Street",
                     "facilitator": self.facilitator.id,
