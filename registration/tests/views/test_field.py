@@ -83,6 +83,12 @@ class FieldTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_delete_fields(self):
+        url = reverse("field-detail", args=[self.guest_field.id])
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_method_not_allowed(self):
         url = reverse("field-detail", args=[self.parent_field.id])
         self.client.force_authenticate(self.user)
@@ -91,9 +97,6 @@ class FieldTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
         response = self.client.patch(url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):

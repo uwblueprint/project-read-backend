@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.db import models
 from .validators import (
     validate_family_parent,
@@ -7,6 +6,7 @@ from .validators import (
     validate_interactions,
 )
 from django.contrib.postgres.fields import ArrayField
+from safedelete.models import SafeDeleteModel
 
 
 class Family(models.Model):
@@ -118,7 +118,7 @@ class Student(models.Model):
         return super().clean()
 
 
-class Field(models.Model):
+class Field(SafeDeleteModel):
     PARENT = "Parent"
     CHILD = "Child"
     GUEST = "Guest"
