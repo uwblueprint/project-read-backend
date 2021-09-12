@@ -61,8 +61,9 @@ class FieldViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
 ):
     queryset = Field.objects.all()
     serializer_class = FieldSerializer
-    http_method_names = ["get", "post", "put"]
+    http_method_names = ["get", "post", "put", "delete"]
     permission_classes = [permissions.IsAuthenticated]
