@@ -1,11 +1,8 @@
-from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
-from registration.models import Student
-from registration.serializers import (
-    FamilyDetailSerializer,
-    FamilySerializer,
-)
+
+from registration.models import Family
+from accounts.models import User
 from .models import Session, Class, Enrolment
 from .validators import (
     validate_class_in_session,
@@ -20,7 +17,62 @@ class ClassListSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "colour",
+            "days",
         ]
+
+
+class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
+    families = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Class
+        fields = [
+            "id",
+            "name",
+            "attendance",
+            "families",
+            "days",
+        ]
+
+    def get_families(self, obj):
+        from registration.serializers import FamilySerializer
+
+        request = self.context.get("request")
+        return [
+            FamilySerializer(
+                enrolment.family,
+                context={
+                    "request": request,
+                    "enrolment": EnrolmentSerializer(
+                        enrolment, context={"request": request}
+                    ).data,
+                },
+            ).data
+            for enrolment in obj.enrolments.filter(active=True).order_by("created_at")
+        ]
+
+
+class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
+    facilitator = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), allow_null=True
+    )
+
+    class Meta:
+        model = Class
+        fields = [
+            "id",
+            "name",
+            "days",
+            "location",
+            "facilitator",
+        ]
+
+    def create(self, validated_data):
+        class_obj = Class.objects.create(
+            **validated_data, attendance=[{"date": "M&G", "attendees": []}]
+        )
+        class_obj.save()
+        return class_obj
 
 
 class SessionListSerializer(serializers.HyperlinkedModelSerializer):
@@ -32,6 +84,7 @@ class SessionListSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "classes",
+            "active",
         ]
 
 
@@ -50,6 +103,8 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_families(self, obj):
+        from registration.serializers import FamilySerializer
+
         return [
             FamilySerializer(
                 enrolment.family,
@@ -58,40 +113,37 @@ class SessionDetailSerializer(serializers.HyperlinkedModelSerializer):
                     "enrolment": EnrolmentSerializer(enrolment).data,
                 },
             ).data
-            for enrolment in obj.enrolments.filter(active=True)
+            for enrolment in obj.enrolments.filter(active=True).order_by("created_at")
         ]
 
 
-class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
-    families = serializers.SerializerMethodField()
+class SessionCreateSerializer(serializers.ModelSerializer):
+    classes = ClassCreateSerializer(many=True)
 
     class Meta:
-        model = Class
+        model = Session
         fields = [
-            "id",
             "name",
-            "attendance",
-            "families",
+            "start_date",
+            "fields",
+            "classes",
         ]
 
-    def get_families(self, obj):
-        request = self.context.get("request")
-        return [
-            FamilySerializer(
-                enrolment.family,
-                context={
-                    "request": request,
-                    "enrolment": EnrolmentSerializer(
-                        enrolment, context={"request": request}
-                    ).data,
-                },
-            ).data
-            for enrolment in obj.enrolments.filter(active=True)
-        ]
+    def create(self, validated_data):
+        classes = validated_data.pop("classes")
+        session = Session.objects.create(**validated_data)
+        for class_obj in classes:
+            Class.objects.create(session=session, **class_obj)
+
+        return session
 
 
 class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
-    session = serializers.PrimaryKeyRelatedField(read_only=True)
+    family = serializers.PrimaryKeyRelatedField(
+        allow_null=True,
+        queryset=Family.objects.all(),
+    )
+    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
     preferred_class = serializers.PrimaryKeyRelatedField(
         queryset=Class.objects.all(), allow_null=True
     )
@@ -103,11 +155,16 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
         model = Enrolment
         fields = [
             "id",
-            "session",
-            "preferred_class",
             "enrolled_class",
+            "family",
+            "preferred_class",
+            "session",
             "status",
             "students",
+            "created_at",
+        ]
+        read_only_fields = [
+            "created_at",
         ]
 
     def to_representation(self, instance):
@@ -124,55 +181,21 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
         return response
 
     def validate(self, attrs):
-        try:
+        if self.instance is not None:
+            # updates should validate against the existing family & session
+            if attrs["family"] != self.instance.family:
+                raise serializers.ValidationError("family cannot be updated")
+            if attrs["session"] != self.instance.session:
+                raise serializers.ValidationError("session cannot be updated")
+
             validate_student_ids_in_family(attrs["students"], self.instance.family)
             validate_class_in_session(attrs["preferred_class"], self.instance.session)
             validate_class_in_session(attrs["enrolled_class"], self.instance.session)
-        except ValidationError:
-            raise serializers.ValidationError(ValidationError)
 
-        return super().validate(attrs)
-
-
-class EnrolmentCreateSerializer(serializers.ModelSerializer):
-    family = FamilyDetailSerializer()
-    preferred_class = serializers.PrimaryKeyRelatedField(
-        allow_null=True, queryset=Class.objects.all()
-    )
-    session = serializers.PrimaryKeyRelatedField(queryset=Session.objects.all())
-
-    class Meta:
-        model = Enrolment
-        fields = [
-            "family",
-            "session",
-            "preferred_class",
-            "status",
-        ]
-
-    def create(self, validated_data):
-        family = FamilyDetailSerializer.create(None, validated_data["family"])
-        students = family.students.all()
-
-        enrolments = Enrolment.objects.create(
-            active=True,
-            family=family,
-            students=[student.id for student in students],
-            session=validated_data["session"],
-            preferred_class=validated_data["preferred_class"],
-            status=validated_data["status"],
-        )
-
-        return enrolments
-
-    def validate(self, attrs):
-        try:
-            if attrs["preferred_class"]:
-                validate_class_in_session(attrs["preferred_class"], attrs["session"])
-        except:
-            raise serializers.ValidationError(
-                detail="preferred class does not exist in session",
-                code="invalid_preferred_class",
-            )
+        else:
+            # creates should validate against the provided family & session
+            validate_student_ids_in_family(attrs["students"], attrs["family"])
+            validate_class_in_session(attrs["preferred_class"], attrs["session"])
+            validate_class_in_session(attrs["enrolled_class"], attrs["session"])
 
         return super().validate(attrs)

@@ -8,7 +8,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = [
             "id",
+            "date_joined",
+            "email",
             "first_name",
+            "is_active",
+            "is_admin",
             "last_name",
         ]
 
@@ -19,6 +23,7 @@ class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "email",
+            "is_admin",
         ]
 
     def create(self, validated_data):

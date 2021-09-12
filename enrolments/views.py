@@ -9,8 +9,9 @@ from .models import Class, Enrolment, Session
 from .serializers import (
     SessionListSerializer,
     SessionDetailSerializer,
+    SessionCreateSerializer,
     ClassDetailSerializer,
-    EnrolmentCreateSerializer,
+    ClassCreateSerializer,
     EnrolmentSerializer,
 )
 
@@ -19,16 +20,20 @@ class SessionViewSet(
     viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
 ):
-    queryset = Session.objects.all().order_by(F("start_date").desc(nulls_last=True))
+    queryset = Session.objects.all().order_by(F("start_date").asc(nulls_last=True))
     http_method_names = [
         "get",
+        "post",
     ]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "retrieve":
             return SessionDetailSerializer
+        elif self.action == "create":
+            return SessionCreateSerializer
         return SessionListSerializer
 
 
@@ -36,14 +41,21 @@ class ClassViewSet(
     viewsets.GenericViewSet,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
+    mixins.CreateModelMixin,
 ):
     queryset = Class.objects.all()
     serializer_class = ClassDetailSerializer
     http_method_names = [
         "get",
+        "post",
         "put",
     ]
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return ClassCreateSerializer
+        return ClassDetailSerializer
 
 
 class EnrolmentViewSet(
@@ -57,8 +69,6 @@ class EnrolmentViewSet(
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return EnrolmentCreateSerializer
         return EnrolmentSerializer
 
 

@@ -7,7 +7,7 @@ fake = Faker()
 Faker.seed(0)
 
 
-def create_test_sessions(num_sessions, with_fields=False):
+def create_test_sessions(num_sessions, fields=[]):
     sessions = []
     for i in range(num_sessions):
         start_date = fake.date_this_decade()
@@ -15,17 +15,7 @@ def create_test_sessions(num_sessions, with_fields=False):
             Session(
                 start_date=start_date,
                 name=f"{start_date.strftime('%B')} {start_date.year}",
-                fields=(
-                    fake.random_elements(
-                        elements=(
-                            list(Field.objects.all().values_list("id", flat=True))
-                        ),
-                        length=fake.random_int(min=1, max=Field.objects.all().count()),
-                        unique=True,
-                    )
-                )
-                if with_fields
-                else [],
+                fields=fields,
             )
         )
 
@@ -56,6 +46,18 @@ def create_test_classes(session, num_classes):
                         "fff9c4",
                         "ffecb3",
                     ]
+                ),
+                days=fake.random_elements(
+                    elements=[
+                        Class.MONDAY,
+                        Class.TUESDAY,
+                        Class.WEDNESDAY,
+                        Class.THURSDAY,
+                        Class.FRIDAY,
+                        Class.SATURDAY,
+                        Class.SUNDAY,
+                    ],
+                    unique=True,
                 ),
             )
         )

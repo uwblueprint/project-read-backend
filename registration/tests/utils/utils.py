@@ -3,7 +3,6 @@ import os
 from faker import Faker
 
 from registration.models import Family, Student, Field
-from accounts.models import User
 
 fake = Faker()
 
@@ -20,6 +19,40 @@ def create_test_fields():
         fields_data = json.loads(f.read())
 
     return Field.objects.bulk_create([Field(**field) for field in fields_data])
+
+
+def gen_information(role):
+    information = {}
+    role_fields = [field for field in Field.objects.filter(role=role).values()]
+
+    if len(role_fields) == 0:
+        return information
+
+    fields = fake.random_elements(
+        elements=role_fields,
+        length=fake.random_int(
+            min=1,
+            max=len(role_fields),
+        ),
+        unique=True,
+    )
+    for field in fields:
+        field_id = str(field["id"])
+        question_type = field["question_type"]
+        options = field["options"]
+        if question_type == Field.SELECT:
+            information[field_id] = fake.random_element(elements=options)
+        elif question_type == Field.MULTIPLE_SELECT:
+            information[field_id] = "\n".join(
+                fake.random_elements(
+                    elements=options,
+                    unique=True,
+                )
+            )
+        else:
+            information[field_id] = "random value"
+
+    return information
 
 
 def create_test_family(last_name, staff_user=None):
@@ -50,31 +83,12 @@ def create_test_family(last_name, staff_user=None):
 def create_test_parent(
     family,
     last_name,
-    with_fields=False,
 ):
+    role = Student.PARENT
     parent = Student.objects.create(
         first_name=fake.first_name(),
-        role=Student.PARENT,
-        information={
-            "1": fake.random_element(elements=Field.objects.get(id=1).options),
-            "3": "\n".join(
-                fake.random_elements(
-                    elements=Field.objects.get(id=3).options,
-                    unique=True,
-                )
-            ),
-            "4": "\n".join(
-                fake.random_elements(
-                    elements=Field.objects.get(id=4).options,
-                    unique=True,
-                )
-            ),
-            "5": fake.random_element(elements=Field.objects.get(id=5).options),
-            "6": fake.random_element(elements=Field.objects.get(id=6).options),
-            "7": fake.random_element(elements=Field.objects.get(id=7).options),
-        }
-        if with_fields
-        else {},
+        role=role,
+        information=gen_information(role),
         last_name=last_name,
         family=family,
     )
@@ -89,21 +103,16 @@ def create_test_children(
     family,
     last_name,
     num_children,
-    with_fields=False,
 ):
+    role = Student.CHILD
     children = []
     for _ in range(num_children):
         children.append(
             Student(
                 first_name=fake.first_name(),
-                role=Student.CHILD,
+                role=role,
                 date_of_birth=fake.date_this_decade().strftime("%Y-%m-%d"),
-                information={
-                    "8": fake.random_element(elements=Field.objects.get(id=8).options),
-                    "9": fake.random_element(elements=Field.objects.get(id=9).options),
-                }
-                if with_fields
-                else {},
+                information=gen_information(role),
                 last_name=last_name,
                 family=family,
             )
@@ -116,22 +125,15 @@ def create_test_guests(
     family,
     last_name,
     num_guests,
-    with_fields=False,
 ):
+    role = Student.GUEST
     guests = []
     for _ in range(num_guests):
         guests.append(
             Student(
                 first_name=fake.first_name(),
-                role=Student.GUEST,
-                information={
-                    "10": fake.random_element(
-                        elements=Field.objects.get(id=10).options
-                    ),
-                    "11": fake.phone_number(),
-                }
-                if with_fields
-                else {},
+                role=role,
+                information=gen_information(role),
                 last_name=last_name,
                 family=family,
             )
@@ -141,25 +143,24 @@ def create_test_guests(
 
 
 def create_test_family_with_students(
-    num_children, num_guests, with_fields=False, staff_user=None
+    num_children,
+    num_guests,
+    staff_user=None,
 ):
     last_name = fake.unique.last_name()
     family = create_test_family(last_name=last_name, staff_user=staff_user)
     create_test_parent(
         family=family,
         last_name=last_name,
-        with_fields=with_fields,
     )
     create_test_children(
         family=family,
         last_name=last_name,
-        with_fields=with_fields,
         num_children=num_children,
     )
     create_test_guests(
         family=family,
         last_name=last_name,
-        with_fields=with_fields,
         num_guests=num_guests,
     )
     return family

@@ -3,10 +3,12 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from .models import Family, Student, Field
-from .validators import validate_student_information_role
-from enrolments.models import Enrolment
-from accounts.models import User
-from accounts.serializers import UserSerializer
+from .validators import (
+    validate_student_information_role,
+    validate_field_order,
+    validate_field_options,
+)
+from enrolments.serializers import EnrolmentSerializer
 
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
@@ -65,8 +67,6 @@ class FamilySerializer(serializers.HyperlinkedModelSerializer):
             return enrolment
 
         if obj.current_enrolment is not None:
-            from enrolments.serializers import EnrolmentSerializer
-
             return EnrolmentSerializer(obj.current_enrolment).data
 
         return None
@@ -76,7 +76,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     children = StudentSerializer(many=True)
     guests = StudentSerializer(many=True)
-    current_enrolment = SerializerMethodField()
+    enrolments = SerializerMethodField()
 
     class Meta:
         model = Family
@@ -93,17 +93,13 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
             "children",
             "guests",
             "notes",
-            "current_enrolment",
+            "enrolments",
             "interactions",
         ]
-        read_only_fields = ["interactions"]
 
-    def get_current_enrolment(self, obj):
-        from enrolments.serializers import EnrolmentSerializer
-
-        if obj.current_enrolment is None:
-            return None
-        return EnrolmentSerializer(obj.current_enrolment).data
+    def get_enrolments(self, obj):
+        enrolments = obj.enrolments.order_by("session__created_at")
+        return EnrolmentSerializer(enrolments, many=True).data
 
     def create(self, validated_data):
         students = validated_data.pop("students")
@@ -119,7 +115,7 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         return family
 
     def update(self, instance, validated_data):
-        validated_data.pop("current_enrolment")
+        validated_data.pop("enrolments")
         students_data = validated_data.pop("students")
         students = (
             [instance.parent]
@@ -240,3 +236,10 @@ class FieldSerializer(serializers.HyperlinkedModelSerializer):
             "order",
         ]
         list_serializer_class = FieldListSerializer
+
+    def validate(self, attrs):
+        request = self.context.get("request")
+        if request.method == "POST":
+            validate_field_order(attrs["order"], attrs["role"])
+        validate_field_options(attrs["question_type"], attrs["options"])
+        return super().validate(attrs)

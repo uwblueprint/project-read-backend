@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.db import models
 from .validators import (
     validate_family_parent,
@@ -7,6 +6,7 @@ from .validators import (
     validate_interactions,
 )
 from django.contrib.postgres.fields import ArrayField
+from safedelete.models import SafeDeleteModel
 
 
 class Family(models.Model):
@@ -36,7 +36,9 @@ class Family(models.Model):
     address = models.CharField(max_length=256, blank=True)
     preferred_comms = models.CharField(max_length=128, blank=True)
     notes = models.TextField(blank=True)
-    interactions = models.JSONField(default=list, validators=[validate_interactions])
+    interactions = models.JSONField(
+        default=list, validators=[validate_interactions], blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
@@ -68,13 +70,11 @@ class Family(models.Model):
 
     @property
     def current_enrolment(self):
-        most_recent_session = (
-            apps.get_model("enrolments", "Session")
-            .objects.filter(start_date__isnull=False)
-            .order_by("-start_date")
+        return (
+            self.enrolments.filter(session__active=True)
+            .order_by("-session__start_date")
             .first()
         )
-        return self.enrolments.filter(session=most_recent_session).first()
 
     def __str__(self):
         if self.parent is not None:
@@ -92,8 +92,8 @@ class Student(models.Model):
         (GUEST, "Guest"),
     ]
 
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=128, blank=True)
+    last_name = models.CharField(max_length=128, blank=True, default="")
     role = models.CharField(max_length=6, choices=ROLE_CHOICES)
     date_of_birth = models.DateField(null=True, blank=True)
     family = models.ForeignKey(
@@ -118,7 +118,7 @@ class Student(models.Model):
         return super().clean()
 
 
-class Field(models.Model):
+class Field(SafeDeleteModel):
     PARENT = "Parent"
     CHILD = "Child"
     GUEST = "Guest"
@@ -151,6 +151,8 @@ class Field(models.Model):
         blank=True,
     )
     order = models.PositiveSmallIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return f"{self.name}"

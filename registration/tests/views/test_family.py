@@ -97,7 +97,7 @@ class FamilyTestCase(APITestCase):
             },
             "children": [],
             "guests": [],
-            "current_enrolment": None,
+            "enrolments": [],
         }
         self.parent.family = self.family
         self.family.parent = self.parent

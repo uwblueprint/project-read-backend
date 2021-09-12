@@ -53,6 +53,7 @@ class FamilySerializerTestCase(TestCase):
         self.current_session = Session.objects.create(
             name="Spring 2021",
             start_date=date(2021, 5, 15),
+            active=True,
         )
         self.current_class = Class.objects.create(
             name="Current Class",

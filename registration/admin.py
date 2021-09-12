@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Family, Student, Field
+from safedelete.admin import SafeDeleteAdmin, highlight_deleted
 
 
 class FamilyAdmin(admin.ModelAdmin):
@@ -13,6 +14,8 @@ class FamilyAdmin(admin.ModelAdmin):
         "work_number",
         "preferred_number",
         "address",
+        "created_at",
+        "updated_at",
     )
     ordering = ("-id",)
     search_fields = (
@@ -34,6 +37,8 @@ class StudentAdmin(admin.ModelAdmin):
         "last_name",
         "family",
         "role",
+        "created_at",
+        "updated_at",
     )
     ordering = (
         "id",
@@ -49,14 +54,17 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = ("role",)
 
 
-class FieldAdmin(admin.ModelAdmin):
+class FieldAdmin(SafeDeleteAdmin):
     list_display = (
+        highlight_deleted,
         "id",
         "name",
         "role",
         "question_type",
         "is_default",
-    )
+        "created_at",
+        "updated_at",
+    ) + SafeDeleteAdmin.list_display
     ordering = ("id", "order", "name")
     search_fields = ("name",)
     list_filter = (

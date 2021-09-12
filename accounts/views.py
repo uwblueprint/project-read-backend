@@ -11,7 +11,7 @@ class UserViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
 ):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by("email")
     serializer_class = UserSerializer
     http_method_names = [
         "get",

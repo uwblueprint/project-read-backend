@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_swagger",
     "corsheaders",
+    "safedelete",
     "accounts.apps.AccountsConfig",
     "enrolments.apps.EnrolmentsConfig",
     "registration.apps.RegistrationConfig",
@@ -135,7 +136,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Toronto"
 
 USE_I18N = True
 
@@ -162,3 +163,7 @@ DATABASES["default"].update(db_from_env)
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Safe delete configuration to interpret revived (undeleted) objects as created
+# https://github.com/makinacorpus/django-safedelete#configuration
+SAFE_DELETE_INTERPRET_UNDELETED_OBJECTS_AS_CREATED = True

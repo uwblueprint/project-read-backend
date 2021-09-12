@@ -1,4 +1,4 @@
-from django.urls import NoReverseMatch, reverse
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -35,10 +35,6 @@ class FieldTestCase(APITestCase):
             order=1,
         )
 
-    def test_field_detail_url_fail(self):
-        with self.assertRaises(NoReverseMatch):
-            reverse("field-detail")
-
     def test_get_fields(self):
         url = reverse("field-list")
         self.client.force_authenticate(self.user)
@@ -51,11 +47,56 @@ class FieldTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(payload, serializer.data)
 
-    def test_method_not_allowed(self):
+    def test_post_fields(self):
         url = reverse("field-list")
         self.client.force_authenticate(self.user)
+        response = self.client.post(
+            url,
+            {
+                "role": Field.CHILD,
+                "name": "Favourite Colour",
+                "question": "What is your favourite colour",
+                "question_type": Field.TEXT,
+                "is_default": False,
+                "options": [],
+                "order": Field.objects.filter(role=Field.CHILD).count() + 1,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        response = self.client.post(url)
+    def test_put_fields(self):
+        url = reverse("field-detail", args=[self.guest_field.id])
+        self.client.force_authenticate(self.user)
+        response = self.client.put(
+            url,
+            {
+                "role": self.guest_field.role,
+                "name": self.guest_field.name,
+                "question": self.guest_field.question,
+                "question_type": Field.SELECT,
+                "is_default": False,
+                "options": ["Aunt, Uncle, Friend, Other"],
+                "order": Field.objects.filter(role=Field.GUEST).count() + 1,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_fields(self):
+        url = reverse("field-detail", args=[self.guest_field.id])
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_method_not_allowed(self):
+        url = reverse("field-detail", args=[self.parent_field.id])
+        self.client.force_authenticate(self.user)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        response = self.client.patch(url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_unauthorized(self):
@@ -65,4 +106,18 @@ class FieldTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        url = reverse("field-detail", args=[self.parent_field.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
