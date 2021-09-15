@@ -23,6 +23,7 @@ class UserCreateSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "email",
+            "is_admin",
         ]
 
     def create(self, validated_data):
