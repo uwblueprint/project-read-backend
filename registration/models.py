@@ -82,7 +82,7 @@ class Family(models.Model):
         return f"{self.id} - {self.email}"
 
 
-class Student(models.Model):
+class Student(SafeDeleteModel):
     PARENT = "Parent"
     CHILD = "Child"
     GUEST = "Guest"

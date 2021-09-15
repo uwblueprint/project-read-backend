@@ -30,8 +30,9 @@ class FamilyAdmin(admin.ModelAdmin):
     list_filter = ("preferred_comms",)
 
 
-class StudentAdmin(admin.ModelAdmin):
+class StudentAdmin(SafeDeleteAdmin):
     list_display = (
+        highlight_deleted,
         "id",
         "first_name",
         "last_name",
@@ -39,7 +40,7 @@ class StudentAdmin(admin.ModelAdmin):
         "role",
         "created_at",
         "updated_at",
-    )
+    ) + SafeDeleteAdmin.list_display
     ordering = (
         "id",
         "last_name",
