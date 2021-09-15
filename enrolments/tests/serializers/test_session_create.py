@@ -43,7 +43,6 @@ class SessionCreateSerializerTestCase(TestCase):
 
         self.name = "Fall 2020"
         self.start_date = date(2020, 9, 5)
-        self.fields = [1, 2, 3]
         self.facilitator = User.objects.create(email="user@staff.com")
 
         self.session_payload = {

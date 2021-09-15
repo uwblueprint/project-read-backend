@@ -70,6 +70,7 @@ class ClassesTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         request = {
             "name": "Test Class Create",
+            "session": self.session1.id,
             "days": [Class.MONDAY, Class.WEDNESDAY],
             "location": "Waterloo",
             "facilitator": self.user.id,

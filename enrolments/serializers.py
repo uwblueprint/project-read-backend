@@ -56,12 +56,16 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
     facilitator = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), allow_null=True
     )
+    session = serializers.PrimaryKeyRelatedField(
+        queryset=Session.objects.all(), allow_null=True, required=False
+    )
 
     class Meta:
         model = Class
         fields = [
             "id",
             "name",
+            "session",
             "days",
             "location",
             "facilitator",
