@@ -246,3 +246,19 @@ class FamilySearchTestCase(APITestCase):
                 FamilySearchSerializer(self.other_family).data,
             ],
         )
+
+    def test_method_not_allowed(self):
+        url = reverse("family-list") + "search/"
+        self.client.force_authenticate(self.user)
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_unauthorized(self):
+        url = reverse("family-list") + "search/"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
