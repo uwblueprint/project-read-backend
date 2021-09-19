@@ -7,6 +7,7 @@ from .serializers import (
     FamilyDetailSerializer,
     FieldSerializer,
     FamilySearchSerializer,
+    StudentListSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -41,6 +42,7 @@ class FamilyViewSet(
         url_name="search",
     )
     def search(self, request):
+        parent_only = self.request.query_params.get("parent_only")
         first_name = self.request.query_params.get("first_name")
         last_name = self.request.query_params.get("last_name")
         if not first_name and not last_name:
@@ -48,14 +50,25 @@ class FamilyViewSet(
                 "No search parameters found.", status=status.HTTP_400_BAD_REQUEST
             )
         result = Family.objects
-        if first_name:
-            result = result.filter(parent__first_name__iexact=first_name)
-        if last_name:
-            result = result.filter(parent__last_name__iexact=last_name)
+        if parent_only:
+            if first_name:
+                result = result.filter(parent__first_name__iexact=first_name)
+            if last_name:
+                result = result.filter(parent__last_name__iexact=last_name)
+        else:
+            if first_name:
+                result = result.filter(students__first_name__iexact=first_name)
+            if last_name:
+                result = result.filter(students__last_name__iexact=last_name)
 
-        return Response(
-            FamilySearchSerializer(result, many=True, context={"request": None}).data
-        )
+        return Response(FamilySearchSerializer(result.distinct(), many=True).data)
+
+
+class StudentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    queryset = Student.objects.all()
+    serializer_class = StudentListSerializer
+    http_method_names = ["post"]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class FieldViewSet(

@@ -7,10 +7,12 @@ from .views import (
     ExportFamiliesView,
     ExportFieldsView,
     ExportStudentsView,
+    StudentViewSet,
 )
 
 router = DefaultRouter()
 router.register(r"families", FamilyViewSet)
+router.register(r"students", StudentViewSet)
 router.register(r"fields", FieldViewSet)
 
 urlpatterns = [
