@@ -36,7 +36,6 @@ class EnrolmentSerializerTestCase(TestCase):
             num_classes=1,
         )[0]
         self.enrolment = Enrolment.objects.create(
-            active=False,
             family=self.family,
             session=self.session,
             preferred_class=self.class1,

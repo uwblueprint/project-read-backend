@@ -61,7 +61,6 @@ class FamilySerializerTestCase(TestCase):
             attendance=[],
         )
         self.current_enrolment = Enrolment.objects.create(
-            active=True,
             family=self.family,
             session=self.current_session,
             enrolled_class=self.current_class,
@@ -77,7 +76,6 @@ class FamilySerializerTestCase(TestCase):
             attendance=[],
         )
         self.past_enrolment = Enrolment.objects.create(
-            active=True,
             family=self.family,
             session=self.past_session,
             enrolled_class=self.past_class,

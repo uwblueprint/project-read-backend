@@ -34,9 +34,9 @@ class ClassAdmin(admin.ModelAdmin):
 class EnrolmentAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "active",
         "family",
         "session",
+        "is_guest",
         "status",
         "preferred_class",
         "enrolled_class",

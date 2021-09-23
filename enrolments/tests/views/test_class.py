@@ -34,7 +34,6 @@ class ClassesTestCase(APITestCase):
             attendance=[{"date": "2020-01-01", "attendees": [self.student1.id]}],
         )
         self.enrolment1 = Enrolment.objects.create(
-            active=True,
             family=self.family1,
             session=self.session1,
             preferred_class=self.class1,
