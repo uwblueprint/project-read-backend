@@ -48,9 +48,7 @@ class ClassDetailSerializer(serializers.HyperlinkedModelSerializer):
                     ).data,
                 },
             ).data
-            for enrolment in obj.enrolments.filter(is_guest=False).order_by(
-                "created_at"
-            )
+            for enrolment in obj.enrolments.order_by("created_at")
         ]
 
 
@@ -165,6 +163,7 @@ class EnrolmentSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "enrolled_class",
             "family",
+            "is_guest",
             "preferred_class",
             "session",
             "status",

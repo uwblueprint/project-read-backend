@@ -42,6 +42,21 @@ class SessionDetailSerializerTestCase(TestCase):
             session=self.session,
         )
 
+        # guests enrolments should be filtered out
+        self.guest_family = Family.objects.create(
+            email="fam3@test.com",
+            cell_number="123406789",
+            address="3 Fam St",
+            preferred_comms="email",
+        )
+        self.guest_enrolment = Enrolment.objects.create(
+            family=self.guest_family,
+            session=self.session,
+            preferred_class=self.session_class,
+            enrolled_class=self.other_session_class,
+            is_guest=True,
+        )
+
     def test_session_detail_serializer(self):
         self.assertEqual(
             {
@@ -83,12 +98,6 @@ class ClassDetailSerializerTestCase(TestCase):
             email="fam2@test.com",
             cell_number="123456789",
             address="2 Fam St",
-            preferred_comms="email",
-        )
-        self.guest_family = Family.objects.create(
-            email="fam3@test.com",
-            cell_number="123406789",
-            address="3 Fam St",
             preferred_comms="email",
         )
         self.session1 = Session.objects.create(name="Fall 2019")
@@ -135,13 +144,7 @@ class ClassDetailSerializerTestCase(TestCase):
             session=self.session1,
             preferred_class=self.class1,
             enrolled_class=self.class1,
-        )
-        self.guest_enrolment = Enrolment.objects.create(
-            family=self.guest_family,
-            session=self.session1,
-            preferred_class=self.class1,
-            enrolled_class=self.class1,
-            # is_guest=True,
+            is_guest=True,
         )
 
     def test_class_detail_serializer(self):

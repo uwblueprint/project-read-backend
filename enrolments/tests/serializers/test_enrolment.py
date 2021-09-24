@@ -65,6 +65,7 @@ class EnrolmentSerializerTestCase(TestCase):
                 "created_at": self.enrolment.created_at.replace(tzinfo=timezone.utc)
                 .astimezone(tz=None)
                 .isoformat(),
+                "is_guest": False,
             },
             EnrolmentSerializer(self.enrolment).data,
         )
