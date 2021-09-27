@@ -36,6 +36,20 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         return super().validate(attrs)
 
 
+class StudentListSerializer(serializers.HyperlinkedModelSerializer):
+    family = serializers.PrimaryKeyRelatedField(queryset=Family.objects.all())
+
+    class Meta:
+        model = Student
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "family",
+            "role",
+        ]
+
+
 class FamilySerializer(serializers.HyperlinkedModelSerializer):
     parent = StudentSerializer()
     num_children = SerializerMethodField()
@@ -183,29 +197,22 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FamilySearchSerializer(serializers.HyperlinkedModelSerializer):
-    first_name = SerializerMethodField()
-    last_name = SerializerMethodField()
-    num_children = SerializerMethodField()
+    parent = StudentListSerializer()
+    children = StudentListSerializer(many=True)
+    guests = StudentListSerializer(many=True)
+    enrolments = EnrolmentSerializer(many=True)
 
     class Meta:
         model = Family
         fields = [
-            "first_name",
-            "last_name",
             "id",
             "email",
             "phone_number",
-            "num_children",
+            "parent",
+            "children",
+            "guests",
+            "enrolments",
         ]
-
-    def get_first_name(self, obj):
-        return obj.parent.first_name
-
-    def get_last_name(self, obj):
-        return obj.parent.last_name
-
-    def get_num_children(self, obj):
-        return obj.children.count()
 
 
 class FieldListSerializer(serializers.ListSerializer):
