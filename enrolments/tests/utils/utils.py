@@ -65,7 +65,7 @@ def create_test_classes(session, num_classes):
     return Class.objects.bulk_create(classes)
 
 
-def create_test_enrolments(session, enrolled_class, families, active=True):
+def create_test_enrolments(session, enrolled_class, families):
     enrolments = []
     for family in families:
         students = list(family.students.all().values_list("id", flat=True))
@@ -75,7 +75,6 @@ def create_test_enrolments(session, enrolled_class, families, active=True):
                 session=session,
                 enrolled_class=enrolled_class,
                 preferred_class=enrolled_class,
-                active=active,
                 status=fake.random_element(
                     elements=[status[1] for status in Enrolment.ENROLMENT_STATUSES]
                 ),

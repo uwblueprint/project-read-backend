@@ -36,7 +36,6 @@ class EnrolmentSerializerTestCase(TestCase):
             num_classes=1,
         )[0]
         self.enrolment = Enrolment.objects.create(
-            active=False,
             family=self.family,
             session=self.session,
             preferred_class=self.class1,
@@ -66,6 +65,7 @@ class EnrolmentSerializerTestCase(TestCase):
                 "created_at": self.enrolment.created_at.replace(tzinfo=timezone.utc)
                 .astimezone(tz=None)
                 .isoformat(),
+                "is_guest": False,
             },
             EnrolmentSerializer(self.enrolment).data,
         )

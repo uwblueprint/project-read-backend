@@ -63,7 +63,6 @@ class EnrolmentUtilsTestCase(TestCase):
                 session=session,
                 enrolled_class=enrolled_class,
                 family__in=families,
-                active=True,
             ).count(),
             num_families,
         )

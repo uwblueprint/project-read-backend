@@ -96,7 +96,6 @@ class Enrolment(models.Model):
         (DROP_OUT, "Drop out"),
         (WAITLISTED, "Waitlisted"),
     ]
-    active = models.BooleanField(default=True)
     family = models.ForeignKey(
         "registration.Family", on_delete=models.PROTECT, related_name="enrolments"
     )
@@ -134,6 +133,7 @@ class Enrolment(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    is_guest = models.BooleanField(default=False)
 
     def clean(self):
         validate_enrolment(self)

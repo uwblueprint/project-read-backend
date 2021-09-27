@@ -76,26 +76,22 @@ class EnrolmentValidatorTestCase(TestCase):
             address="2 Fam St",
             preferred_comms="email",
         )
-        enrolment1_for_family1 = Enrolment.objects.create(
-            active=True,
+        Enrolment.objects.create(
             family=family1,
             session=session1,
             enrolled_class=class1_in_session1,
         )
-        enrolment2_for_family1 = Enrolment.objects.create(
-            active=False,
+        Enrolment.objects.create(
             family=family1,
             session=session2,
             enrolled_class=class1_in_session2,
         )
-        enrolment1_for_family2 = Enrolment.objects.create(
-            active=True,
+        Enrolment.objects.create(
             family=family2,
             session=session1,
             enrolled_class=class1_in_session1,
         )
-        duplicate_enrolment = Enrolment.objects.create(
-            active=True,
+        Enrolment.objects.create(
             family=family1,
             session=session1,
             enrolled_class=class2_in_session1,

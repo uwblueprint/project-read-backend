@@ -29,7 +29,6 @@ class SessionDetailSerializerTestCase(TestCase):
             preferred_comms="Owl Post",
         )
         self.enrolment = Enrolment.objects.create(
-            active=True,
             family=self.family,
             session=self.session,
         )
@@ -39,9 +38,23 @@ class SessionDetailSerializerTestCase(TestCase):
             preferred_comms="Snail Delivery",
         )
         self.other_enrolment = Enrolment.objects.create(
-            active=True,
             family=self.other_family,
             session=self.session,
+        )
+
+        # guests enrolments should be filtered out
+        self.guest_family = Family.objects.create(
+            email="fam3@test.com",
+            cell_number="123406789",
+            address="3 Fam St",
+            preferred_comms="email",
+        )
+        self.guest_enrolment = Enrolment.objects.create(
+            family=self.guest_family,
+            session=self.session,
+            preferred_class=self.session_class,
+            enrolled_class=self.other_session_class,
+            is_guest=True,
         )
 
     def test_session_detail_serializer(self):
@@ -87,12 +100,6 @@ class ClassDetailSerializerTestCase(TestCase):
             address="2 Fam St",
             preferred_comms="email",
         )
-        self.inactive_family = Family.objects.create(
-            email="fam3@test.com",
-            cell_number="123406789",
-            address="3 Fam St",
-            preferred_comms="email",
-        )
         self.session1 = Session.objects.create(name="Fall 2019")
         self.session2 = Session.objects.create(
             name="Spring 2021",
@@ -127,25 +134,17 @@ class ClassDetailSerializerTestCase(TestCase):
             days=[Class.FRIDAY],
         )
         self.enrolment1 = Enrolment.objects.create(
-            active=True,
             family=self.family1,
             session=self.session1,
             preferred_class=self.class1,
             enrolled_class=self.class1,
         )
         self.enrolment2 = Enrolment.objects.create(
-            active=True,
             family=self.family2,
             session=self.session1,
             preferred_class=self.class1,
             enrolled_class=self.class1,
-        )
-        self.inactive_enrolment = Enrolment.objects.create(
-            active=False,
-            family=self.inactive_family,
-            session=self.session1,
-            preferred_class=self.class1,
-            enrolled_class=self.class1,
+            is_guest=True,
         )
 
     def test_class_detail_serializer(self):

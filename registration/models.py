@@ -71,7 +71,7 @@ class Family(models.Model):
     @property
     def current_enrolment(self):
         return (
-            self.enrolments.filter(session__active=True)
+            self.enrolments.filter(session__active=True, is_guest=False)
             .order_by("-session__start_date")
             .first()
         )
