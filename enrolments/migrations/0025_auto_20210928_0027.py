@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('enrolments', '0024_auto_20210922_2124'),
+        ("enrolments", "0024_auto_20210922_2124"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='class',
-            name='name',
+            model_name="class",
+            name="name",
             field=models.CharField(blank=True, max_length=128),
         ),
         migrations.AlterField(
-            model_name='session',
-            name='active',
+            model_name="session",
+            name="active",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='session',
-            name='name',
-            field=models.CharField(blank=True, default='', max_length=128),
+            model_name="session",
+            name="name",
+            field=models.CharField(blank=True, default="", max_length=128),
         ),
     ]
