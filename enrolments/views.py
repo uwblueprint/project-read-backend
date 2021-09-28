@@ -77,7 +77,41 @@ class ExportClassesView(APIView):
     renderer_classes = [r.CSVRenderer]
 
     def get(self, request, format=None):
-        return Response(list(Class.objects.values()))
+        # return all fields except attendance
+        return Response(list(Class.objects.values(*[field.name for field in Class._meta.fields if field.name != "attendance"])))
+
+class ExportAttendancesView(APIView):
+    queryset = Class.objects.all()
+    renderer_classes = [r.CSVRenderer]
+
+    def get(self, request, format=None):
+        class_id = request.query_params.get("class_id")
+        attendance = Class.objects.get(pk=class_id).attendance
+        print(attendance, len(attendance))
+        # Transform to {date: set_of_attendees, ...}
+        attendance = {obj["date"]: set(obj["attendees"]) for obj in attendance}
+        # flatten attendance.values() to get set of attendees
+        attendees = set(attendee for attendees in list(attendance.values()) for attendee in attendees)
+        res = []
+        for attendee in attendees:
+            attendee_attendance = {"student_id": attendee}
+            for date in attendance.keys():
+                attendee_attendance[date] = 1 if attendee in attendance[date] else 0
+            res.append(attendee_attendance)
+        return Response(res)
+        # for date in attendance.keys():
+        #     csv += date + ","
+        # csv += "\n"
+        # # flatten attendance.values()
+        # attendees = set(attendee for attendees in list(attendance.values()) for attendee in attendees)
+        # for attendee in attendees:
+        #     row = str(attendee) + ","
+        #     for date in attendance.keys():
+        #         if attendee in attendance[date]:
+        #             row += "1,"
+        #         else:
+        #             row += "0,"
+        #     csv += row + "\n"
 
 
 class ExportEnrolmentsView(APIView):
