@@ -32,5 +32,5 @@ class ClassCreateSerializerTestCase(TestCase):
         self.assertTrue(serializer.is_valid())
         class_obj = serializer.save()
 
-        self.assertEqual(class_obj.attendance, [{"date": "M&G", "attendees": []}])
+        self.assertEqual(class_obj.attendance, [])
         self.assertEqual(class_obj.session.id, self.session.id)

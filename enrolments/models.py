@@ -8,9 +8,9 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class Session(models.Model):
-    name = models.CharField(max_length=128, default="")
+    name = models.CharField(max_length=128, default="", blank=True)
     start_date = models.DateField(null=True)
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
 
     fields = ArrayField(
         models.IntegerField(), default=list, validators=[validate_fields]
@@ -39,7 +39,7 @@ class Class(models.Model):
         (SATURDAY, "Saturday"),
         (SUNDAY, "Sunday"),
     ]
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, blank=True)
     session = models.ForeignKey(
         "Session",
         related_name="classes",
