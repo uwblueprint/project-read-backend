@@ -1,7 +1,6 @@
 from django.db.models import F
 from rest_framework import mixins, permissions, viewsets
 from rest_framework.views import APIView
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_csv import renderers as r
 
@@ -99,19 +98,6 @@ class ExportAttendancesView(APIView):
                 attendee_attendance[date] = 1 if attendee in attendance[date] else 0
             res.append(attendee_attendance)
         return Response(res)
-        # for date in attendance.keys():
-        #     csv += date + ","
-        # csv += "\n"
-        # # flatten attendance.values()
-        # attendees = set(attendee for attendees in list(attendance.values()) for attendee in attendees)
-        # for attendee in attendees:
-        #     row = str(attendee) + ","
-        #     for date in attendance.keys():
-        #         if attendee in attendance[date]:
-        #             row += "1,"
-        #         else:
-        #             row += "0,"
-        #     csv += row + "\n"
 
 
 class ExportEnrolmentsView(APIView):
