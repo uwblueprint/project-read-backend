@@ -19,7 +19,9 @@ router.register(r"enrolments", EnrolmentViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("export/classes", ExportClassesView.as_view(), name="export-classes"),
-    path("export/attendances", ExportAttendancesView.as_view(), name="export-attendances"),
+    path(
+        "export/attendances", ExportAttendancesView.as_view(), name="export-attendances"
+    ),
     path("export/enrolments", ExportEnrolmentsView.as_view(), name="export-enrolments"),
     path("export/sessions", ExportSessionsView.as_view(), name="export-sessions"),
 ]

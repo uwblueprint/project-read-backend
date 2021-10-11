@@ -77,7 +77,18 @@ class ExportClassesView(APIView):
 
     def get(self, request, format=None):
         # return all fields except attendance
-        return Response(list(Class.objects.values(*[field.name for field in Class._meta.fields if field.name != "attendance"])))
+        return Response(
+            list(
+                Class.objects.values(
+                    *[
+                        field.name
+                        for field in Class._meta.fields
+                        if field.name != "attendance"
+                    ]
+                )
+            )
+        )
+
 
 class ExportAttendancesView(APIView):
     queryset = Class.objects.all()
@@ -90,7 +101,11 @@ class ExportAttendancesView(APIView):
         # Transform to {date: set_of_attendees, ...}
         attendance = {obj["date"]: set(obj["attendees"]) for obj in attendance}
         # flatten attendance.values() to get set of attendees
-        attendees = set(attendee for attendees in list(attendance.values()) for attendee in attendees)
+        attendees = set(
+            attendee
+            for attendees in list(attendance.values())
+            for attendee in attendees
+        )
         res = []
         for attendee in attendees:
             attendee_attendance = {"student_id": attendee}
