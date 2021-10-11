@@ -97,7 +97,6 @@ class ExportAttendancesView(APIView):
     def get(self, request, format=None):
         class_id = request.query_params.get("class_id")
         attendance = Class.objects.get(pk=class_id).attendance
-        print(attendance, len(attendance))
         # Transform to {date: set_of_attendees, ...}
         attendance = {obj["date"]: set(obj["attendees"]) for obj in attendance}
         # flatten attendance.values() to get set of attendees
