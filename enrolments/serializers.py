@@ -72,9 +72,7 @@ class ClassCreateSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def create(self, validated_data):
-        class_obj = Class.objects.create(
-            **validated_data, attendance=[{"date": "M&G", "attendees": []}]
-        )
+        class_obj = Class.objects.create(**validated_data)
         class_obj.save()
         return class_obj
 
@@ -129,6 +127,7 @@ class SessionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = [
+            "id",
             "name",
             "start_date",
             "fields",
