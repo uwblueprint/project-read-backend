@@ -142,14 +142,16 @@ class FamilyDetailSerializer(serializers.HyperlinkedModelSerializer):
         )
 
         students_to_delete = existing_students.difference(
-            Student.objects.filter(id__in=[student["id"] for student in students_data])
+            Student.objects.filter(
+                id__in=[student.get("id") for student in students_data]
+            )
         )
         # TODO: change deletion of students to soft delete
         for student in students_to_delete:
             Student.objects.filter(id=student.id).delete()
 
         for student_data in students_data:
-            student = Student.objects.filter(id=student_data["id"])
+            student = Student.objects.filter(id=student_data.get("id"))
             if student.exists():
                 student.update(
                     first_name=student_data["first_name"],
